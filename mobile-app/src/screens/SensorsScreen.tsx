@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { StatusBar, BackHeader, Card, SectionLabel, ReadAloudFAB } from "../components/ui";
 import { useESP32 } from "../context/ESP32Context";
 import { t } from "../i18n/index";

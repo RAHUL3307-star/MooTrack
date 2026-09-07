@@ -1,4 +1,4 @@
-﻿// Auto-generated Dataset for MooTracker Telemetry & Herd Analytics
+// Auto-generated Dataset for MooTracker Telemetry & Herd Analytics
 const HERD_DATASET = [
   {
     "Animal_ID": "IN-DAIRY-1000",

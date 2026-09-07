@@ -1,4 +1,4 @@
-﻿const fs = require('fs');
+const fs = require('fs');
 const path = require('path');
 
 const csvPath = path.join(__dirname, 'datasets', 'dataset_v1_snapshot_tabular.csv');

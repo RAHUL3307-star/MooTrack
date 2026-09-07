@@ -1,5 +1,6 @@
-﻿{
-  "description": "Predicts bovine MooTracker risk for Indian dairy farmers using sensor data and analytics to improve herd health, alerts, and farm management decisions.",
+{
+  "title": "MooTracker - Smart Cattle Health Monitoring",
+  "description": "Predicts bovine health risks for Indian dairy farmers using sensor data and analytics to improve herd health, alerts, and farm management decisions.",
   "robots": {
     "index": false
   },

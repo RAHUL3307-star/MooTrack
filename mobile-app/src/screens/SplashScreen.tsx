@@ -1,4 +1,4 @@
-﻿import React, { useEffect } from "react";
+import React, { useEffect } from "react";
 import { StatusBar } from "../components/ui";
 
 export function SplashScreen({ onNext }: { onNext: () => void }) {

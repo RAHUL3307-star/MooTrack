@@ -1,4 +1,4 @@
-﻿-- ============================================================================
+-- ============================================================================
 -- MooTracker · Supabase Database Schema
 -- Organization: COw sensing
 -- Project: cow-sensing-db / MooTracker-core

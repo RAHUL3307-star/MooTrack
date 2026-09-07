@@ -1,4 +1,4 @@
-﻿export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
+export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
   home: (lang: string) => {
     switch (lang) {
       case "Tamil":

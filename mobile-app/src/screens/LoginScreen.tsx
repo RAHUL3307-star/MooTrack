@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { StatusBar, SectionLabel } from "../components/ui";
 import { t } from "../i18n/index";
 

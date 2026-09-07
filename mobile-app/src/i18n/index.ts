@@ -1,4 +1,4 @@
-﻿// Translation helper — does NOT use require() so it works with ES modules (Vite)
+// Translation helper — does NOT use require() so it works with ES modules (Vite)
 import { UI_STRINGS } from "./translations";
 
 export function t(key: string, lang: string): string {
