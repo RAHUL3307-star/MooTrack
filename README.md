@@ -1,7 +1,7 @@
-# MastiGuardAI Landing Page & Command Center
+﻿# MooTracker Landing Page & Command Center
 
 ## Project Overview
-This landing page and interactive command center replicates the exact UI/UX design from the Replit application ([Mastitis-Early-Warning](https://b03689c3-bc24-4811-8d51-483cb2c4208f-00-iptztbrat8aa.pike.replit.dev/)) and integrates the Figma mobile app design system ([MastiGuardAI Mobile App Design](https://www.figma.com/make/TEwg9UH9OtGABvCOR3kszj/MastiGuardAI-Mobile-App-Design?p=f&t=m2I9Uw1O3PQlXKM1-0)).
+This landing page and interactive command center replicates the exact UI/UX design from the Replit application ([Mastitis-Early-Warning](https://b03689c3-bc24-4811-8d51-483cb2c4208f-00-iptztbrat8aa.pike.replit.dev/)) and integrates the Figma mobile app design system ([MooTracker Mobile App Design](https://www.figma.com/make/TEwg9UH9OtGABvCOR3kszj/MooTracker-Mobile-App-Design?p=f&t=m2I9Uw1O3PQlXKM1-0)).
 
 ---
 

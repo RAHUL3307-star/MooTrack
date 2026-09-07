@@ -1,4 +1,4 @@
-name: Deploy MastiGuard AI to GitHub Pages
+﻿name: Deploy MooTracker to GitHub Pages
 
 on:
   push:

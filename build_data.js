@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const path = require('path');
 
 const csvPath = path.join(__dirname, 'datasets', 'dataset_v1_snapshot_tabular.csv');
@@ -43,7 +43,7 @@ const avgPH = (records.reduce((a, b) => a + b.Milk_pH, 0) / totalCattle).toFixed
 const avgTemp = (records.reduce((a, b) => a + b.Milk_Temperature_C, 0) / totalCattle).toFixed(2);
 const totalYield = (records.reduce((a, b) => a + b.Milk_Yield_Liters, 0)).toFixed(1);
 
-const outputContent = `// Auto-generated Dataset for MastiGuardAI Telemetry & Herd Analytics
+const outputContent = `// Auto-generated Dataset for MooTracker Telemetry & Herd Analytics
 const HERD_DATASET = ${JSON.stringify(records, null, 2)};
 
 const HERD_ANALYTICS = {

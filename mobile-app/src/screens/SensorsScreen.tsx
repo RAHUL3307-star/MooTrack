@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { StatusBar, BackHeader, Card, SectionLabel, ReadAloudFAB } from "../components/ui";
 import { useESP32 } from "../context/ESP32Context";
 import { t } from "../i18n/index";
@@ -76,7 +76,7 @@ void loop() {
   // 1. Output Serial JSON for USB WebSerial connection
   Serial.printf("{\\"cowId\\":\\"KA-001\\",\\"temp\\":%.2f,\\"conductivity\\":%.2f,\\"scc\\":%ld}\\n", temp, ec, scc);
 
-  // 2. Stream HTTP POST to MastiGuard AI LAN Server
+  // 2. Stream HTTP POST to MooTracker LAN Server
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     http.begin(serverUrl);
@@ -221,7 +221,7 @@ void loop() {
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                 <span style={{ fontSize: 10, color: "#A7F3D0", fontFamily: "'JetBrains Mono'" }}>
-                  MastiGuard_ESP32_Firmware.ino
+                  MooTracker_ESP32_Firmware.ino
                 </span>
                 <button
                   onClick={() => {

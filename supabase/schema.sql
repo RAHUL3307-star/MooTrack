@@ -1,7 +1,7 @@
--- ============================================================================
--- MastiGuard AI · Supabase Database Schema
+﻿-- ============================================================================
+-- MooTracker · Supabase Database Schema
 -- Organization: COw sensing
--- Project: cow-sensing-db / mastiguard-core
+-- Project: cow-sensing-db / MooTracker-core
 -- Problem Statement: #26109 (ICAR-NRC Bovine Mastitis Early Detection)
 -- ============================================================================
 

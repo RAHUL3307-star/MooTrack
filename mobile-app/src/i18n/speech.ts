@@ -1,4 +1,4 @@
-export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
+﻿export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
   home: (lang: string) => {
     switch (lang) {
       case "Tamil":
@@ -196,7 +196,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Hindi":
         return "कृपया अपनी पसंदीदा भाषा चुनें। तमिल, हिंदी, अंग्रेजी, कन्नड़ या तेलुगु में से कोई भी चुनकर आगे बढ़ें।";
       default:
-        return "Please select your preferred language to continue using MastiGuard AI.";
+        return "Please select your preferred language to continue using MooTracker.";
     }
   },
   "ml-lab": (lang: string) => {
@@ -226,7 +226,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Hindi":
         return "मस्तिगार्ड एआई में आपका स्वागत है! अपना मोबाइल नंबर दर्ज करें या सीधे एक क्लिक में अपनी डेयरी के डैशबोर्ड में प्रवेश करें।";
       default:
-        return "Welcome to MastiGuard AI! Enter your mobile number or continue with one click to enter your dairy farm dashboard.";
+        return "Welcome to MooTracker! Enter your mobile number or continue with one click to enter your dairy farm dashboard.";
     }
   },
 };

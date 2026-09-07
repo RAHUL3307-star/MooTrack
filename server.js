@@ -1,4 +1,4 @@
-const http = require('http');
+﻿const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
@@ -248,6 +248,6 @@ void loop() {
 
 server.listen(PORT, () => {
   console.log(`====================================================`);
-  console.log(`🚀 MastiGuardAI Web App Running at http://localhost:${PORT}`);
+  console.log(`🚀 MooTracker Web App Running at http://localhost:${PORT}`);
   console.log(`====================================================`);
 });

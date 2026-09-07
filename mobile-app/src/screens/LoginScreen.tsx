@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { StatusBar, SectionLabel } from "../components/ui";
 import { t } from "../i18n/index";
 
@@ -25,7 +25,7 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
               color: "#FFFFFF",
             }}
           >
-            MastiGuard AI
+            MooTracker
           </span>
         </div>
         <div

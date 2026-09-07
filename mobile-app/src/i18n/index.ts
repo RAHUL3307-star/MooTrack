@@ -1,4 +1,4 @@
-// Translation helper — does NOT use require() so it works with ES modules (Vite)
+﻿// Translation helper — does NOT use require() so it works with ES modules (Vite)
 import { UI_STRINGS } from "./translations";
 
 export function t(key: string, lang: string): string {
@@ -17,7 +17,7 @@ export function sendWhatsAppAlert(
   let msg = "";
   if (lang === "Tamil") {
     msg = [
-      `🚨 *மஸ்திகார்ட் AI எச்சரிக்கை (MastiGuard AI Alert)*`,
+      `🚨 *மஸ்திகார்ட் AI எச்சரிக்கை (MooTracker Alert)*`,
       ``,
       `🐄 *மாடு:* ${animal}`,
       `⚠️ *ஆபத்து நிலை:* ${risk.toUpperCase() === "HIGH" ? "அதிக ஆபத்து (HIGH)" : risk.toUpperCase()}`,
@@ -30,7 +30,7 @@ export function sendWhatsAppAlert(
     ].join("\n");
   } else if (lang === "Hindi") {
     msg = [
-      `🚨 *मस्तिगार्ड AI अलर्ट (MastiGuard AI Alert)*`,
+      `🚨 *मस्तिगार्ड AI अलर्ट (MooTracker Alert)*`,
       ``,
       `🐄 *पशु:* ${animal}`,
       `⚠️ *जोखिम स्तर:* ${risk.toUpperCase() === "HIGH" ? "उच्च जोखिम (HIGH)" : risk.toUpperCase()}`,
@@ -43,7 +43,7 @@ export function sendWhatsAppAlert(
     ].join("\n");
   } else {
     msg = [
-      `🚨 *MastiGuard AI Alert*`,
+      `🚨 *MooTracker Alert*`,
       ``,
       `🐄 *Animal:* ${animal}`,
       `⚠️ *Risk Level:* ${risk.toUpperCase()}`,
@@ -51,7 +51,7 @@ export function sendWhatsAppAlert(
       `⏱️ *Urgency:* ${urgency}`,
       `💡 *Recommended Action:* ${action}`,
       ``,
-      `_Sent via MastiGuard AI · Shri Balaji Dairy Farm_`,
+      `_Sent via MooTracker · Shri Balaji Dairy Farm_`,
       `_Powered by ICAR-NRC Bovine Health_`,
     ].join("\n");
   }
