@@ -1,0 +1,10 @@
+{
+  "description": "Predicts bovine mastitis risk for Indian dairy farmers using sensor data and analytics to improve herd health, alerts, and farm management decisions.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
