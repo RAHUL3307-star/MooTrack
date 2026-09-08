@@ -14,6 +14,10 @@ mobile-app/.env.local
 
 # Raw large downloads cache (>100MB)
 downloaded_data/
+datasets/images/cow_teat_condition_dataset/
+*.exe
+*.zip
+*.rar
 
 # Logs
 *.log
