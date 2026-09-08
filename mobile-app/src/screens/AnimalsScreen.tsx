@@ -12,7 +12,7 @@ export function AnimalsScreen({
   onNavigate: (s: Screen) => void;
   lang: string;
 }) {
-  const { animals } = useAnimals();
+  const { animals, setSelectedAnimal } = useAnimals();
   const [filter, setFilter] = useState<"all" | RiskLevel>("all");
   const [search, setSearch] = useState("");
   const filters: { id: "all" | RiskLevel; label: string }[] = [
@@ -81,7 +81,7 @@ export function AnimalsScreen({
               {f.label}
               {f.id !== "all" && (
                 <span style={{ marginLeft: 4, opacity: 0.7 }}>
-                  ({ANIMALS.filter((a) => a.risk === f.id).length})
+                  ({animals.filter((a) => a.risk === f.id).length})
                 </span>
               )}
             </button>
@@ -96,7 +96,10 @@ export function AnimalsScreen({
             {visible.map((a) => (
               <button
                 key={a.id}
-                onClick={() => onNavigate("animal-profile")}
+                onClick={() => {
+                  setSelectedAnimal(a);
+                  onNavigate("animal-profile");
+                }}
                 style={{
                   display: "flex",
                   alignItems: "center",

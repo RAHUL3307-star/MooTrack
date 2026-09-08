@@ -16,6 +16,7 @@ import type { Screen, RiskLevel } from "../types/index";
 import { t, LANG_FLAGS } from "../i18n/index";
 import { SCREEN_SPEECH } from "../i18n/speech";
 import { useReadAloud } from "../i18n/useReadAloud";
+import { useAnimals } from "../context/AnimalsContext";
 
 export function HomeSituationSummaryCard({
   onNavigate,
@@ -192,8 +193,6 @@ export function HomeSituationSummaryCard({
   );
 }
 
-import { useAnimals } from "../context/AnimalsContext";
-
 export function HomeScreen({
   onNavigate,
   lang,
@@ -201,7 +200,7 @@ export function HomeScreen({
   onNavigate: (s: Screen) => void;
   lang: string;
 }) {
-  const { animals } = useAnimals();
+  const { animals, setSelectedAnimal } = useAnimals();
   const priorityAnimals = animals.filter((a) => a.risk === "high" || a.risk === "moderate").slice(0, 3);
   const counts = {
     high: animals.filter((a) => a.risk === "high").length,
@@ -379,7 +378,10 @@ export function HomeScreen({
             {priorityAnimals.map((a) => (
               <button
                 key={a.id}
-                onClick={() => onNavigate("animal-profile")}
+                onClick={() => {
+                  setSelectedAnimal(a);
+                  onNavigate("animal-profile");
+                }}
                 style={{
                   display: "flex",
                   alignItems: "center",

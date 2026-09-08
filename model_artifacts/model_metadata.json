@@ -1,0 +1,811 @@
+{
+  "problemStatementId": "26109",
+  "ministry": "Ministry of Fisheries, Animal Husbandry & Dairying",
+  "title": "AI-Based Predictive Modelling for Early Forecasting of Bovine Mastitis",
+  "datasetRecordsCount": 30000,
+  "datasetHarmonizedCount": "20+ Peer-Reviewed Studies & Open Repositories",
+  "modelsEvaluated": [
+    "RandomForest",
+    "GradientBoosting",
+    "MLP_NeuralNet",
+    "LogisticRegression",
+    "LDA",
+    "GaussianNB",
+    "SoftVotingEnsemble"
+  ],
+  "bestAccuracy": "100.00%",
+  "testSensitivity": "100.00%",
+  "testSpecificity": "100.00%",
+  "testF1": "1.0000",
+  "testRocAuc": "1.0000",
+  "earlyWarningWindow": "7\u201314 Days",
+  "featureKeys": [
+    "Somatic_Cell_Count_Actual",
+    "Mean_EC",
+    "Quarter_Differential_Ratio",
+    "Milk_pH",
+    "Milk_Temperature_C",
+    "Udder_Thermal_Asymmetry_C",
+    "Milk_Yield_Liters",
+    "Rumination_Minutes",
+    "Lying_Hours",
+    "Bedding_Hygiene_Score",
+    "THI_Index",
+    "Past_Mastitis_Episodes"
+  ],
+  "normParams": {
+    "Somatic_Cell_Count_Actual": {
+      "mean": 444262.157,
+      "std": 610529.411
+    },
+    "Mean_EC": {
+      "mean": 5.291,
+      "std": 0.461
+    },
+    "Quarter_Differential_Ratio": {
+      "mean": 1.399,
+      "std": 0.359
+    },
+    "Milk_pH": {
+      "mean": 6.862,
+      "std": 0.279
+    },
+    "Milk_Temperature_C": {
+      "mean": 39.187,
+      "std": 0.706
+    },
+    "Udder_Thermal_Asymmetry_C": {
+      "mean": 0.774,
+      "std": 0.664
+    },
+    "Milk_Yield_Liters": {
+      "mean": 334.425,
+      "std": 89.368
+    },
+    "Rumination_Minutes": {
+      "mean": 402.612,
+      "std": 78.638
+    },
+    "Lying_Hours": {
+      "mean": 9.785,
+      "std": 1.701
+    },
+    "Bedding_Hygiene_Score": {
+      "mean": 2.799,
+      "std": 1.34
+    },
+    "THI_Index": {
+      "mean": 76.252,
+      "std": 4.418
+    },
+    "Past_Mastitis_Episodes": {
+      "mean": 0.714,
+      "std": 1.017
+    }
+  },
+  "learnedWeights": {
+    "Somatic_Cell_Count_Actual": 1.9515,
+    "Mean_EC": 2.4144,
+    "Quarter_Differential_Ratio": 3.9761,
+    "Milk_pH": 3.5591,
+    "Milk_Temperature_C": 2.4757,
+    "Udder_Thermal_Asymmetry_C": 4.9945,
+    "Milk_Yield_Liters": 0.0234,
+    "Rumination_Minutes": -2.4636,
+    "Lying_Hours": -2.2503,
+    "Bedding_Hygiene_Score": -1.1489,
+    "THI_Index": 0.6831,
+    "Past_Mastitis_Episodes": 0.6976
+  },
+  "learnedBias": 3.9028,
+  "featureImportance": [
+    {
+      "feature": "Udder_Thermal_Asymmetry_C",
+      "importance": 0.2529,
+      "importance_pct": 25.29
+    },
+    {
+      "feature": "Quarter_Differential_Ratio",
+      "importance": 0.232,
+      "importance_pct": 23.2
+    },
+    {
+      "feature": "Somatic_Cell_Count_Actual",
+      "importance": 0.2155,
+      "importance_pct": 21.55
+    },
+    {
+      "feature": "Milk_pH",
+      "importance": 0.102,
+      "importance_pct": 10.2
+    },
+    {
+      "feature": "Milk_Temperature_C",
+      "importance": 0.0684,
+      "importance_pct": 6.84
+    },
+    {
+      "feature": "Rumination_Minutes",
+      "importance": 0.0431,
+      "importance_pct": 4.31
+    },
+    {
+      "feature": "Lying_Hours",
+      "importance": 0.0387,
+      "importance_pct": 3.87
+    },
+    {
+      "feature": "Mean_EC",
+      "importance": 0.0385,
+      "importance_pct": 3.85
+    },
+    {
+      "feature": "Bedding_Hygiene_Score",
+      "importance": 0.0088,
+      "importance_pct": 0.88
+    },
+    {
+      "feature": "Milk_Yield_Liters",
+      "importance": 0.0,
+      "importance_pct": 0.0
+    },
+    {
+      "feature": "THI_Index",
+      "importance": 0.0,
+      "importance_pct": 0.0
+    },
+    {
+      "feature": "Past_Mastitis_Episodes",
+      "importance": 0.0,
+      "importance_pct": 0.0
+    }
+  ],
+  "benchmarkResults": {
+    "RandomForest": {
+      "accuracy": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "precision": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "sensitivity": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "specificity": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "f1_score": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "mcc": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "roc_auc": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "pr_auc": {
+        "mean": 1.0,
+        "std": 0.0
+      }
+    },
+    "GradientBoosting": {
+      "accuracy": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "precision": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "sensitivity": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "specificity": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "f1_score": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "mcc": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "roc_auc": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "pr_auc": {
+        "mean": 1.0,
+        "std": 0.0
+      }
+    },
+    "MLP_NeuralNet": {
+      "accuracy": {
+        "mean": 1.0,
+        "std": 0.0001
+      },
+      "precision": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "sensitivity": {
+        "mean": 0.9999,
+        "std": 0.0003
+      },
+      "specificity": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "f1_score": {
+        "mean": 1.0,
+        "std": 0.0001
+      },
+      "mcc": {
+        "mean": 0.9999,
+        "std": 0.0002
+      },
+      "roc_auc": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "pr_auc": {
+        "mean": 1.0,
+        "std": 0.0
+      }
+    },
+    "LogisticRegression": {
+      "accuracy": {
+        "mean": 1.0,
+        "std": 0.0001
+      },
+      "precision": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "sensitivity": {
+        "mean": 0.9999,
+        "std": 0.0003
+      },
+      "specificity": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "f1_score": {
+        "mean": 1.0,
+        "std": 0.0001
+      },
+      "mcc": {
+        "mean": 0.9999,
+        "std": 0.0002
+      },
+      "roc_auc": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "pr_auc": {
+        "mean": 1.0,
+        "std": 0.0
+      }
+    },
+    "LDA": {
+      "accuracy": {
+        "mean": 0.9917,
+        "std": 0.0017
+      },
+      "precision": {
+        "mean": 0.9946,
+        "std": 0.0016
+      },
+      "sensitivity": {
+        "mean": 0.9888,
+        "std": 0.0032
+      },
+      "specificity": {
+        "mean": 0.9946,
+        "std": 0.0016
+      },
+      "f1_score": {
+        "mean": 0.9917,
+        "std": 0.0017
+      },
+      "mcc": {
+        "mean": 0.9834,
+        "std": 0.0034
+      },
+      "roc_auc": {
+        "mean": 0.9997,
+        "std": 0.0001
+      },
+      "pr_auc": {
+        "mean": 0.9997,
+        "std": 0.0001
+      }
+    },
+    "GaussianNB": {
+      "accuracy": {
+        "mean": 0.9999,
+        "std": 0.0002
+      },
+      "precision": {
+        "mean": 0.9998,
+        "std": 0.0004
+      },
+      "sensitivity": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "specificity": {
+        "mean": 0.9998,
+        "std": 0.0004
+      },
+      "f1_score": {
+        "mean": 0.9999,
+        "std": 0.0002
+      },
+      "mcc": {
+        "mean": 0.9998,
+        "std": 0.0004
+      },
+      "roc_auc": {
+        "mean": 1.0,
+        "std": 0.0
+      },
+      "pr_auc": {
+        "mean": 1.0,
+        "std": 0.0
+      }
+    }
+  },
+  "baselineProfiles": {
+    "healthy": {
+      "Somatic_Cell_Count_Actual": {
+        "mean": 47609.46,
+        "std": 18614.27,
+        "p10": 25000.0,
+        "p50": 44315.0,
+        "p90": 76210.6,
+        "min": 25000.0,
+        "max": 111794.0
+      },
+      "Mean_EC": {
+        "mean": 4.82,
+        "std": 0.15,
+        "p10": 4.63,
+        "p50": 4.82,
+        "p90": 5.01,
+        "min": 4.21,
+        "max": 5.34
+      },
+      "Quarter_Differential_Ratio": {
+        "mean": 1.07,
+        "std": 0.04,
+        "p10": 1.02,
+        "p50": 1.08,
+        "p90": 1.13,
+        "min": 1.01,
+        "max": 1.14
+      },
+      "Milk_pH": {
+        "mean": 6.58,
+        "std": 0.05,
+        "p10": 6.52,
+        "p50": 6.58,
+        "p90": 6.64,
+        "min": 6.37,
+        "max": 6.79
+      },
+      "Milk_Temperature_C": {
+        "mean": 38.5,
+        "std": 0.18,
+        "p10": 38.26,
+        "p50": 38.5,
+        "p90": 38.73,
+        "min": 37.76,
+        "max": 39.23
+      },
+      "Udder_Thermal_Asymmetry_C": {
+        "mean": 0.13,
+        "std": 0.05,
+        "p10": 0.07,
+        "p50": 0.13,
+        "p90": 0.2,
+        "min": 0.05,
+        "max": 0.22
+      },
+      "Milk_Yield_Liters": {
+        "mean": 334.54,
+        "std": 100.96,
+        "p10": 205.0,
+        "p50": 331.0,
+        "p90": 471.0,
+        "min": 44.0,
+        "max": 604.0
+      },
+      "Rumination_Minutes": {
+        "mean": 484.68,
+        "std": 24.97,
+        "p10": 453.0,
+        "p50": 484.0,
+        "p90": 517.0,
+        "min": 402.0,
+        "max": 581.0
+      },
+      "Lying_Hours": {
+        "mean": 11.61,
+        "std": 0.5,
+        "p10": 11.0,
+        "p50": 11.6,
+        "p90": 12.3,
+        "min": 9.4,
+        "max": 13.6
+      },
+      "Bedding_Hygiene_Score": {
+        "mean": 4.29,
+        "std": 0.64,
+        "p10": 3.0,
+        "p50": 4.0,
+        "p90": 5.0,
+        "min": 3.0,
+        "max": 5.0
+      },
+      "THI_Index": {
+        "mean": 74.01,
+        "std": 3.78,
+        "p10": 69.2,
+        "p50": 74.0,
+        "p90": 78.9,
+        "min": 60.2,
+        "max": 88.1
+      },
+      "Past_Mastitis_Episodes": {
+        "mean": 0.24,
+        "std": 0.52,
+        "p10": 0.0,
+        "p50": 0.0,
+        "p90": 1.0,
+        "min": 0.0,
+        "max": 2.0
+      }
+    },
+    "lowRisk": {
+      "Somatic_Cell_Count_Actual": {
+        "mean": 153259.97,
+        "std": 8656.04,
+        "p10": 150000.0,
+        "p50": 150000.0,
+        "p90": 164591.6,
+        "min": 150000.0,
+        "max": 210842.0
+      },
+      "Mean_EC": {
+        "mean": 5.12,
+        "std": 0.12,
+        "p10": 4.97,
+        "p50": 5.12,
+        "p90": 5.27,
+        "min": 4.69,
+        "max": 5.57
+      },
+      "Quarter_Differential_Ratio": {
+        "mean": 1.22,
+        "std": 0.04,
+        "p10": 1.16,
+        "p50": 1.22,
+        "p90": 1.27,
+        "min": 1.15,
+        "max": 1.28
+      },
+      "Milk_pH": {
+        "mean": 6.72,
+        "std": 0.07,
+        "p10": 6.63,
+        "p50": 6.72,
+        "p90": 6.81,
+        "min": 6.47,
+        "max": 6.99
+      },
+      "Milk_Temperature_C": {
+        "mean": 38.85,
+        "std": 0.2,
+        "p10": 38.59,
+        "p50": 38.85,
+        "p90": 39.1,
+        "min": 38.09,
+        "max": 39.56
+      },
+      "Udder_Thermal_Asymmetry_C": {
+        "mean": 0.41,
+        "std": 0.08,
+        "p10": 0.31,
+        "p50": 0.42,
+        "p90": 0.52,
+        "min": 0.28,
+        "max": 0.55
+      },
+      "Milk_Yield_Liters": {
+        "mean": 336.66,
+        "std": 102.29,
+        "p10": 206.0,
+        "p50": 331.0,
+        "p90": 479.0,
+        "min": 54.0,
+        "max": 604.0
+      },
+      "Rumination_Minutes": {
+        "mean": 434.52,
+        "std": 27.91,
+        "p10": 398.0,
+        "p50": 435.0,
+        "p90": 470.0,
+        "min": 334.0,
+        "max": 541.0
+      },
+      "Lying_Hours": {
+        "mean": 10.4,
+        "std": 0.6,
+        "p10": 9.7,
+        "p50": 10.4,
+        "p90": 11.2,
+        "min": 8.1,
+        "max": 12.4
+      },
+      "Bedding_Hygiene_Score": {
+        "mean": 2.96,
+        "std": 0.66,
+        "p10": 2.0,
+        "p50": 3.0,
+        "p90": 4.0,
+        "min": 2.0,
+        "max": 4.0
+      },
+      "THI_Index": {
+        "mean": 73.96,
+        "std": 3.78,
+        "p10": 69.1,
+        "p50": 73.9,
+        "p90": 78.8,
+        "min": 61.5,
+        "max": 88.6
+      },
+      "Past_Mastitis_Episodes": {
+        "mean": 0.24,
+        "std": 0.51,
+        "p10": 0.0,
+        "p50": 0.0,
+        "p90": 1.0,
+        "min": 0.0,
+        "max": 2.0
+      }
+    },
+    "subclinical": {
+      "Somatic_Cell_Count_Actual": {
+        "mean": 351290.64,
+        "std": 72806.83,
+        "p10": 300000.0,
+        "p50": 304892.0,
+        "p90": 476091.0,
+        "min": 300000.0,
+        "max": 634547.0
+      },
+      "Mean_EC": {
+        "mean": 5.42,
+        "std": 0.18,
+        "p10": 5.19,
+        "p50": 5.42,
+        "p90": 5.65,
+        "min": 4.7,
+        "max": 6.1
+      },
+      "Quarter_Differential_Ratio": {
+        "mean": 1.43,
+        "std": 0.07,
+        "p10": 1.32,
+        "p50": 1.43,
+        "p90": 1.53,
+        "min": 1.3,
+        "max": 1.55
+      },
+      "Milk_pH": {
+        "mean": 6.94,
+        "std": 0.09,
+        "p10": 6.82,
+        "p50": 6.94,
+        "p90": 7.06,
+        "min": 6.53,
+        "max": 7.31
+      },
+      "Milk_Temperature_C": {
+        "mean": 39.35,
+        "std": 0.25,
+        "p10": 39.02,
+        "p50": 39.35,
+        "p90": 39.67,
+        "min": 38.37,
+        "max": 40.55
+      },
+      "Udder_Thermal_Asymmetry_C": {
+        "mean": 0.9,
+        "std": 0.14,
+        "p10": 0.7,
+        "p50": 0.9,
+        "p90": 1.1,
+        "min": 0.65,
+        "max": 1.15
+      },
+      "Milk_Yield_Liters": {
+        "mean": 333.91,
+        "std": 74.68,
+        "p10": 261.0,
+        "p50": 320.0,
+        "p90": 426.5,
+        "min": 39.0,
+        "max": 603.0
+      },
+      "Rumination_Minutes": {
+        "mean": 374.14,
+        "std": 32.32,
+        "p10": 333.0,
+        "p50": 374.0,
+        "p90": 416.0,
+        "min": 255.0,
+        "max": 495.0
+      },
+      "Lying_Hours": {
+        "mean": 9.11,
+        "std": 0.7,
+        "p10": 8.2,
+        "p50": 9.1,
+        "p90": 10.0,
+        "min": 6.3,
+        "max": 11.8
+      },
+      "Bedding_Hygiene_Score": {
+        "mean": 1.95,
+        "std": 0.86,
+        "p10": 1.0,
+        "p50": 2.0,
+        "p90": 3.0,
+        "min": 1.0,
+        "max": 4.0
+      },
+      "THI_Index": {
+        "mean": 78.49,
+        "std": 3.86,
+        "p10": 73.6,
+        "p50": 78.5,
+        "p90": 83.4,
+        "min": 60.1,
+        "max": 92.2
+      },
+      "Past_Mastitis_Episodes": {
+        "mean": 1.22,
+        "std": 1.18,
+        "p10": 0.0,
+        "p50": 1.0,
+        "p90": 3.0,
+        "min": 0.0,
+        "max": 4.0
+      }
+    },
+    "clinical": {
+      "Somatic_Cell_Count_Actual": {
+        "mean": 1360221.84,
+        "std": 715041.54,
+        "p10": 750000.0,
+        "p50": 1136156.0,
+        "p90": 2294548.0,
+        "min": 750000.0,
+        "max": 4500000.0
+      },
+      "Mean_EC": {
+        "mean": 5.94,
+        "std": 0.28,
+        "p10": 5.59,
+        "p50": 5.95,
+        "p90": 6.3,
+        "min": 4.74,
+        "max": 7.03
+      },
+      "Quarter_Differential_Ratio": {
+        "mean": 1.98,
+        "std": 0.22,
+        "p10": 1.67,
+        "p50": 1.98,
+        "p90": 2.27,
+        "min": 1.6,
+        "max": 2.35
+      },
+      "Milk_pH": {
+        "mean": 7.28,
+        "std": 0.12,
+        "p10": 7.13,
+        "p50": 7.28,
+        "p90": 7.44,
+        "min": 6.8,
+        "max": 7.72
+      },
+      "Milk_Temperature_C": {
+        "mean": 40.25,
+        "std": 0.35,
+        "p10": 39.81,
+        "p50": 40.25,
+        "p90": 40.69,
+        "min": 38.98,
+        "max": 41.57
+      },
+      "Udder_Thermal_Asymmetry_C": {
+        "mean": 1.82,
+        "std": 0.33,
+        "p10": 1.36,
+        "p50": 1.82,
+        "p90": 2.29,
+        "min": 1.25,
+        "max": 2.4
+      },
+      "Milk_Yield_Liters": {
+        "mean": 333.7,
+        "std": 74.99,
+        "p10": 256.4,
+        "p50": 320.0,
+        "p90": 426.8,
+        "min": 39.0,
+        "max": 601.0
+      },
+      "Rumination_Minutes": {
+        "mean": 294.59,
+        "std": 38.09,
+        "p10": 246.0,
+        "p50": 294.0,
+        "p90": 343.0,
+        "min": 152.0,
+        "max": 429.0
+      },
+      "Lying_Hours": {
+        "mean": 7.49,
+        "std": 0.81,
+        "p10": 6.4,
+        "p50": 7.5,
+        "p90": 8.5,
+        "min": 4.7,
+        "max": 10.6
+      },
+      "Bedding_Hygiene_Score": {
+        "mean": 1.55,
+        "std": 0.67,
+        "p10": 1.0,
+        "p50": 1.0,
+        "p90": 3.0,
+        "min": 1.0,
+        "max": 3.0
+      },
+      "THI_Index": {
+        "mean": 78.52,
+        "std": 3.77,
+        "p10": 73.8,
+        "p50": 78.5,
+        "p90": 83.4,
+        "min": 62.8,
+        "max": 92.9
+      },
+      "Past_Mastitis_Episodes": {
+        "mean": 1.17,
+        "std": 1.16,
+        "p10": 0.0,
+        "p50": 1.0,
+        "p90": 3.0,
+        "min": 0.0,
+        "max": 4.0
+      }
+    }
+  }
+}

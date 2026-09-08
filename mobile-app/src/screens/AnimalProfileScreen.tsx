@@ -11,6 +11,7 @@ import {
 import { ANIMALS, RISK_COLOR } from "../types/index";
 import type { Screen } from "../types/index";
 import { t } from "../i18n/index";
+import { useAnimals } from "../context/AnimalsContext";
 
 export function AnimalProfileScreen({
   onBack,
@@ -21,7 +22,8 @@ export function AnimalProfileScreen({
   onNavigate: (s: Screen) => void;
   lang: string;
 }) {
-  const a = ANIMALS[0];
+  const { selectedAnimal, animals } = useAnimals();
+  const a = selectedAnimal || animals[0] || ANIMALS[0];
   const [tab, setTab] = useState<"health" | "milk" | "sensors" | "history">("health");
   const sccHistory = [320, 380, 410, 445, 468, 485];
   const milkHistory = [14.2, 13.6, 12.8, 11.9, 11.2, 10.2];

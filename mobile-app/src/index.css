@@ -36,13 +36,29 @@
 }
 
 html, body, #root {
+  width: 100%;
   height: 100%;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
   font-family: 'Outfit', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  background-color: #F7F4EE;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Mobile viewport and safe-area utilities */
+.safe-top-padding {
+  padding-top: max(env(safe-area-inset-top, 0px), 8px);
+}
+
+.safe-bottom-padding {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 12px);
 }
 
 ::-webkit-scrollbar { width: 0; height: 0; }

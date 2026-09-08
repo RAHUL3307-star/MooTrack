@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 mobile-app/node_modules/
+.venv/
+__pycache__/
+*.pyc
 
 # Environment Variables - NEVER commit real credentials
 .env
@@ -8,6 +11,9 @@ mobile-app/node_modules/
 .env.*.local
 mobile-app/.env
 mobile-app/.env.local
+
+# Raw large downloads cache (>100MB)
+downloaded_data/
 
 # Logs
 *.log

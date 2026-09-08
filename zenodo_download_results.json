@@ -1,0 +1,110 @@
+{
+  "16479542": {
+    "title": "Interpretable Machine Learning Models for Early Detection of Subclinical Mastitis using Routine Milk Composition Data",
+    "access": "open",
+    "status": "ok",
+    "files": [
+      {
+        "filename": "17 nnumara yalçın_pagenumber.pdf",
+        "size": 784556,
+        "url": "https://zenodo.org/api/records/16479542/files/17%20nnumara%20yalc%CC%A7%C4%B1n_pagenumber.pdf/content",
+        "downloaded": true
+      }
+    ]
+  },
+  "7056828": {
+    "title": "Relationship between total and differential quarter somatic cell counts at dry-off and early lactation",
+    "access": "open",
+    "status": "ok",
+    "files": [
+      {
+        "filename": "milk_records.gz",
+        "size": 260453,
+        "url": "https://zenodo.org/api/records/7056828/files/milk_records.gz/content",
+        "downloaded": true
+      },
+      {
+        "filename": "README",
+        "size": 986,
+        "url": "https://zenodo.org/api/records/7056828/files/README/content",
+        "downloaded": true
+      }
+    ]
+  },
+  "18013106": {
+    "title": "Prevalence and Risk Factor Analysis of Escherichia Coli–Associated Subclinical Mastitis in Cholistani Cattle",
+    "access": "open",
+    "status": "ok",
+    "files": [
+      {
+        "filename": "192_Published 21-12-2025.pdf",
+        "size": 1218133,
+        "url": "https://zenodo.org/api/records/18013106/files/192_Published%2021-12-2025.pdf/content",
+        "downloaded": true
+      }
+    ]
+  },
+  "5733981": {
+    "title": "STUDIES ON THE CAUSES OF BACTERIAL MASTITIES IN TWO DAIRY BOVINE FARMS IN NORTHEASTERN BULGARIA AND THEIR SENSITIVITY TO ANTIMICROBIAL PRODUCTS",
+    "access": "open",
+    "status": "ok",
+    "files": [
+      {
+        "filename": "vol-6-2_2021-21-27.pdf",
+        "size": 625190,
+        "url": "https://zenodo.org/api/records/5733981/files/vol-6-2_2021-21-27.pdf/content",
+        "downloaded": true
+      }
+    ]
+  },
+  "14908264": {
+    "title": "Exploring pathogen-specific somatic cell patterns in dairy ewes during early lactation",
+    "access": "open",
+    "status": "ok",
+    "files": [
+      {
+        "filename": "Data analysis.do",
+        "size": 29733,
+        "url": "https://zenodo.org/api/records/14908264/files/Data%20analysis.do/content",
+        "downloaded": true
+      },
+      {
+        "filename": "Data_clean.dta",
+        "size": 100921,
+        "url": "https://zenodo.org/api/records/14908264/files/Data_clean.dta/content",
+        "downloaded": true
+      },
+      {
+        "filename": "Data_management.do",
+        "size": 4965,
+        "url": "https://zenodo.org/api/records/14908264/files/Data_management.do/content",
+        "downloaded": true
+      }
+    ]
+  },
+  "15619247": {
+    "title": "TIDS: A Thermal Imaging Dataset for Subclinical Mastitis in Dairy Sheep",
+    "access": "open",
+    "status": "ok",
+    "files": [
+      {
+        "filename": "TIDS Dataset.zip",
+        "size": 228938203,
+        "url": "https://zenodo.org/api/records/15619247/files/TIDS%20Dataset.zip/content",
+        "downloaded": true
+      }
+    ]
+  },
+  "19391230": {
+    "status": "The read operation timed out",
+    "files": []
+  },
+  "2660878": {
+    "status": "The read operation timed out",
+    "files": []
+  },
+  "20763985": {
+    "status": "The read operation timed out",
+    "files": []
+  }
+}

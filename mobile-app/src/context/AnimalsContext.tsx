@@ -6,6 +6,8 @@ import { supabase, isSupabaseConfigured } from "../lib/supabase";
 
 interface AnimalsContextType {
   animals: Animal[];
+  selectedAnimal: Animal | null;
+  setSelectedAnimal: (animal: Animal | null) => void;
   loading: boolean;
   refreshAnimals: () => Promise<void>;
   updateRisk: (animalId: string, risk: RiskLevel, scc: number, temp: number) => Promise<void>;
@@ -13,6 +15,8 @@ interface AnimalsContextType {
 
 const AnimalsContext = createContext<AnimalsContextType>({
   animals: ANIMALS,
+  selectedAnimal: null,
+  setSelectedAnimal: () => {},
   loading: false,
   refreshAnimals: async () => {},
   updateRisk: async () => {},
@@ -24,6 +28,7 @@ export function useAnimals() {
 
 export function AnimalsProvider({ children }: { children: React.ReactNode }) {
   const [animals, setAnimals] = useState<Animal[]>(ANIMALS);
+  const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
   const [loading, setLoading] = useState(false);
 
   const loadData = useCallback(async () => {
@@ -84,6 +89,8 @@ export function AnimalsProvider({ children }: { children: React.ReactNode }) {
     <AnimalsContext.Provider
       value={{
         animals,
+        selectedAnimal,
+        setSelectedAnimal,
         loading,
         refreshAnimals: loadData,
         updateRisk,

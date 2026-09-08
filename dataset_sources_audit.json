@@ -1,0 +1,226 @@
+[
+  {
+    "name": "Kaggle amithadityacp cow-mastitisfrom-milk",
+    "url": "https://www.kaggle.com/datasets/amithadityacp/cow-mastitisfrom-milk",
+    "status": "page_200",
+    "files": [],
+    "metadata": {
+      "title": "Checking your browser - reCAPTCHA"
+    }
+  },
+  {
+    "name": "GitHub FishMaster93 Cow_mastitis",
+    "url": "https://github.com/FishMaster93/Cow_mastitis",
+    "status": "success",
+    "files": [
+      {
+        "name": "S1.py",
+        "type": "file",
+        "download_url": "https://raw.githubusercontent.com/FishMaster93/Cow_mastitis/main/S1.py"
+      },
+      {
+        "name": "S2.py",
+        "type": "file",
+        "download_url": "https://raw.githubusercontent.com/FishMaster93/Cow_mastitis/main/S2.py"
+      },
+      {
+        "name": "readme",
+        "type": "file",
+        "download_url": "https://raw.githubusercontent.com/FishMaster93/Cow_mastitis/main/readme"
+      }
+    ],
+    "metadata": {}
+  },
+  {
+    "name": "GitHub gssi mastitis-detection",
+    "url": "https://github.com/gssi/mastitis-detection",
+    "status": "success",
+    "files": [
+      {
+        "name": "README.md",
+        "type": "file",
+        "download_url": "https://raw.githubusercontent.com/gssi/mastitis-detection/main/README.md"
+      },
+      {
+        "name": "classifier",
+        "type": "dir",
+        "download_url": null
+      },
+      {
+        "name": "dataset_assembly",
+        "type": "dir",
+        "download_url": null
+      },
+      {
+        "name": "libraries.py",
+        "type": "file",
+        "download_url": "https://raw.githubusercontent.com/gssi/mastitis-detection/main/libraries.py"
+      },
+      {
+        "name": "ml_process",
+        "type": "dir",
+        "download_url": null
+      },
+      {
+        "name": "output",
+        "type": "dir",
+        "download_url": null
+      },
+      {
+        "name": "process_run.ipynb",
+        "type": "file",
+        "download_url": "https://raw.githubusercontent.com/gssi/mastitis-detection/main/process_run.ipynb"
+      },
+      {
+        "name": "requirements.txt",
+        "type": "file",
+        "download_url": "https://raw.githubusercontent.com/gssi/mastitis-detection/main/requirements.txt"
+      },
+      {
+        "name": "temporary_datasets",
+        "type": "dir",
+        "download_url": null
+      }
+    ],
+    "metadata": {}
+  },
+  {
+    "name": "Zenodo 16479542",
+    "url": "https://zenodo.org/records/16479542",
+    "status": "http_403",
+    "files": [],
+    "metadata": {}
+  },
+  {
+    "name": "Zenodo 7056828",
+    "url": "https://zenodo.org/record/7056828",
+    "status": "http_403",
+    "files": [],
+    "metadata": {}
+  },
+  {
+    "name": "Mendeley d8kgk57b9h/3",
+    "url": "https://data.mendeley.com/datasets/d8kgk57b9h/3",
+    "status": "page_403",
+    "files": [],
+    "metadata": {
+      "title": "Just a moment..."
+    }
+  },
+  {
+    "name": "Mendeley vhds87r252/2",
+    "url": "https://data.mendeley.com/datasets/vhds87r252/2",
+    "status": "page_403",
+    "files": [],
+    "metadata": {
+      "title": "Just a moment..."
+    }
+  },
+  {
+    "name": "Mendeley mvmp258dsh/1",
+    "url": "https://data.mendeley.com/datasets/mvmp258dsh/1",
+    "status": "page_403",
+    "files": [],
+    "metadata": {
+      "title": "Just a moment..."
+    }
+  },
+  {
+    "name": "Mendeley hd7gh8nc46/1",
+    "url": "https://data.mendeley.com/datasets/hd7gh8nc46/1",
+    "status": "page_403",
+    "files": [],
+    "metadata": {
+      "title": "Just a moment..."
+    }
+  },
+  {
+    "name": "Mendeley gk2g6vsrym/1",
+    "url": "https://data.mendeley.com/datasets/gk2g6vsrym/1",
+    "status": "page_403",
+    "files": [],
+    "metadata": {
+      "title": "Just a moment..."
+    }
+  },
+  {
+    "name": "PLOS Figshare 31560957",
+    "url": "https://plos.figshare.com/articles/dataset/_p_Anonymized_dataset_used_for_statistical_analysis_of_mastitis_and_associated_risk_factors_p_/31560957",
+    "status": "success",
+    "files": [
+      {
+        "name": "pone.0329250.s001.xlsx",
+        "size": 65273,
+        "download": "https://ndownloader.figshare.com/files/62486598"
+      }
+    ],
+    "metadata": {
+      "title": "<p>Anonymized dataset used for statistical analysis of mastitis and associated risk factors.</p>"
+    }
+  },
+  {
+    "name": "Dryad doi:10.5061/dryad.hhmgqnkp7",
+    "url": "https://datadryad.org/dataset/doi:10.5061/dryad.hhmgqnkp7",
+    "status": "http_404",
+    "files": [],
+    "metadata": {}
+  },
+  {
+    "name": "Zenodo 18013106",
+    "url": "https://zenodo.org/records/18013106",
+    "status": "http_403",
+    "files": [],
+    "metadata": {}
+  },
+  {
+    "name": "Zenodo 5733981",
+    "url": "https://zenodo.org/records/5733981",
+    "status": "http_403",
+    "files": [],
+    "metadata": {}
+  },
+  {
+    "name": "Kaggle sivaprathishsiva mastitis-disease-detection",
+    "url": "https://www.kaggle.com/datasets/sivaprathishsiva/mastitis-disease-detection",
+    "status": "page_200",
+    "files": [],
+    "metadata": {
+      "title": "Checking your browser - reCAPTCHA"
+    }
+  },
+  {
+    "name": "Zenodo 14908264",
+    "url": "https://zenodo.org/records/14908264",
+    "status": "http_403",
+    "files": [],
+    "metadata": {}
+  },
+  {
+    "name": "Zenodo 15619247",
+    "url": "https://zenodo.org/records/15619247",
+    "status": "http_403",
+    "files": [],
+    "metadata": {}
+  },
+  {
+    "name": "Zenodo 19391230",
+    "url": "https://zenodo.org/records/19391230",
+    "status": "http_403",
+    "files": [],
+    "metadata": {}
+  },
+  {
+    "name": "Zenodo 2660878",
+    "url": "https://zenodo.org/record/2660878",
+    "status": "http_403",
+    "files": [],
+    "metadata": {}
+  },
+  {
+    "name": "Zenodo 20763985",
+    "url": "https://zenodo.org/records/20763985",
+    "status": "http_403",
+    "files": [],
+    "metadata": {}
+  }
+]
