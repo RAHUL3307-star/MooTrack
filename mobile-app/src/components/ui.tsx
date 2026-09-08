@@ -37,72 +37,42 @@ export function AudioEqualizerBars({
 // ─── StatusBar ────────────────────────────────────────────────────────────────
 export function StatusBar({ light = false }: { light?: boolean }) {
   const { isLive } = useESP32();
-  const c = light ? "#FFFFFF" : "#1C2714";
+  if (!isLive) return null;
   return (
     <div
       style={{
         display: "flex",
-        justifyContent: "space-between",
+        justifyContent: "flex-end",
         alignItems: "center",
-        padding: "12px 20px 4px",
-        fontSize: 12,
-        fontWeight: 600,
-        color: c,
-        letterSpacing: "0.01em",
+        padding: "6px 16px 2px",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        <span>9:41</span>
-        {isLive && (
-          <span
-            style={{
-              fontSize: 9,
-              background: light ? "rgba(255,255,255,0.2)" : "#E6F0E2",
-              color: light ? "#FFFFFF" : "#2A5C1F",
-              border: `1px solid ${light ? "rgba(255,255,255,0.4)" : "#2A5C1F"}`,
-              borderRadius: 6,
-              padding: "1px 6px",
-              fontWeight: 800,
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 4,
-            }}
-          >
-            <span
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                background: "#22C55E",
-                display: "inline-block",
-                boxShadow: "0 0 4px #22C55E",
-              }}
-            />
-            ESP32 LIVE
-          </span>
-        )}
-      </div>
-      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-        {/* Signal bars */}
-        <svg width="16" height="11" viewBox="0 0 16 11" fill={c}>
-          <rect x="0" y="4" width="3" height="7" rx="0.5" opacity="0.35" />
-          <rect x="4.5" y="2.5" width="3" height="8.5" rx="0.5" opacity="0.6" />
-          <rect x="9" y="0.5" width="3" height="10.5" rx="0.5" />
-          <rect x="14" y="3.5" width="1.5" height="4" rx="0.5" />
-        </svg>
-        {/* WiFi */}
-        <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
-          <path d="M7.5 2.2C9.8 2.2 11.9 3.1 13.4 4.6L14.8 3.2C12.9 1.2 10.3 0 7.5 0C4.7 0 2.1 1.2 0.2 3.2L1.6 4.6C3.1 3.1 5.2 2.2 7.5 2.2Z" fill={c} opacity="0.5" />
-          <path d="M7.5 5.5C9 5.5 10.4 6.1 11.4 7.1L12.8 5.7C11.4 4.3 9.5 3.5 7.5 3.5C5.5 3.5 3.6 4.3 2.2 5.7L3.6 7.1C4.6 6.1 6 5.5 7.5 5.5Z" fill={c} opacity="0.75" />
-          <circle cx="7.5" cy="9.5" r="1.5" fill={c} />
-        </svg>
-        {/* Battery */}
-        <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
-          <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke={c} strokeOpacity="0.35" />
-          <rect x="2" y="2" width="16" height="8" rx="2" fill={c} />
-          <path d="M23 4.5V7.5C23.8 7.2 24.5 6.6 24.5 6C24.5 5.4 23.8 4.8 23 4.5Z" fill={c} opacity="0.4" />
-        </svg>
-      </div>
+      <span
+        style={{
+          fontSize: 9,
+          background: light ? "rgba(255,255,255,0.2)" : "#E6F0E2",
+          color: light ? "#FFFFFF" : "#2A5C1F",
+          border: `1px solid ${light ? "rgba(255,255,255,0.4)" : "#2A5C1F"}`,
+          borderRadius: 6,
+          padding: "2px 8px",
+          fontWeight: 800,
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 4,
+        }}
+      >
+        <span
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: "50%",
+            background: "#22C55E",
+            display: "inline-block",
+            boxShadow: "0 0 4px #22C55E",
+          }}
+        />
+        ESP32 LIVE
+      </span>
     </div>
   );
 }
