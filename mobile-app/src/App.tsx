@@ -81,6 +81,9 @@ function MainAppShell() {
     if (history.length > 0) {
       setScreen(history[history.length - 1]);
       setHistory((h) => h.slice(0, -1));
+    } else {
+      setScreen("home");
+      setActiveTab("home");
     }
   };
 

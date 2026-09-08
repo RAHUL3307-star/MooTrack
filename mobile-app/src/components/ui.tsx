@@ -233,16 +233,19 @@ export { RISK_COLOR };
 
 export function RiskBadge({
   level,
+  risk,
   small,
   lang = "English",
 }: {
-  level: RiskLevel;
+  level?: RiskLevel;
+  risk?: RiskLevel;
   small?: boolean;
   lang?: string;
 }) {
-  const c = RISK_COLOR[level];
+  const actualLevel: RiskLevel = level || risk || "none";
+  const c = RISK_COLOR[actualLevel] || RISK_COLOR.none;
   const icons: Record<RiskLevel, string> = { none: "✓", low: "↗", moderate: "⚠", high: "!" };
-  const label = t(`risk_${level}`, lang);
+  const label = t(`risk_${actualLevel}`, lang);
   return (
     <span
       style={{
@@ -259,7 +262,7 @@ export function RiskBadge({
         letterSpacing: "0.03em",
       }}
     >
-      <span style={{ fontSize: small ? 9 : 10 }}>{icons[level]}</span>
+      <span style={{ fontSize: small ? 9 : 10 }}>{icons[actualLevel] || "✓"}</span>
       {label}
     </span>
   );

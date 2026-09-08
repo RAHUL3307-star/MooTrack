@@ -18,13 +18,13 @@ export function AnalyticsScreen({
   const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d">("7d");
 
   // Dynamic calculations from context
-  const totalCows = animals.length;
+  const totalCows = Math.max(1, animals?.length || 0);
   const highRiskCount = animals.filter((a) => a.risk === "high").length;
   const modRiskCount = animals.filter((a) => a.risk === "moderate").length;
   const healthyCount = animals.filter((a) => a.risk === "none" || a.risk === "low").length;
 
   const avgSCC = Math.round(
-    animals.reduce((acc, a) => acc + (a.scc || 0), 0) / (totalCows || 1)
+    animals.reduce((acc, a) => acc + (a.scc || 0), 0) / (animals.length || 1)
   );
 
   const totalMilkYield = animals
@@ -33,16 +33,35 @@ export function AnalyticsScreen({
 
   // Herd Health Resilience Index (0 - 100)
   const healthIndex = Math.round(
-    ((healthyCount * 1.0 + modRiskCount * 0.5) / (totalCows || 1)) * 100
+    ((healthyCount * 1.0 + modRiskCount * 0.5) / totalCows) * 100
   );
 
   // Economic loss calculation (assuming ₹42/L milk and 3.5L/day loss per clinical case + ₹650 vet fee)
   const dailyLossPrevented = (modRiskCount * 3.5 * 42 + highRiskCount * 650).toFixed(0);
 
-  // 7-day trend mock data
-  const sccHistory = [310, 295, 280, 265, 255, 248, avgSCC];
-  const yieldHistory = [395, 402, 410, 415, 418, 421, parseFloat(totalMilkYield) || 424];
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Today"];
+  // Dynamic trend data based on selected timeRange
+  const trendData: Record<"7d" | "30d" | "90d", { scc: number[]; yield: number[]; labels: string[] }> = {
+    "7d": {
+      scc: [310, 295, 280, 265, 255, 248, avgSCC || 235],
+      yield: [395, 402, 410, 415, 418, 421, parseFloat(totalMilkYield) || 424],
+      labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Today"],
+    },
+    "30d": {
+      scc: [380, 360, 335, 310, 285, 260, avgSCC || 235],
+      yield: [360, 375, 390, 405, 415, 420, parseFloat(totalMilkYield) || 424],
+      labels: ["Wk 1", "Wk 2", "Wk 3", "Wk 4", "Wk 5", "Wk 6", "Today"],
+    },
+    "90d": {
+      scc: [440, 410, 380, 350, 310, 275, avgSCC || 235],
+      yield: [330, 350, 375, 395, 410, 420, parseFloat(totalMilkYield) || 424],
+      labels: ["M-3", "M-2.5", "M-2", "M-1.5", "M-1", "M-0.5", "Today"],
+    },
+  };
+
+  const currentTrend = trendData[timeRange] || trendData["7d"];
+  const sccHistory = currentTrend.scc;
+  const yieldHistory = currentTrend.yield;
+  const days = currentTrend.labels;
 
   const filteredAnimals = animals.filter((a) => {
     if (filter === "high") return a.risk === "high";
@@ -232,8 +251,9 @@ export function AnalyticsScreen({
                 strokeLinejoin="round"
                 points={sccHistory
                   .map((val, idx) => {
-                    const x = 25 + idx * 47;
-                    const y = 110 - ((val - 150) / 200) * 80;
+                    const step = days.length > 1 ? 280 / (days.length - 1) : 280;
+                    const x = 25 + idx * step;
+                    const y = 110 - ((val - 150) / 280) * 80;
                     return `${x},${Math.max(20, Math.min(115, y))}`;
                   })
                   .join(" ")}
@@ -249,8 +269,9 @@ export function AnalyticsScreen({
                 strokeDasharray="4,2"
                 points={yieldHistory
                   .map((val, idx) => {
-                    const x = 25 + idx * 47;
-                    const y = 115 - ((val - 380) / 60) * 80;
+                    const step = days.length > 1 ? 280 / (days.length - 1) : 280;
+                    const x = 25 + idx * step;
+                    const y = 115 - ((val - 300) / 150) * 80;
                     return `${x},${Math.max(20, Math.min(115, y))}`;
                   })
                   .join(" ")}
@@ -258,8 +279,9 @@ export function AnalyticsScreen({
 
               {/* Data points */}
               {sccHistory.map((val, idx) => {
-                const x = 25 + idx * 47;
-                const y = 110 - ((val - 150) / 200) * 80;
+                const step = days.length > 1 ? 280 / (days.length - 1) : 280;
+                const x = 25 + idx * step;
+                const y = 110 - ((val - 150) / 280) * 80;
                 return (
                   <circle
                     key={`scc-${idx}`}
@@ -274,19 +296,22 @@ export function AnalyticsScreen({
               })}
 
               {/* Day Labels */}
-              {days.map((d, idx) => (
-                <text
-                  key={d}
-                  x={25 + idx * 47}
-                  y="130"
-                  textAnchor="middle"
-                  fontSize="9"
-                  fill="#8A7356"
-                  fontWeight="600"
-                >
-                  {d}
-                </text>
-              ))}
+              {days.map((d, idx) => {
+                const step = days.length > 1 ? 280 / (days.length - 1) : 280;
+                return (
+                  <text
+                    key={`${d}-${idx}`}
+                    x={25 + idx * step}
+                    y="130"
+                    textAnchor="middle"
+                    fontSize="9"
+                    fill="#8A7356"
+                    fontWeight="600"
+                  >
+                    {d}
+                  </text>
+                );
+              })}
             </svg>
           </div>
 
@@ -313,7 +338,7 @@ export function AnalyticsScreen({
           <div style={{ display: "flex", height: 16, borderRadius: 8, overflow: "hidden", marginBottom: 10 }}>
             <div
               style={{
-                width: `${(healthyCount / totalCows) * 100}%`,
+                width: `${Math.max(0, (healthyCount / totalCows) * 100)}%`,
                 background: "#2E7D32",
                 transition: "width 0.4s",
               }}
@@ -321,7 +346,7 @@ export function AnalyticsScreen({
             />
             <div
               style={{
-                width: `${(modRiskCount / totalCows) * 100}%`,
+                width: `${Math.max(0, (modRiskCount / totalCows) * 100)}%`,
                 background: "#F59E0B",
                 transition: "width 0.4s",
               }}
@@ -329,7 +354,7 @@ export function AnalyticsScreen({
             />
             <div
               style={{
-                width: `${(highRiskCount / totalCows) * 100}%`,
+                width: `${Math.max(0, (highRiskCount / totalCows) * 100)}%`,
                 background: "#DC2626",
                 transition: "width 0.4s",
               }}
@@ -418,7 +443,7 @@ export function AnalyticsScreen({
                 </div>
 
                 <div style={{ textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }}>
-                  <RiskBadge risk={animal.risk} lang={lang} />
+                  <RiskBadge level={animal.risk} risk={animal.risk} lang={lang} />
                   <span style={{ fontSize: 11, fontWeight: 700, color: animal.scc > 300 ? "#B83220" : "#2A5C1F" }}>
                     {animal.scc}k SCC
                   </span>
