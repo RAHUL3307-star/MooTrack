@@ -1,5 +1,5 @@
-// MooTracker PWA Service Worker v2
-const CACHE_NAME = 'mootracker-v2';
+// MooTracker PWA Service Worker v3 (Visual AI & Analytics Upgrades)
+const CACHE_NAME = 'mootracker-v3';
 const OFFLINE_URL = 'mobile.html';
 
 // Core assets to cache on install
