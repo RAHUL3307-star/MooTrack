@@ -1,0 +1,952 @@
+{
+  "dataset_name": "Bovine Clinical Mastitis & Teat Condition Image Dataset",
+  "total_images": 187,
+  "categories": {
+    "mastitis": 170,
+    "normal_teats": 10,
+    "general_samples": 7
+  },
+  "catalog": {
+    "mastitis": [
+      {
+        "filename": "Base-ringing-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Base-ringing-400x284.jpg",
+        "size_bytes": 19649
+      },
+      {
+        "filename": "Burnt-teat-e1515283231199-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Burnt-teat-e1515283231199-400x284.jpg",
+        "size_bytes": 19902
+      },
+      {
+        "filename": "Chemcial-burn-e1515283477137-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Chemcial-burn-e1515283477137-400x284.jpg",
+        "size_bytes": 13837
+      },
+      {
+        "filename": "Chemcial-burn3-e1515283623745-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Chemcial-burn3-e1515283623745-400x284.jpg",
+        "size_bytes": 16393
+      },
+      {
+        "filename": "Chemcial-burn4-e1515283733588-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Chemcial-burn4-e1515283733588-400x284.jpg",
+        "size_bytes": 13286
+      },
+      {
+        "filename": "Chemical-burn-6-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Chemical-burn-6-400x284.jpg",
+        "size_bytes": 10786
+      },
+      {
+        "filename": "Chemical-burn-7-e1515283936872-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Chemical-burn-7-e1515283936872-400x284.jpg",
+        "size_bytes": 14886
+      },
+      {
+        "filename": "Chemical-damage-e1515285856612-356x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Chemical-damage-e1515285856612-356x284.jpg",
+        "size_bytes": 20083
+      },
+      {
+        "filename": "Chlorine-pre-dip-used-at-4-parts-chlorine-1-part-waters-manure-solids-bedding-e1515285965121-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Chlorine-pre-dip-used-at-4-parts-chlorine-1-part-waters-manure-solids-bedding-e1515285965121-400x284.jpg",
+        "size_bytes": 13464
+      },
+      {
+        "filename": "Creased-blue-teats-low-rest-phase-high-vacuumKE-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Creased-blue-teats-low-rest-phase-high-vacuumKE-400x284.jpg",
+        "size_bytes": 17221
+      },
+      {
+        "filename": "Drying-chemical-barrier-dip-build-up-build-up-e1515286053269.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Drying-chemical-barrier-dip-build-up-build-up-e1515286053269.jpg",
+        "size_bytes": 9706
+      },
+      {
+        "filename": "Facial-eczma-on-teats-e1515294568304-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Facial-eczma-on-teats-e1515294568304-400x284.jpg",
+        "size_bytes": 16863
+      },
+      {
+        "filename": "Hyperkeratosis-e1515371480240-332x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Hyperkeratosis-e1515371480240-332x284.jpg",
+        "size_bytes": 19730
+      },
+      {
+        "filename": "Isolated-keratin-1-1-e1515371116259-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Isolated-keratin-1-1-e1515371116259-400x284.jpg",
+        "size_bytes": 16440
+      },
+      {
+        "filename": "Large-Ring-1-1-e1515371355481-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Large-Ring-1-1-e1515371355481-400x284.jpg",
+        "size_bytes": 14451
+      },
+      {
+        "filename": "Large-Ring-1-2-e1515371563841-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Large-Ring-1-2-e1515371563841-400x284.jpg",
+        "size_bytes": 14370
+      },
+      {
+        "filename": "Large-Ring-2-2-e1515371633565-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Large-Ring-2-2-e1515371633565-400x284.jpg",
+        "size_bytes": 15331
+      },
+      {
+        "filename": "Large-Rough-Ring-1-2-e1515372034493-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Large-Rough-Ring-1-2-e1515372034493-400x284.jpg",
+        "size_bytes": 17803
+      },
+      {
+        "filename": "NMC-TCP-chemical-damage1-e1515281879220-400x284.jpeg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/NMC-TCP-chemical-damage1-e1515281879220-400x284.jpeg",
+        "size_bytes": 11323
+      },
+      {
+        "filename": "Papilloma-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Papilloma-400x284.jpg",
+        "size_bytes": 22476
+      },
+      {
+        "filename": "Petechail-hemoraghing-e1515364651809-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Petechail-hemoraghing-e1515364651809-400x284.jpg",
+        "size_bytes": 16760
+      },
+      {
+        "filename": "Picture1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture1-400x284.jpg",
+        "size_bytes": 20428
+      },
+      {
+        "filename": "Picture11-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture11-400x284.jpg",
+        "size_bytes": 21544
+      },
+      {
+        "filename": "Picture12-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture12-400x284.jpg",
+        "size_bytes": 19776
+      },
+      {
+        "filename": "Picture13-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture13-400x284.jpg",
+        "size_bytes": 22900
+      },
+      {
+        "filename": "Picture15-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture15-400x284.jpg",
+        "size_bytes": 16927
+      },
+      {
+        "filename": "Picture16-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture16-400x284.jpg",
+        "size_bytes": 19211
+      },
+      {
+        "filename": "Picture17-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture17-400x284.jpg",
+        "size_bytes": 12899
+      },
+      {
+        "filename": "Picture18-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture18-400x284.jpg",
+        "size_bytes": 17885
+      },
+      {
+        "filename": "Picture19-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture19-400x284.jpg",
+        "size_bytes": 10985
+      },
+      {
+        "filename": "Picture2-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture2-400x284.jpg",
+        "size_bytes": 15277
+      },
+      {
+        "filename": "Picture20-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture20-1-400x284.jpg",
+        "size_bytes": 26369
+      },
+      {
+        "filename": "Picture20-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture20-400x284.jpg",
+        "size_bytes": 10164
+      },
+      {
+        "filename": "Picture21-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture21-1-400x284.jpg",
+        "size_bytes": 18680
+      },
+      {
+        "filename": "Picture21-2-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture21-2-400x284.jpg",
+        "size_bytes": 18680
+      },
+      {
+        "filename": "Picture21-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture21-400x284.jpg",
+        "size_bytes": 14110
+      },
+      {
+        "filename": "Picture22-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture22-400x284.jpg",
+        "size_bytes": 12260
+      },
+      {
+        "filename": "Picture23-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture23-1-400x284.jpg",
+        "size_bytes": 17689
+      },
+      {
+        "filename": "Picture23-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture23-400x284.jpg",
+        "size_bytes": 13662
+      },
+      {
+        "filename": "Picture24-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture24-1-400x284.jpg",
+        "size_bytes": 18930
+      },
+      {
+        "filename": "Picture24-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture24-400x284.jpg",
+        "size_bytes": 19366
+      },
+      {
+        "filename": "Picture25-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture25-1-400x284.jpg",
+        "size_bytes": 13885
+      },
+      {
+        "filename": "Picture25-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture25-400x284.jpg",
+        "size_bytes": 19771
+      },
+      {
+        "filename": "Picture26-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture26-1-400x284.jpg",
+        "size_bytes": 10307
+      },
+      {
+        "filename": "Picture26-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture26-400x284.jpg",
+        "size_bytes": 19962
+      },
+      {
+        "filename": "Picture27-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture27-400x284.jpg",
+        "size_bytes": 20950
+      },
+      {
+        "filename": "Picture28-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture28-1-400x284.jpg",
+        "size_bytes": 13537
+      },
+      {
+        "filename": "Picture28-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture28-400x284.jpg",
+        "size_bytes": 13460
+      },
+      {
+        "filename": "Picture29-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture29-1-400x284.jpg",
+        "size_bytes": 16845
+      },
+      {
+        "filename": "Picture29-297x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture29-297x284.jpg",
+        "size_bytes": 5952
+      },
+      {
+        "filename": "Picture30-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture30-1-400x284.jpg",
+        "size_bytes": 28073
+      },
+      {
+        "filename": "Picture30-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture30-400x284.jpg",
+        "size_bytes": 16757
+      },
+      {
+        "filename": "Picture31-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture31-400x284.jpg",
+        "size_bytes": 22341
+      },
+      {
+        "filename": "Picture32-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture32-400x284.jpg",
+        "size_bytes": 17719
+      },
+      {
+        "filename": "Picture34-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture34-1-400x284.jpg",
+        "size_bytes": 16722
+      },
+      {
+        "filename": "Picture34-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture34-400x284.jpg",
+        "size_bytes": 19528
+      },
+      {
+        "filename": "Picture35-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture35-400x284.jpg",
+        "size_bytes": 18453
+      },
+      {
+        "filename": "Picture36-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture36-400x284.jpg",
+        "size_bytes": 21185
+      },
+      {
+        "filename": "Picture4-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture4-400x284.jpg",
+        "size_bytes": 11926
+      },
+      {
+        "filename": "Picture40-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture40-400x284.jpg",
+        "size_bytes": 17138
+      },
+      {
+        "filename": "Picture41-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture41-400x284.jpg",
+        "size_bytes": 18592
+      },
+      {
+        "filename": "Picture42-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture42-1-400x284.jpg",
+        "size_bytes": 19379
+      },
+      {
+        "filename": "Picture42-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture42-400x284.jpg",
+        "size_bytes": 21147
+      },
+      {
+        "filename": "Picture43-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture43-1-400x284.jpg",
+        "size_bytes": 16719
+      },
+      {
+        "filename": "Picture43-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture43-400x284.jpg",
+        "size_bytes": 15899
+      },
+      {
+        "filename": "Picture44-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture44-1-400x284.jpg",
+        "size_bytes": 10855
+      },
+      {
+        "filename": "Picture44-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture44-400x284.jpg",
+        "size_bytes": 17348
+      },
+      {
+        "filename": "Picture45-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture45-1-400x284.jpg",
+        "size_bytes": 17537
+      },
+      {
+        "filename": "Picture45-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture45-400x284.jpg",
+        "size_bytes": 15248
+      },
+      {
+        "filename": "Picture46-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture46-1-400x284.jpg",
+        "size_bytes": 16044
+      },
+      {
+        "filename": "Picture46-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture46-400x284.jpg",
+        "size_bytes": 24228
+      },
+      {
+        "filename": "Picture47-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture47-1-400x284.jpg",
+        "size_bytes": 12591
+      },
+      {
+        "filename": "Picture47-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture47-400x284.jpg",
+        "size_bytes": 14636
+      },
+      {
+        "filename": "Picture48-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture48-1-400x284.jpg",
+        "size_bytes": 13549
+      },
+      {
+        "filename": "Picture48-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture48-400x284.jpg",
+        "size_bytes": 12490
+      },
+      {
+        "filename": "Picture49-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture49-1-400x284.jpg",
+        "size_bytes": 17551
+      },
+      {
+        "filename": "Picture49-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture49-400x284.jpg",
+        "size_bytes": 14868
+      },
+      {
+        "filename": "Picture50-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture50-1-400x284.jpg",
+        "size_bytes": 21314
+      },
+      {
+        "filename": "Picture50-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture50-400x284.jpg",
+        "size_bytes": 12971
+      },
+      {
+        "filename": "Picture51-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture51-400x284.jpg",
+        "size_bytes": 16879
+      },
+      {
+        "filename": "Picture52-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture52-400x284.jpg",
+        "size_bytes": 23037
+      },
+      {
+        "filename": "Picture53-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture53-400x284.jpg",
+        "size_bytes": 20048
+      },
+      {
+        "filename": "Picture54-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture54-400x284.jpg",
+        "size_bytes": 16217
+      },
+      {
+        "filename": "Picture9-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Picture9-400x284.jpg",
+        "size_bytes": 17437
+      },
+      {
+        "filename": "Purple-Teats-with-wedging-overmilking-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Purple-Teats-with-wedging-overmilking-400x284.jpg",
+        "size_bytes": 14977
+      },
+      {
+        "filename": "Smooth-1-1-e1515372118683-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Smooth-1-1-e1515372118683-400x284.jpg",
+        "size_bytes": 13707
+      },
+      {
+        "filename": "Smooth-2-1-e1515372198475-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Smooth-2-1-e1515372198475-400x284.jpg",
+        "size_bytes": 15853
+      },
+      {
+        "filename": "Smooth-2-2-e1515372371349-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Smooth-2-2-e1515372371349-400x284.jpg",
+        "size_bytes": 14963
+      },
+      {
+        "filename": "Very-Rough-2-1-e1515371869119-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Very-Rough-2-1-e1515371869119-400x284.jpg",
+        "size_bytes": 15347
+      },
+      {
+        "filename": "Very-Rough-2-2-e1515372540883-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/Very-Rough-2-2-e1515372540883-400x284.jpg",
+        "size_bytes": 16058
+      },
+      {
+        "filename": "blue11-e1515364798164-1012x1024-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/blue11-e1515364798164-1012x1024-1-400x284.jpg",
+        "size_bytes": 16987
+      },
+      {
+        "filename": "blue12-e1515364823675-1024x790-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/blue12-e1515364823675-1024x790-1-400x284.jpg",
+        "size_bytes": 20162
+      },
+      {
+        "filename": "chaps-2.1new-and-healed-390x284.png",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/chaps-2.1new-and-healed-390x284.png",
+        "size_bytes": 57418
+      },
+      {
+        "filename": "chaps-3.1whole-teat.soiled-400x284.png",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/chaps-3.1whole-teat.soiled-400x284.png",
+        "size_bytes": 63046
+      },
+      {
+        "filename": "chaps-4.1scabbed-400x284.png",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/chaps-4.1scabbed-400x284.png",
+        "size_bytes": 57660
+      },
+      {
+        "filename": "chaps-5.1.orifice-400x284.png",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/chaps-5.1.orifice-400x284.png",
+        "size_bytes": 55298
+      },
+      {
+        "filename": "chaps-6.1.mouthpiece-400x284.png",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/chaps-6.1.mouthpiece-400x284.png",
+        "size_bytes": 47678
+      },
+      {
+        "filename": "chemical-burn2-e1515284193990-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/chemical-burn2-e1515284193990-400x284.jpg",
+        "size_bytes": 18274
+      },
+      {
+        "filename": "dry-skin-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/dry-skin-1-400x284.jpg",
+        "size_bytes": 15970
+      },
+      {
+        "filename": "dry-skin-2-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/dry-skin-2-400x284.jpg",
+        "size_bytes": 11213
+      },
+      {
+        "filename": "dry-skin-crack-6-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/dry-skin-crack-6-400x284.jpg",
+        "size_bytes": 13698
+      },
+      {
+        "filename": "dry-skin-crack2-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/dry-skin-crack2-400x284.jpg",
+        "size_bytes": 13801
+      },
+      {
+        "filename": "dry-skin-crack3-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/dry-skin-crack3-400x284.jpg",
+        "size_bytes": 16531
+      },
+      {
+        "filename": "dry-skin-crack5-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/dry-skin-crack5-400x284.jpg",
+        "size_bytes": 13444
+      },
+      {
+        "filename": "dry-skin-crack7-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/dry-skin-crack7-400x284.jpg",
+        "size_bytes": 17560
+      },
+      {
+        "filename": "dry-skin-crack9-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/dry-skin-crack9-400x284.jpg",
+        "size_bytes": 24420
+      },
+      {
+        "filename": "dry-skin-eo5-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/dry-skin-eo5-400x284.jpg",
+        "size_bytes": 21716
+      },
+      {
+        "filename": "dry-skin5-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/dry-skin5-400x284.jpg",
+        "size_bytes": 14811
+      },
+      {
+        "filename": "dry-skin7-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/dry-skin7-400x284.jpg",
+        "size_bytes": 14988
+      },
+      {
+        "filename": "dry-skin8-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/dry-skin8-400x284.jpg",
+        "size_bytes": 13387
+      },
+      {
+        "filename": "exfol1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/exfol1-400x284.jpg",
+        "size_bytes": 14136
+      },
+      {
+        "filename": "exfol2-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/exfol2-400x284.jpg",
+        "size_bytes": 13373
+      },
+      {
+        "filename": "exfol3-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/exfol3-400x284.jpg",
+        "size_bytes": 10217
+      },
+      {
+        "filename": "frostbite5_preview-e1515281757816-400x284.jpeg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/frostbite5_preview-e1515281757816-400x284.jpeg",
+        "size_bytes": 9448
+      },
+      {
+        "filename": "hyp1-e1515373528892-940x1024-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp1-e1515373528892-940x1024-1-400x284.jpg",
+        "size_bytes": 16859
+      },
+      {
+        "filename": "hyp10-e1515373757796-1024x902-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp10-e1515373757796-1024x902-1-400x284.jpg",
+        "size_bytes": 11337
+      },
+      {
+        "filename": "hyp11-e1515373777349-1024x851-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp11-e1515373777349-1024x851-1-400x284.jpg",
+        "size_bytes": 13616
+      },
+      {
+        "filename": "hyp12-e1515373796893-1024x903-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp12-e1515373796893-1024x903-1-400x284.jpg",
+        "size_bytes": 13866
+      },
+      {
+        "filename": "hyp13-e1515373816135-1024x738-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp13-e1515373816135-1024x738-1-400x284.jpg",
+        "size_bytes": 11386
+      },
+      {
+        "filename": "hyp14-e1515373846770-1024x925-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp14-e1515373846770-1024x925-1-400x284.jpg",
+        "size_bytes": 12238
+      },
+      {
+        "filename": "hyp15-e1515373864506-1024x765-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp15-e1515373864506-1024x765-1-400x284.jpg",
+        "size_bytes": 7623
+      },
+      {
+        "filename": "hyp16-e1515373888406-1024x718-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp16-e1515373888406-1024x718-1-400x284.jpg",
+        "size_bytes": 13232
+      },
+      {
+        "filename": "hyp17-e1515373911728-1024x894-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp17-e1515373911728-1024x894-1-400x284.jpg",
+        "size_bytes": 12007
+      },
+      {
+        "filename": "hyp18-e1515373930791-1024x972-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp18-e1515373930791-1024x972-1-400x284.jpg",
+        "size_bytes": 12774
+      },
+      {
+        "filename": "hyp19-e1515373952298-1024x828-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp19-e1515373952298-1024x828-1-400x284.jpg",
+        "size_bytes": 12701
+      },
+      {
+        "filename": "hyp2-e1515373564252-729x1024-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp2-e1515373564252-729x1024-1-400x284.jpg",
+        "size_bytes": 16352
+      },
+      {
+        "filename": "hyp20-e1515373975164-1024x749-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp20-e1515373975164-1024x749-1-400x284.jpg",
+        "size_bytes": 11774
+      },
+      {
+        "filename": "hyp21-e1515374009194-1024x763-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp21-e1515374009194-1024x763-1-400x284.jpg",
+        "size_bytes": 10299
+      },
+      {
+        "filename": "hyp22-e1515374029867-1024x742-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp22-e1515374029867-1024x742-1-400x284.jpg",
+        "size_bytes": 13310
+      },
+      {
+        "filename": "hyp23-e1515374144420-1024x787-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp23-e1515374144420-1024x787-1-400x284.jpg",
+        "size_bytes": 11793
+      },
+      {
+        "filename": "hyp24-e1515374393597-1024x788-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp24-e1515374393597-1024x788-1-400x284.jpg",
+        "size_bytes": 14289
+      },
+      {
+        "filename": "hyp25-1024x683-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp25-1024x683-1-400x284.jpg",
+        "size_bytes": 8200
+      },
+      {
+        "filename": "hyp3-e1515373586855-1024x864-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp3-e1515373586855-1024x864-1-400x284.jpg",
+        "size_bytes": 9950
+      },
+      {
+        "filename": "hyp4-e1515373603251-1024x688-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp4-e1515373603251-1024x688-1-400x284.jpg",
+        "size_bytes": 8694
+      },
+      {
+        "filename": "hyp5-e1515373631315-1024x893-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp5-e1515373631315-1024x893-1-400x284.jpg",
+        "size_bytes": 9964
+      },
+      {
+        "filename": "hyp6-e1515373652959-1024x855-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp6-e1515373652959-1024x855-1-400x284.jpg",
+        "size_bytes": 11805
+      },
+      {
+        "filename": "hyp7-e1515373678799-1024x799-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp7-e1515373678799-1024x799-1-400x284.jpg",
+        "size_bytes": 7481
+      },
+      {
+        "filename": "hyp8-e1515373705810-1024x765-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp8-e1515373705810-1024x765-1-400x284.jpg",
+        "size_bytes": 6820
+      },
+      {
+        "filename": "hyp9-e1515373723171-1024x924-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/hyp9-e1515373723171-1024x924-1-400x284.jpg",
+        "size_bytes": 13718
+      },
+      {
+        "filename": "pet-hem2-e1515364540239-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/pet-hem2-e1515364540239-400x284.jpg",
+        "size_bytes": 14957
+      },
+      {
+        "filename": "pet-hem3-e1515364562702-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/pet-hem3-e1515364562702-400x284.jpg",
+        "size_bytes": 11143
+      },
+      {
+        "filename": "pox1-e1515354008404-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/pox1-e1515354008404-400x284.jpg",
+        "size_bytes": 21224
+      },
+      {
+        "filename": "pox2-e1515354088188-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/pox2-e1515354088188-400x284.jpg",
+        "size_bytes": 27229
+      },
+      {
+        "filename": "pox3-e1515354218443-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/pox3-e1515354218443-400x284.jpg",
+        "size_bytes": 13420
+      },
+      {
+        "filename": "pox4-e1515354347181-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/pox4-e1515354347181-400x284.jpg",
+        "size_bytes": 20384
+      },
+      {
+        "filename": "pox5-e1515354512661-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/pox5-e1515354512661-400x284.jpg",
+        "size_bytes": 13634
+      },
+      {
+        "filename": "pox6-e1515355158533-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/pox6-e1515355158533-400x284.jpg",
+        "size_bytes": 19152
+      },
+      {
+        "filename": "pseudo-pox1-e1515356634396-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/pseudo-pox1-e1515356634396-400x284.jpg",
+        "size_bytes": 23502
+      },
+      {
+        "filename": "red10-e1515364965265-652x1024-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/red10-e1515364965265-652x1024-1-400x284.jpg",
+        "size_bytes": 11258
+      },
+      {
+        "filename": "red11-683x1024-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/red11-683x1024-1-400x284.jpg",
+        "size_bytes": 15864
+      },
+      {
+        "filename": "red13-e1515365056736-735x1024-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/red13-e1515365056736-735x1024-1-400x284.jpg",
+        "size_bytes": 14663
+      },
+      {
+        "filename": "red14-e1515365078912-1024x756-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/red14-e1515365078912-1024x756-1-400x284.jpg",
+        "size_bytes": 16500
+      },
+      {
+        "filename": "red5-e1515364876519-839x1024-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/red5-e1515364876519-839x1024-1-400x284.jpg",
+        "size_bytes": 10989
+      },
+      {
+        "filename": "red7-e1515364900556-1024x843-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/red7-e1515364900556-1024x843-1-400x284.jpg",
+        "size_bytes": 11375
+      },
+      {
+        "filename": "red8-e1515364929848-1024x997-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/red8-e1515364929848-1024x997-1-400x284.jpg",
+        "size_bytes": 12957
+      },
+      {
+        "filename": "ring10-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/ring10-400x284.jpg",
+        "size_bytes": 17516
+      },
+      {
+        "filename": "ring11-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/ring11-400x284.jpg",
+        "size_bytes": 15538
+      },
+      {
+        "filename": "ring16-e1515291521268-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/ring16-e1515291521268-400x284.jpg",
+        "size_bytes": 11282
+      },
+      {
+        "filename": "ring2-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/ring2-400x284.jpg",
+        "size_bytes": 9417
+      },
+      {
+        "filename": "ring4-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/ring4-400x284.jpg",
+        "size_bytes": 11002
+      },
+      {
+        "filename": "ring6-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/ring6-400x284.jpg",
+        "size_bytes": 17455
+      },
+      {
+        "filename": "ring7-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/ring7-400x284.jpg",
+        "size_bytes": 17922
+      },
+      {
+        "filename": "severe-hemm3-e1515364758805-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/severe-hemm3-e1515364758805-400x284.jpg",
+        "size_bytes": 16582
+      },
+      {
+        "filename": "severe-hemm7-e1515364519265-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/severe-hemm7-e1515364519265-400x284.jpg",
+        "size_bytes": 25736
+      },
+      {
+        "filename": "severe-ringing-blue-teats-congestionKE-1-e1515364733512-1024x809-1-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/severe-ringing-blue-teats-congestionKE-1-e1515364733512-1024x809-1-400x284.jpg",
+        "size_bytes": 16806
+      },
+      {
+        "filename": "severe-ringing-blue-teats-congestionKE-e1515291895686-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/severe-ringing-blue-teats-congestionKE-e1515291895686-400x284.jpg",
+        "size_bytes": 18082
+      },
+      {
+        "filename": "wet-teat2-1-e1515287241981-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/wet-teat2-1-e1515287241981-400x284.jpg",
+        "size_bytes": 18929
+      },
+      {
+        "filename": "wet-teat2-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/wet-teat2-400x284.jpg",
+        "size_bytes": 19569
+      },
+      {
+        "filename": "wet-teat6-1-e1515287995479-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/wet-teat6-1-e1515287995479-400x284.jpg",
+        "size_bytes": 16896
+      },
+      {
+        "filename": "wet-teat6-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/mastitis/wet-teat6-400x284.jpg",
+        "size_bytes": 16571
+      }
+    ],
+    "normal_teats": [
+      {
+        "filename": "normal1-e1515368903681-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/normal_teats/normal1-e1515368903681-400x284.jpg",
+        "size_bytes": 11584
+      },
+      {
+        "filename": "normal12-e1515369630614-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/normal_teats/normal12-e1515369630614-400x284.jpg",
+        "size_bytes": 11327
+      },
+      {
+        "filename": "normal14-e1515369702798-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/normal_teats/normal14-e1515369702798-400x284.jpg",
+        "size_bytes": 10995
+      },
+      {
+        "filename": "normal15-e1515369788421-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/normal_teats/normal15-e1515369788421-400x284.jpg",
+        "size_bytes": 16928
+      },
+      {
+        "filename": "normal16-e1515369863835-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/normal_teats/normal16-e1515369863835-400x284.jpg",
+        "size_bytes": 12549
+      },
+      {
+        "filename": "normal17-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/normal_teats/normal17-400x284.jpg",
+        "size_bytes": 21679
+      },
+      {
+        "filename": "normal18-e1515370070827-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/normal_teats/normal18-e1515370070827-400x284.jpg",
+        "size_bytes": 10420
+      },
+      {
+        "filename": "normal2-e1515369386480-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/normal_teats/normal2-e1515369386480-400x284.jpg",
+        "size_bytes": 13624
+      },
+      {
+        "filename": "normal4-e1515369489318-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/normal_teats/normal4-e1515369489318-400x284.jpg",
+        "size_bytes": 14904
+      },
+      {
+        "filename": "normal5-e1515369559545-400x284.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/normal_teats/normal5-e1515369559545-400x284.jpg",
+        "size_bytes": 15092
+      }
+    ],
+    "general_samples": [
+      {
+        "filename": "001_30_IMG_gro174291-009-848x565.jpg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/general_samples/001_30_IMG_gro174291-009-848x565.jpg",
+        "size_bytes": 82670
+      },
+      {
+        "filename": "23.jpeg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/general_samples/23.jpeg",
+        "size_bytes": 9274
+      },
+      {
+        "filename": "26.jpeg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/general_samples/26.jpeg",
+        "size_bytes": 5330
+      },
+      {
+        "filename": "27.jpeg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/general_samples/27.jpeg",
+        "size_bytes": 4853
+      },
+      {
+        "filename": "6.jpeg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/general_samples/6.jpeg",
+        "size_bytes": 4978
+      },
+      {
+        "filename": "7.jpeg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/general_samples/7.jpeg",
+        "size_bytes": 5579
+      },
+      {
+        "filename": "8.jpeg",
+        "path": "datasets/images/bovine_mastitis_clinical_dataset/general_samples/8.jpeg",
+        "size_bytes": 6157
+      }
+    ]
+  }
+}

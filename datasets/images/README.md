@@ -30,7 +30,18 @@ This directory contains open-access, peer-reviewed clinical and thermal imaging 
 
 ---
 
-### 3. 🔬 B-Mode Udder Ultrasound & Parenchyma Sonograms (Mendeley Data)
+### 3. 🔬 Bovine Clinical Mastitis & Teat Condition Image Dataset
+- **Directory:** [`bovine_mastitis_clinical_dataset/`](./bovine_mastitis_clinical_dataset/)
+- **Total Images:** 187 clinical images
+- **Contents:**
+  - `mastitis/` (170 images): Clinical mastitis, hyperkeratosis rings (Grades 1–4), chemical burns, teat edema, papillomas, and petechial hemorrhaging.
+  - `normal_teats/` (10 images): Healthy baseline smooth teat orifices (NMC Grade 1).
+  - `general_samples/` (7 images): Macro photographic reference field samples.
+- **Index:** Indexed in `dataset_catalog.json`.
+
+---
+
+### 4. 🔬 B-Mode Udder Ultrasound & Parenchyma Sonograms (Mendeley Data)
 - **Source:** Mendeley Data ([DOI: 10.17632/d8kgk57b9h](https://data.mendeley.com/))
 - **Contents:** 3,072 B-mode ultrasound sonograms of bovine mammary glands with echotexture feature matrices for tissue density and mastitis fibrosis analysis.
 
