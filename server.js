@@ -217,7 +217,7 @@ void loop() {
 
 
   if (reqPath === '/' || reqPath === '') reqPath = '/index.html';
-  if (reqPath === '/dashboard' || reqPath === '/app' || reqPath === '/mobile') reqPath = '/mobile.html';
+  if (reqPath === '/dashboard' || reqPath === '/app' || reqPath === '/app/' || reqPath === '/mobile' || reqPath === '/mobile/') reqPath = '/mobile.html';
 
   const filePath = path.join(__dirname, reqPath);
   const ext = path.extname(filePath).toLowerCase();
