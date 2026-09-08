@@ -145,10 +145,14 @@ function analyzeUdderImageWithDataset(
         const totalPixels = w * h;
 
         let bovineSkinPixels = 0;
+        let bovineSkinPixelsLowerHalf = 0; // udder hangs in lower half
         let grayscaleInkPixels = 0;
         let pureBlackPixels = 0;
         let pureWhitePixels = 0;
         let artificialVividPixels = 0;
+        let saturationSum = 0;
+        let saturationCount = 0;
+        let uniformFlatPixels = 0; // walls, floors, solid-color surfaces
 
         let totalRedness = 0;
         let leftMass = 0;
@@ -169,6 +173,18 @@ function analyzeUdderImageWithDataset(
 
           const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
           grayBuf[idx] = luminance;
+
+          // HSL-based saturation for organic tissue variance check
+          const maxC = Math.max(r, g, b);
+          const minC = Math.min(r, g, b);
+          const delta = (maxC - minC) / 255;
+          saturationSum += delta;
+          saturationCount++;
+
+          // Flat uniform surfaces (walls, floors, solid objects) — low color variance
+          if (delta < 0.08 && luminance > 40 && luminance < 220) {
+            uniformFlatPixels++;
+          }
 
           // Check for pure black/ink lines (manga / sketches / text)
           if (r < 35 && g < 35 && b < 35) {
@@ -191,10 +207,13 @@ function analyzeUdderImageWithDataset(
           }
 
           // True organic bovine mammalian tissue/udder skin color detection
-          // Pinkish/salmon udders, tan cattle skin, brown or dark pigmented bovine udder
-          const isWarmPinkTissue = r > 115 && g > 65 && b > 55 && r > g && (r - b) > 12 && (r - g) > 8;
-          const isTanBovineSkin = r > 70 && g > 45 && b > 30 && r > g && g >= b && (r - b) > 18;
-          const isDarkBovineSkin = r >= 35 && g >= 25 && b >= 20 && r > g && g >= b && (r - b) > 6 && r < 120;
+          // Stricter: require meaningful redness delta to avoid generic warm objects
+          // Pinkish/salmon udders: strong r>g>b with non-trivial difference
+          const isWarmPinkTissue = r > 120 && g > 70 && b > 55 && r > g && (r - b) > 18 && (r - g) > 12 && delta > 0.08;
+          // Tan cattle skin: warm brown tones with clear warm bias
+          const isTanBovineSkin = r > 80 && g > 50 && b > 30 && r > g && g > b && (r - b) > 25 && (g - b) > 8 && delta > 0.1;
+          // Dark bovine pigmentation: darker brownish with warm bias
+          const isDarkBovineSkin = r >= 40 && g >= 28 && b >= 18 && r > g && g >= b && (r - b) > 10 && r < 110 && delta > 0.06;
 
           if (isWarmPinkTissue || isTanBovineSkin || isDarkBovineSkin) {
             bovineSkinPixels++;
@@ -206,15 +225,23 @@ function analyzeUdderImageWithDataset(
 
             if (y < h / 2) topMass += 1;
             else bottomMass += 1;
+
+            // Count bovine-skin pixels in lower half (udder location)
+            if (y >= h / 2) bovineSkinPixelsLowerHalf++;
           }
         }
 
         const bovineSkinPct = Math.round((bovineSkinPixels / totalPixels) * 100);
+        const bovineLowerHalfPct = Math.round((bovineSkinPixelsLowerHalf / (totalPixels / 2)) * 100);
         const grayscaleInkPct = Math.round((grayscaleInkPixels / totalPixels) * 100);
         const pureContrastPct = Math.round(((pureBlackPixels + pureWhitePixels) / totalPixels) * 100);
         const artificialPct = Math.round((artificialVividPixels / totalPixels) * 100);
+        const avgSaturation = saturationCount > 0 ? saturationSum / saturationCount : 0;
+        const uniformFlatPct = Math.round((uniformFlatPixels / totalPixels) * 100);
 
         // ─── REJECTION RULES ────────────────────────────────────────────────
+        // Udder images must: (1) not be art/graphics, (2) have ≥35% warm bovine tone,
+        // (3) show the udder concentrate in lower-half (≥28%), (4) not be flat uniform surface
         let rejectionReason = "";
         let detectedSubject = "Bovine Udder";
 
@@ -224,9 +251,20 @@ function analyzeUdderImageWithDataset(
         } else if (artificialPct > 28) {
           rejectionReason = "Artificial / Digital Graphic detected. Unnatural synthetic colors found.";
           detectedSubject = "Digital Graphic / Non-Biological";
-        } else if (bovineSkinPct < 22) {
+        } else if (uniformFlatPct > 55) {
+          rejectionReason = "Flat/uniform surface detected (wall, floor, or solid object). No biological udder texture found.";
+          detectedSubject = "Non-Biological Surface";
+        } else if (bovineSkinPct < 35) {
           rejectionReason = "No cow udder, teat, or cattle tissue detected in this photo. Please upload a clear camera photo of the cow's udder.";
           detectedSubject = "Unidentified Object / Non-Cow";
+        } else if (bovineLowerHalfPct < 28) {
+          // Udder must be present in the lower portion of the photo
+          rejectionReason = "Udder not visible in expected region. Please center the cow's udder in the frame.";
+          detectedSubject = "Partial / Off-Center Photo";
+        } else if (avgSaturation < 0.09) {
+          // Very low saturation = desaturated photo (fog, overexposed, B&W scan)
+          rejectionReason = "Image appears desaturated or overexposed. Please take a clear, well-lit photo of the cow's udder.";
+          detectedSubject = "Low Quality / Overexposed";
         }
 
         if (rejectionReason) {
@@ -356,15 +394,36 @@ function analyzeUdderImageWithDataset(
           }
         }
 
+        // If image doesn't closely match ANY clinical anchor, it's not a recognized udder condition
+        // Distance > 1.6 means the computed features are outside the clinical reference space
+        if (minDistance > 1.6) {
+          resolve({
+            validation: {
+              isValid: false,
+              bovineTissueMatch: bovineSkinPct,
+              detectedSubject: "Non-Clinical / Unrecognized Image",
+              reason: "Image does not match any known bovine udder condition from the clinical dataset. Please upload a clear, close-up photo of the cow's udder.",
+              hindiReason: "यह फोटो किसी भी ज्ञात मवेशी रोग के नमूने से मेल नहीं खाती। कृपया गाय के अयन की स्पष्ट, नजदीकी फोटो लें।",
+              tamilReason: "இந்தப் படம் எந்த மருத்துவ கால்நடை நோய் மாதிரியுடனும் பொருந்தவில்லை. தயவுசெய்து மடியை தெளிவாக படம் பிடிக்கவும்.",
+            },
+          });
+          return;
+        }
+
         const datasetMatchSimilarity = Math.round(Math.max(68, Math.min(97, 100 - minDistance * 18)));
 
         // Compute interpolated visual risk percentage
+        // Blend computed risk with bestMatch baseRisk weighted by proximity
+        // (closer match → more weight on bestMatch's known risk baseline)
+        const proximityWeight = Math.max(0, Math.min(0.5, (1.6 - minDistance) / 1.6));
         const rawRisk = Math.round(
           computedErythema * 0.45 +
           ((computedAsymmetry - 1.0) / 1.5) * 100 * 0.35 +
           ((computedTeatGrade - 1) / 3.0) * 100 * 0.20
         );
-        const visualRisk = Math.max(6, Math.min(96, rawRisk));
+        // Blend: computed features + bestMatch anchor baseline to prevent wild extrapolation
+        const blendedRisk = Math.round(rawRisk * (1 - proximityWeight) + bestMatch.baseRisk * proximityWeight);
+        const visualRisk = Math.max(6, Math.min(96, blendedRisk));
 
         let riskLevel: RiskLevel = "none";
         if (visualRisk >= 80) riskLevel = "high";
