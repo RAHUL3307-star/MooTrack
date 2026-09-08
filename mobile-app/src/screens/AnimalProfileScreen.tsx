@@ -94,9 +94,44 @@ export function AnimalProfileScreen({
               </div>
               <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, color: "#9BA88C", marginTop: 2 }}>
                 {a.id}
+                {a.rfidTag && (
+                  <span style={{ marginLeft: 8, color: "#4F8823" }}>· 📡 {a.rfidTag}</span>
+                )}
               </div>
-              <div style={{ fontSize: 12, color: "#6B7A5C", marginTop: 4 }}>
-                {a.breed} · {a.age} · Lactation {a.lactation} · {a.quarter}
+              {/* Age prominent badge row */}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
+                <span style={{
+                  background: "#EEF6E4", color: "#2A5C1F",
+                  fontSize: 12, fontWeight: 700,
+                  padding: "4px 10px", borderRadius: 20,
+                  border: "1.5px solid #C4DDA0",
+                }}>
+                  🎂 Age: {a.age}
+                </span>
+                <span style={{
+                  background: "#F0EDE6", color: "#6B7A5C",
+                  fontSize: 12, fontWeight: 600,
+                  padding: "4px 10px", borderRadius: 20,
+                  border: "1px solid #E0DAD0",
+                }}>
+                  🐄 {a.breed}
+                </span>
+                <span style={{
+                  background: "#F0EDE6", color: "#6B7A5C",
+                  fontSize: 12, fontWeight: 600,
+                  padding: "4px 10px", borderRadius: 20,
+                  border: "1px solid #E0DAD0",
+                }}>
+                  🥛 Lac {a.lactation}
+                </span>
+                <span style={{
+                  background: "#F0EDE6", color: "#6B7A5C",
+                  fontSize: 12, fontWeight: 600,
+                  padding: "4px 10px", borderRadius: 20,
+                  border: "1px solid #E0DAD0",
+                }}>
+                  📍 {a.quarter}
+                </span>
               </div>
             </div>
           </div>
