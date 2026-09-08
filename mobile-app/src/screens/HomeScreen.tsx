@@ -92,49 +92,49 @@ export function HomeSituationSummaryCard({
           <>
             <div>🚨 <strong>கங்கா (KA-001)</strong> & <strong>பெட்வா (KA-052)</strong> மாடுகளுக்கு தீவிர மடிநோய் அபாயம் <strong>96%</strong>.</div>
             <div style={{ marginTop: 4, color: "#FFE082", fontSize: 11.5 }}>
-              ⚠️ <strong>இடைநிலை கட்டம் (70%–80%):</strong> காவேரி & சரஸ்வதி மாடுகளுக்கு அடுத்த <strong>7 முதல் 14 நாட்களில்</strong> மடிநோய் தாக்கும் அதிக வாய்ப்புள்ளது என AI எச்சரிக்கிறது. உடனடி தடுப்பு சிகிச்சை தேவை!
+              ⚠️ <strong>இடைநிலை கட்டம் (70%–80%):</strong> Cow 2 & Cow 3 மாடுகளுக்கு அடுத்த <strong>7 முதல் 14 நாட்களில்</strong> மடிநோய் தாக்கும் அதிக வாய்ப்புள்ளது என AI எச்சரிக்கிறது. உடனடி தடுப்பு சிகிச்சை தேவை!
             </div>
           </>
         ) : lang === "Hindi" ? (
           <>
-            <div>🚨 <strong>गंगा (KA-001)</strong> व <strong>बेतवा (KA-052)</strong> में गंभीर थनैला का <strong>96%</strong> खतरा।</div>
+            <div>🚨 <strong>Cow 1 (KA-001)</strong> व <strong>Cow 8 (KA-052)</strong> में गंभीर थनैला का <strong>96%</strong> खतरा।</div>
             <div style={{ marginTop: 4, color: "#FFE082", fontSize: 11.5 }}>
-              ⚠️ <strong>मध्यवर्ती चरण (70%–80%):</strong> कावेरी और सरस्वती में अगले <strong>7 से 14 दिनों में</strong> रोग होने की पूरी आशंका है। तुरंत निवारक आयोडीन उपचार शुरू करें!
+              ⚠️ <strong>मध्यवर्ती चरण (70%–80%):</strong> Cow 2 और Cow 3 में अगले <strong>7 से 14 दिनों में</strong> रोग होने की पूरी आशंका है। तुरंत निवारक आयोडीन उपचार शुरू करें!
             </div>
           </>
         ) : lang === "Kannada" ? (
           <>
-            <div>🚨 <strong>ಗಂಗಾ (KA-001)</strong> ಮತ್ತು <strong>ಬೆಟ್ವಾ (KA-052)</strong> ಹಸುಗಳಿಗೆ ಕೆಚ್ಚಲುಬಾವು ಅಪಾಯ <strong>96%</strong>.</div>
+            <div>🚨 <strong>Cow 1 (KA-001)</strong> ಮತ್ತು <strong>Cow 8 (KA-052)</strong> ಹಸುಗಳಿಗೆ ಕೆಚ್ಚಲುಬಾವು ಅಪಾಯ <strong>96%</strong>.</div>
             <div style={{ marginTop: 4, color: "#FFE082", fontSize: 11.5 }}>
-              ⚠️ <strong>ಮಧ್ಯಂತರ ಹಂತ (70%–80%):</strong> ಕಾವೇರಿ ಮತ್ತು ಸರಸ್ವತಿ ಹಸುಗಳಿಗೆ ಮುಂದಿನ <strong>7 ರಿಂದ 14 ದಿನಗಳಲ್ಲಿ</strong> ರೋಗ ಬರುವ ಹೆಚ್ಚಿನ ಸಾಧ್ಯತೆಯಿದೆ ಎಂದು AI ಎಚ್ಚರಿಸಿದೆ.
+              ⚠️ <strong>ಮಧ್ಯಂತರ ಹಂತ (70%–80%):</strong> Cow 2 ಮತ್ತು Cow 3 ಹಸುಗಳಿಗೆ ಮುಂದಿನ <strong>7 ರಿಂದ 14 ದಿನಗಳಲ್ಲಿ</strong> ರೋಗ ಬರುವ ಹೆಚ್ಚಿನ ಸಾಧ್ಯತೆಯಿದೆ ಎಂದು AI ಎಚ್ಚರಿಸಿದೆ.
             </div>
           </>
         ) : lang === "Telugu" ? (
           <>
-            <div>🚨 <strong>గంగ (KA-001)</strong> మరియు <strong>బెత్వా (KA-052)</strong> ఆవులకు తీవ్ర పొదుగువాపు ముప్పు <strong>96%</strong>.</div>
+            <div>🚨 <strong>Cow 1 (KA-001)</strong> మరియు <strong>Cow 8 (KA-052)</strong> ఆవులకు తీవ్ర పొదుగువాపు ముప్పు <strong>96%</strong>.</div>
             <div style={{ marginTop: 4, color: "#FFE082", fontSize: 11.5 }}>
-              ⚠️ <strong>మధ్యస్థ దశ (70%–80%):</strong> కావేరి మరియు సరస్వతి ఆవులకు రాబోయే <strong>7 నుండి 14 రోజులలో</strong> వ్యాధి సోకే అవకాశం ఎక్కువగా ఉందని AI హెచ్చరిస్తోంది.
+              ⚠️ <strong>మధ్యస్థ దశ (70%–80%):</strong> Cow 2 మరియు Cow 3 ఆవులకు రాబోయే <strong>7 నుండి 14 రోజులలో</strong> వ్యాధి సోకే అవకాశం ఎక్కువగా ఉందని AI హెచ్చరిస్తోంది.
             </div>
           </>
         ) : lang === "Marathi" ? (
           <>
-            <div>🚨 <strong>गंगा (KA-001)</strong> व <strong>बेतवा (KA-052)</strong> मध्ये <strong>96%</strong> तीव्र मस्टायटिस धोका.</div>
+            <div>🚨 <strong>Cow 1 (KA-001)</strong> व <strong>Cow 8 (KA-052)</strong> मध्ये <strong>96%</strong> तीव्र मस्टायटिस धोका.</div>
             <div style={{ marginTop: 4, color: "#FFE082", fontSize: 11.5 }}>
-              ⚠️ <strong>मध्यम टप्पा (70%–80%):</strong> कावेरी आणि सरस्वती गाईंना पुढील <strong>7 ते 14 दिवसांत</strong> रोग होण्याची दाट शक्यता आहे. तातडीने प्रतिबंधक उपाय करा!
+              ⚠️ <strong>मध्यम टप्पा (70%–80%):</strong> Cow 2 आणि Cow 3 गाईंना पुढील <strong>7 ते 14 दिवसांत</strong> रोग होण्याची दाट शक्यता आहे. तातडीने प्रतिबंधक उपाय करा!
             </div>
           </>
         ) : lang === "Gujarati" ? (
           <>
-            <div>🚨 <strong>ગંગા (KA-001)</strong> અને <strong>બetva (KA-052)</strong> માં <strong>96%</strong> ગંભીર મસ્ટાઇટિસ જોખમ.</div>
+            <div>🚨 <strong>Cow 1 (KA-001)</strong> અને <strong>Cow 8 (KA-052)</strong> માં <strong>96%</strong> ગંભીર મસ્ટાઇટિસ જોખમ.</div>
             <div style={{ marginTop: 4, color: "#FFE082", fontSize: 11.5 }}>
-              ⚠️ <strong>મધ્યવર્તી તબક્કો (70%–80%):</strong> કાવેરી અને સરસ્વતીમાં આગામી <strong>7 થી 14 દિવસમાં</strong> રોગ થવાની પૂરી શક્યતા છે. તાત્કાલિક સાવચેતી રાખો!
+              ⚠️ <strong>મધ્યવર્તી તબક્કો (70%–80%):</strong> Cow 2 અને Cow 3 માં આગામી <strong>7 થી 14 દિવસમાં</strong> રોગ થવાની પૂરી શક્યતા છે. તાત્કાલિક સાવચેતી રાખો!
             </div>
           </>
         ) : lang === "Punjabi" ? (
           <>
-            <div>🚨 <strong>ਗੰਗਾ (KA-001)</strong> ਅਤੇ <strong>ਬੇਤਵਾ (KA-052)</strong> ਵਿੱਚ <strong>96%</strong> ਗੰਭੀਰ ਥਣੇਲਾ ਖ਼ਤਰਾ।</div>
+            <div>🚨 <strong>Cow 1 (KA-001)</strong> ਅਤੇ <strong>Cow 8 (KA-052)</strong> ਵਿੱਚ <strong>96%</strong> ਗੰਭੀਰ ਥਣੇਲਾ ਖ਼ਤਰਾ।</div>
             <div style={{ marginTop: 4, color: "#FFE082", fontSize: 11.5 }}>
-              ⚠️ <strong>ਦਰਮਿਆਨਾ ਪੜਾਅ (70%–80%):</strong> ਕਾਵੇਰੀ ਅਤੇ ਸਰਸਵਤੀ ਵਿੱਚ ਅਗਲੇ <strong>7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ</strong> ਰੋਗ ਲੱਗਣ ਦੀ ਪੂਰੀ ਸੰਭਾਵਨਾ ਹੈ।
+              ⚠️ <strong>ਦਰਮਿਆਨਾ ਪੜਾਅ (70%–80%):</strong> Cow 2 ਅਤੇ Cow 3 ਵਿੱਚ ਅਗਲੇ <strong>7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ</strong> ਰੋਗ ਲੱਗਣ ਦੀ ਪੂਰੀ ਸੰਭਾਵਨਾ ਹੈ।
             </div>
           </>
         ) : (

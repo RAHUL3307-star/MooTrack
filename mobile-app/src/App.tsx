@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ESP32Provider, useESP32 } from "./context/ESP32Context";
-import { AnimalsProvider } from "./context/AnimalsContext";
+import { AnimalsProvider, useAnimals } from "./context/AnimalsContext";
 import { ESP32TopBannerNotification, BottomNav } from "./components/ui";
 import type { Screen, Tab } from "./types/index";
 import { t } from "./i18n/index";
@@ -42,6 +42,7 @@ function MainAppShell() {
     notification,
     dismissNotification,
   } = useESP32();
+  const { setSelectedAnimal } = useAnimals();
 
   useEffect(() => {
     const handleResize = () => {
@@ -120,11 +121,29 @@ function MainAppShell() {
       case "recommendations":
         return <RecommendationsScreen onBack={goBack} lang={lang} />;
       case "analytics":
-        return <AnalyticsScreen onBack={goBack} lang={lang} />;
+        return (
+          <AnalyticsScreen
+            onBack={goBack}
+            lang={lang}
+            onSelectAnimal={(animal) => {
+              setSelectedAnimal(animal);
+              navigate("animal-profile");
+            }}
+          />
+        );
       case "sensors":
         return <SensorsScreen onBack={goBack} lang={lang} />;
       case "gis":
-        return <GISScreen onBack={goBack} lang={lang} />;
+        return (
+          <GISScreen
+            onBack={goBack}
+            lang={lang}
+            onSelectAnimal={(animal) => {
+              setSelectedAnimal(animal);
+              navigate("animal-profile");
+            }}
+          />
+        );
       case "interventions":
         return <InterventionsScreen onBack={goBack} lang={lang} />;
       case "ml-lab":
