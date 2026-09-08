@@ -50,6 +50,7 @@ jobs:
           cp index.html dist-pages/index.html
           cp style.css dist-pages/ 2>/dev/null || true
           cp app.js data.js ml_engine.js dist-pages/ 2>/dev/null || true
+          cp manifest.json sw.js icon.svg dist-pages/ 2>/dev/null || true
           cp -r assets dist-pages/ 2>/dev/null || true
           cp -r mobile-app/dist/. dist-pages/app/
           cp mobile-app/dist/index.html dist-pages/mobile.html 2>/dev/null || true

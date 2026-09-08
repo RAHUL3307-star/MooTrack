@@ -1,0 +1,26 @@
+{
+  "name": "MooTracker - Smart Cattle Health",
+  "short_name": "MooTracker",
+  "description": "Real-time bovine telemetry & AI mastitis prediction for dairy farmers",
+  "start_url": "mobile.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#2A5C1F",
+  "theme_color": "#2A5C1F",
+  "orientation": "portrait-primary",
+  "categories": ["medical", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
