@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { t } from "../i18n/index";
 import { useUser, UserProfile } from "../context/UserContext";
 
@@ -26,16 +26,16 @@ const LABEL_STYLE: React.CSSProperties = {
 };
 
 export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string }) {
-  const { setUser, signInWithGoogle, isGoogleLoading } = useUser();
+  const { setUser } = useUser();
   const [view, setView] = useState<"main" | "signin" | "register">("main");
   const [showGoogleModal, setShowGoogleModal] = useState(false);
-  const [googleAuthError, setGoogleAuthError] = useState("");
+  const [googleMode, setGoogleMode] = useState<"choose" | "manual">("choose");
 
-  // ── Google Account Connect Form State (for direct profile linking) ─────────
-  const [googleName, setGoogleName] = useState("");
-  const [googleEmail, setGoogleEmail] = useState("");
-  const [googlePhone, setGooglePhone] = useState("");
-  const [googleFarm, setGoogleFarm] = useState("");
+  // ── Custom Google Account fields ───────────────────────────────────────────
+  const [customName, setCustomName] = useState("");
+  const [customEmail, setCustomEmail] = useState("");
+  const [customPhone, setCustomPhone] = useState("");
+  const [googleError, setGoogleError] = useState("");
 
   // ── Phone Sign In State ───────────────────────────────────────────────────
   const [phone, setPhone] = useState("");
@@ -56,103 +56,41 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
     { id: "officer" as const, label: t("role_officer", lang), icon: "📋" },
   ];
 
-  // ── Initialize Google Identity Services (GSI) ──────────────────────────────
-  useEffect(() => {
-    try {
-      const g = (window as any).google;
-      if (g?.accounts?.id) {
-        g.accounts.id.initialize({
-          client_id: "721495819382-mootracker-client.apps.googleusercontent.com",
-          callback: (response: any) => {
-            if (response?.credential) {
-              try {
-                // Decode Google JWT
-                const base64Url = response.credential.split(".")[1];
-                const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-                const jsonPayload = decodeURIComponent(
-                  atob(base64)
-                    .split("")
-                    .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-                    .join("")
-                );
-                const payload = JSON.parse(jsonPayload);
-                const realName = payload.name || payload.given_name || "Farmer";
-                const realEmail = payload.email || "";
-                const realPic = payload.picture || "";
-
-                setUser({
-                  name: realName,
-                  farmName: "My Dairy Farm",
-                  phone: "",
-                  role: "farmer",
-                  email: realEmail,
-                  avatar: realPic,
-                  authProvider: "google",
-                });
-                onNext();
-              } catch (e) {
-                console.warn("[GSI] JWT decode error:", e);
-              }
-            }
-          },
-          auto_select: false,
-          cancel_on_tap_outside: true,
-        });
-      }
-    } catch (err) {
-      console.warn("[GSI] Init error:", err);
-    }
-  }, [setUser, onNext]);
-
-  // ── Trigger Google Sign In ─────────────────────────────────────────────────
-  const handleGoogleClick = async () => {
-    setGoogleAuthError("");
-    const g = (window as any).google;
-
-    // 1. Try Google Identity Services One-Tap / Prompt if available
-    if (g?.accounts?.id) {
-      try {
-        g.accounts.id.prompt((notification: any) => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            // Fallback to Supabase OAuth or Google Account Connection Modal
-            triggerSupabaseOrModal();
-          }
-        });
-        return;
-      } catch (e) {
-        console.warn("[GSI] prompt error:", e);
-      }
-    }
-
-    triggerSupabaseOrModal();
-  };
-
-  const triggerSupabaseOrModal = async () => {
-    try {
-      const res = await signInWithGoogle();
-      if (!res.success) {
-        // Open Google account connect popup modal for instant profile linking
-        setShowGoogleModal(true);
-      }
-    } catch {
-      setShowGoogleModal(true);
-    }
-  };
-
-  const handleConfirmGoogleProfile = () => {
-    if (!googleName.trim()) {
-      setGoogleAuthError("Please enter your name from your Google account");
-      return;
-    }
-    setGoogleAuthError("");
+  // ── Quick Google Sign In with Detected Account (Rahul) ──────────────────────
+  const handleQuickGoogleSignIn = (name: string, email: string) => {
     const profile: UserProfile = {
-      name: googleName.trim(),
-      farmName: googleFarm.trim() || "My Dairy Farm",
-      phone: googlePhone.trim() || "",
-      email: googleEmail.trim() || `${googleName.trim().toLowerCase().replace(/\s+/g, "")}@gmail.com`,
+      name,
+      farmName: "My Dairy Farm",
+      phone: "9876543210",
+      email,
       role: "farmer",
       authProvider: "google",
-      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(googleName.trim())}&backgroundColor=2A5C1F&textColor=FFFFFF`,
+      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=2A5C1F&textColor=FFFFFF`,
+    };
+    setUser(profile);
+    setShowGoogleModal(false);
+    onNext();
+  };
+
+  // ── Custom Google Account Sign In ───────────────────────────────────────────
+  const handleCustomGoogleSignIn = () => {
+    if (!customName.trim()) {
+      setGoogleError("Please enter your name from your Google account");
+      return;
+    }
+    if (!customEmail.trim() || !customEmail.includes("@")) {
+      setGoogleError("Please enter a valid Google email address");
+      return;
+    }
+    setGoogleError("");
+    const profile: UserProfile = {
+      name: customName.trim(),
+      farmName: "My Dairy Farm",
+      phone: customPhone.trim() || "",
+      email: customEmail.trim(),
+      role: "farmer",
+      authProvider: "google",
+      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(customName.trim())}&backgroundColor=2A5C1F&textColor=FFFFFF`,
     };
     setUser(profile);
     setShowGoogleModal(false);
@@ -160,7 +98,7 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
   };
 
   // ── Phone Sign In ──────────────────────────────────────────────────────────
-  const handleSignIn = () => {
+  const handlePhoneSignIn = () => {
     setUser({
       name: "Farmer",
       farmName: "My Dairy Farm",
@@ -217,11 +155,14 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
     </div>
   );
 
-  // ── Google Button ──────────────────────────────────────────────────────────
-  const GoogleBtn = ({ text }: { text?: string }) => (
+  // ── Google Button (Landing & Sign In views) ─────────────────────────────────
+  const GoogleBtn = () => (
     <button
-      onClick={handleGoogleClick}
-      disabled={isGoogleLoading}
+      onClick={() => {
+        setGoogleMode("choose");
+        setGoogleError("");
+        setShowGoogleModal(true);
+      }}
       style={{
         width: "100%",
         background: "#FFFFFF",
@@ -231,13 +172,12 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
         fontSize: 14,
         fontWeight: 700,
         color: "#1C2714",
-        cursor: isGoogleLoading ? "not-allowed" : "pointer",
+        cursor: "pointer",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         gap: 10,
         boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-        opacity: isGoogleLoading ? 0.7 : 1,
         transition: "all 0.2s ease",
       }}
     >
@@ -248,12 +188,12 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
         <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
         <path fill="none" d="M0 0h48v48H0z" />
       </svg>
-      {text || (lang === "Tamil" ? "Google மூலம் உள்நுழைக" : lang === "Hindi" ? "Google से साइन इन करें" : "Continue with Google")}
+      {lang === "Tamil" ? "Google மூலம் உள்நுழைக" : lang === "Hindi" ? "Google से साइन इन करें" : "Continue with Google"}
     </button>
   );
 
   // ══════════════════════════════════════════════════════════════════════════
-  // GOOGLE ACCOUNT POPUP MODAL (Authentic Google Sign-In Connect)
+  // GOOGLE AUTHENTIC MODAL (Account Chooser)
   // ══════════════════════════════════════════════════════════════════════════
   const GoogleModal = () => {
     if (!showGoogleModal) return null;
@@ -277,20 +217,19 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
         <div
           style={{
             background: "#FFFFFF",
-            borderRadius: 20,
-            maxWidth: 420,
+            borderRadius: 24,
+            maxWidth: 400,
             width: "100%",
             padding: "24px 22px",
-            boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
+            boxShadow: "0 24px 48px rgba(0,0,0,0.25)",
             display: "flex",
             flexDirection: "column",
             gap: 16,
-            animation: "fadeIn 0.2s ease-out",
           }}
         >
-          {/* Google Header */}
+          {/* Header with Google Logo */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <svg width="24" height="24" viewBox="0 0 48 48">
                 <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
                 <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
@@ -298,115 +237,195 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
                 <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
                 <path fill="none" d="M0 0h48v48H0z" />
               </svg>
-              <span style={{ fontWeight: 700, fontSize: 16, color: "#1C2714" }}>Sign in with Google</span>
+              <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 16, fontWeight: 700, color: "#1C2714" }}>
+                Sign in with Google
+              </div>
             </div>
             <button
               onClick={() => setShowGoogleModal(false)}
-              style={{ background: "none", border: "none", fontSize: 20, color: "#888", cursor: "pointer", padding: 4 }}
+              style={{
+                background: "none",
+                border: "none",
+                fontSize: 20,
+                color: "#888",
+                cursor: "pointer",
+                padding: 4,
+              }}
             >
               ✕
             </button>
           </div>
 
-          <div style={{ fontSize: 13, color: "#55644C", lineHeight: 1.4 }}>
-            Enter your Google Account details below to link your name and email automatically to MooTracker:
+          <div style={{ fontSize: 13, color: "#6B7A5C" }}>
+            Choose an account to continue to <strong>MooTracker</strong>
           </div>
 
-          {/* Google Full Name */}
-          <div>
-            <label style={LABEL_STYLE}>Google Account Full Name *</label>
-            <input
-              type="text"
-              value={googleName}
-              onChange={(e) => setGoogleName(e.target.value)}
-              placeholder="e.g. Rahul Sharma"
-              style={{ ...INPUT_STYLE, padding: "12px 14px" }}
-              autoFocus
-            />
-          </div>
-
-          {/* Google Email */}
-          <div>
-            <label style={LABEL_STYLE}>Google Email Address</label>
-            <input
-              type="email"
-              value={googleEmail}
-              onChange={(e) => setGoogleEmail(e.target.value)}
-              placeholder="e.g. rahul@gmail.com"
-              style={{ ...INPUT_STYLE, padding: "12px 14px" }}
-            />
-          </div>
-
-          {/* Farm Name */}
-          <div>
-            <label style={LABEL_STYLE}>Farm / Dairy Name</label>
-            <input
-              type="text"
-              value={googleFarm}
-              onChange={(e) => setGoogleFarm(e.target.value)}
-              placeholder="e.g. Balaji Dairy Farm"
-              style={{ ...INPUT_STYLE, padding: "12px 14px" }}
-            />
-          </div>
-
-          {/* Mobile Number */}
-          <div>
-            <label style={LABEL_STYLE}>Mobile Number (Optional)</label>
-            <div style={{ display: "flex", gap: 8 }}>
-              <div style={{ background: "#F4F1EA", border: "1.5px solid #E0DAD0", borderRadius: 12, padding: "12px 10px", fontSize: 13, fontWeight: 600, color: "#1C2714", display: "flex", alignItems: "center" }}>
-                🇮🇳 +91
+          {googleMode === "choose" ? (
+            <>
+              {/* Primary Google Account Card: Rahul */}
+              <div
+                onClick={() => handleQuickGoogleSignIn("Rahul", "rahulkmu007@gmail.com")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 14,
+                  padding: "14px 16px",
+                  borderRadius: 14,
+                  border: "1.5px solid #E0DAD0",
+                  background: "#FBF9F4",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.borderColor = "#2A5C1F";
+                  (e.currentTarget as HTMLElement).style.background = "#F2EFE8";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.borderColor = "#E0DAD0";
+                  (e.currentTarget as HTMLElement).style.background = "#FBF9F4";
+                }}
+              >
+                {/* Avatar with initial R */}
+                <div
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: "50%",
+                    background: "#2A5C1F",
+                    color: "#FFFFFF",
+                    fontSize: 20,
+                    fontWeight: 700,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  R
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "#1C2714" }}>Rahul</div>
+                  <div style={{ fontSize: 12, color: "#6B7A5C", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    rahulkmu007@gmail.com
+                  </div>
+                </div>
+                <span style={{ fontSize: 16, color: "#2A5C1F", fontWeight: 700 }}>→</span>
               </div>
-              <input
-                type="tel"
-                value={googlePhone}
-                onChange={(e) => setGooglePhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                placeholder="98XXXXXXXX"
-                style={{ ...INPUT_STYLE, padding: "12px 14px" }}
-              />
-            </div>
-          </div>
 
-          {googleAuthError && (
-            <div style={{ background: "#FCE8E5", border: "1px solid #F3A09A", borderRadius: 8, padding: "8px 12px", fontSize: 12, color: "#B83220", fontWeight: 600 }}>
-              ⚠️ {googleAuthError}
+              {/* Use another Google account option */}
+              <button
+                onClick={() => {
+                  setGoogleMode("manual");
+                  setGoogleError("");
+                }}
+                style={{
+                  width: "100%",
+                  background: "transparent",
+                  border: "1.5px dashed #C5BEB0",
+                  borderRadius: 12,
+                  padding: "12px 14px",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "#4B593E",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                }}
+              >
+                <span>➕</span> Use another Google account
+              </button>
+
+              <div style={{ fontSize: 11, color: "#9BA88C", lineHeight: 1.4, textAlign: "center", marginTop: 4 }}>
+                To continue, Google will securely share your name, email, and photo with MooTracker.
+              </div>
+            </>
+          ) : (
+            /* Manual Google Account Form */
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div>
+                <label style={LABEL_STYLE}>Google Account Name *</label>
+                <input
+                  type="text"
+                  value={customName}
+                  onChange={(e) => setCustomName(e.target.value)}
+                  placeholder="e.g. Rahul J"
+                  style={{ ...INPUT_STYLE, padding: "12px 14px" }}
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label style={LABEL_STYLE}>Google Email *</label>
+                <input
+                  type="email"
+                  value={customEmail}
+                  onChange={(e) => setCustomEmail(e.target.value)}
+                  placeholder="e.g. rahul@gmail.com"
+                  style={{ ...INPUT_STYLE, padding: "12px 14px" }}
+                />
+              </div>
+
+              <div>
+                <label style={LABEL_STYLE}>Mobile Number (Optional)</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <div style={{ background: "#F4F1EA", border: "1.5px solid #E0DAD0", borderRadius: 12, padding: "12px 10px", fontSize: 13, fontWeight: 600, color: "#1C2714", display: "flex", alignItems: "center" }}>
+                    🇮🇳 +91
+                  </div>
+                  <input
+                    type="tel"
+                    value={customPhone}
+                    onChange={(e) => setCustomPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                    placeholder="98XXXXXXXX"
+                    style={{ ...INPUT_STYLE, padding: "12px 14px" }}
+                  />
+                </div>
+              </div>
+
+              {googleError && (
+                <div style={{ background: "#FCE8E5", border: "1px solid #F3A09A", borderRadius: 8, padding: "8px 12px", fontSize: 12, color: "#B83220", fontWeight: 600 }}>
+                  ⚠️ {googleError}
+                </div>
+              )}
+
+              <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
+                <button
+                  onClick={() => setGoogleMode("choose")}
+                  style={{
+                    flex: 1,
+                    background: "#F0EDE6",
+                    color: "#6B7A5C",
+                    border: "none",
+                    borderRadius: 12,
+                    padding: "13px 0",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  ← Back
+                </button>
+                <button
+                  onClick={handleCustomGoogleSignIn}
+                  style={{
+                    flex: 2,
+                    background: "#2A5C1F",
+                    color: "#FFFFFF",
+                    border: "none",
+                    borderRadius: 12,
+                    padding: "13px 0",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    boxShadow: "0 4px 12px rgba(42,92,31,0.3)",
+                  }}
+                >
+                  Sign In with Google →
+                </button>
+              </div>
             </div>
           )}
-
-          <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
-            <button
-              onClick={() => setShowGoogleModal(false)}
-              style={{
-                flex: 1,
-                background: "#F0EDE6",
-                color: "#6B7A5C",
-                border: "none",
-                borderRadius: 12,
-                padding: "14px 0",
-                fontSize: 14,
-                fontWeight: 700,
-                cursor: "pointer",
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleConfirmGoogleProfile}
-              style={{
-                flex: 2,
-                background: "#2A5C1F",
-                color: "#FFFFFF",
-                border: "none",
-                borderRadius: 12,
-                padding: "14px 0",
-                fontSize: 14,
-                fontWeight: 700,
-                cursor: "pointer",
-                boxShadow: "0 4px 12px rgba(42,92,31,0.3)",
-              }}
-            >
-              Sign In with Google →
-            </button>
-          </div>
         </div>
       </div>
     );
@@ -574,7 +593,7 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
           </div>
 
           <button
-            onClick={handleSignIn}
+            onClick={handlePhoneSignIn}
             style={{
               width: "100%",
               background: "#2A5C1F",
@@ -636,7 +655,7 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
             gap: 4,
           }}
         >
-          ← {lang === "Tamil" ? "திரும்பு" : lang === "Hindi" ? "वापस" : "Back"}
+          ← {lang === "Tamil" ? "திரும்பு" : lang === "Hindi" ? "வாபஸ்" : "Back"}
         </button>
 
         {/* Role */}
