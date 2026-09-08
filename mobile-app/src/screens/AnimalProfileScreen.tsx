@@ -23,11 +23,11 @@ export function AnimalProfileScreen({
   lang: string;
 }) {
   const { selectedAnimal, animals } = useAnimals();
-  const a = selectedAnimal || animals[0] || ANIMALS[0];
   const [tab, setTab] = useState<"health" | "milk" | "sensors" | "history">("health");
-  const sccHistory = [320, 380, 410, 445, 468, 485];
+  const a = selectedAnimal || animals[0] || ANIMALS[0];
+  const ecHistory = [4.8, 5.1, 5.3, 5.8, 6.4, a.conductivity || 5.0];
   const milkHistory = [14.2, 13.6, 12.8, 11.9, 11.2, 10.2];
-  const tempHistory = [38.5, 38.7, 38.9, 39.1, 39.3, 39.4];
+  const tempHistory = [38.5, 38.7, 38.9, 39.1, 39.3, a.temp || 39.4];
 
   const tabLabels = {
     health: lang === "Tamil" ? "ஆரோக்கியம்" : lang === "Hindi" ? "स्वास्थ्य" : "Health",
@@ -182,11 +182,17 @@ export function AnimalProfileScreen({
               <SectionLabel>{t("scc_trend", lang)}</SectionLabel>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div>
-                  <div style={{ fontFamily: "'Fraunces', serif", fontSize: 24, fontWeight: 700, color: "#B83220" }}>{a.scc}k</div>
-                  <div style={{ fontSize: 10, color: "#6B7A5C" }}>cells/mL · <span style={{ color: "#B83220", fontWeight: 700 }}>↑ 51% {t("this_week", lang)}</span></div>
+                  <div style={{ fontFamily: "'Fraunces', serif", fontSize: 24, fontWeight: 700, color: (a.conductivity || 5.0) > 6.5 ? "#B83220" : "#2A5C1F" }}>
+                    {a.conductivity || 5.2} <span style={{ fontSize: 13, fontWeight: 500, fontFamily: "sans-serif" }}>mS/cm</span>
+                  </div>
+                  <div style={{ fontSize: 10, color: "#6B7A5C" }}>
+                    pH {a.ph || 6.6} · <span style={{ color: (a.conductivity || 5.0) > 6.5 ? "#B83220" : "#2A5C1F", fontWeight: 700 }}>
+                      {(a.conductivity || 5.0) > 6.5 ? `↑ ${(a.conductivity || 5.0) > 8.5 ? "Critical" : "Elevated (7-14d Risk)"}` : "Normal Range (4.0 - 6.5)"}
+                    </span>
+                  </div>
                 </div>
                 <div style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
-                  <Sparkline data={sccHistory} color="#B83220" width={110} height={44} />
+                  <Sparkline data={ecHistory} color={(a.conductivity || 5.0) > 6.5 ? "#B83220" : "#2A5C1F"} width={110} height={44} />
                 </div>
               </div>
             </Card>

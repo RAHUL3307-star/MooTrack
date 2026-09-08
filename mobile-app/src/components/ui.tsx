@@ -47,7 +47,7 @@ export function ESP32TopBannerNotification({
 }: {
   notification: {
     id: number;
-    type: "connected" | "disconnected";
+    type: "connected" | "disconnected" | "rfid_scan";
     deviceId: string;
     source?: string;
     cowId?: string;
@@ -586,9 +586,17 @@ export function BarChart({
 }
 
 // ─── ReadAloudFAB ─────────────────────────────────────────────────────────────
-export function ReadAloudFAB({ screen, lang }: { screen: string; lang: string }) {
+export function ReadAloudFAB({
+  screen,
+  lang,
+  customText,
+}: {
+  screen: string;
+  lang: string;
+  customText?: string;
+}) {
   const textFn = SCREEN_SPEECH[screen] || SCREEN_SPEECH["home"];
-  const text = textFn ? textFn(lang) : "";
+  const text = customText || (textFn ? textFn(lang) : "");
   const { speak, speaking, activeChunk, totalChunks } = useReadAloud(text, lang);
   const flag = LANG_FLAGS[lang] || "EN";
 

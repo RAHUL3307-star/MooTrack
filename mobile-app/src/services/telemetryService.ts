@@ -9,10 +9,11 @@ export async function logTelemetry(
 
   const { error } = await supabase.from("telemetry_logs").insert({
     device_id: deviceId,
-    cow_id: telemetry.cowId,
+    cow_id: telemetry.cowId ?? "unknown",
     temperature: telemetry.temp,
-    conductivity: telemetry.conductivity,
-    scc: telemetry.scc,
+    ph: telemetry.ph ?? null,
+    conductivity: telemetry.conductivity ?? 0,
+    weight: telemetry.weight ?? null,
     humidity: telemetry.humidity ?? null,
     battery: telemetry.battery ?? null,
     rssi: telemetry.rssi ?? null,

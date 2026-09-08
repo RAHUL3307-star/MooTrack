@@ -23,8 +23,10 @@ export function AnalyticsScreen({
   const modRiskCount = animals.filter((a) => a.risk === "moderate").length;
   const healthyCount = animals.filter((a) => a.risk === "none" || a.risk === "low").length;
 
-  const avgSCC = Math.round(
-    animals.reduce((acc, a) => acc + (a.scc || 0), 0) / (animals.length || 1)
+  const avgEC = Number(
+    (
+      animals.reduce((acc, a) => acc + (a.conductivity || 5.2), 0) / (animals.length || 1)
+    ).toFixed(2)
   );
 
   const totalMilkYield = animals
@@ -39,27 +41,27 @@ export function AnalyticsScreen({
   // Economic loss calculation (assuming ₹42/L milk and 3.5L/day loss per clinical case + ₹650 vet fee)
   const dailyLossPrevented = (modRiskCount * 3.5 * 42 + highRiskCount * 650).toFixed(0);
 
-  // Dynamic trend data based on selected timeRange
-  const trendData: Record<"7d" | "30d" | "90d", { scc: number[]; yield: number[]; labels: string[] }> = {
+  // Dynamic trend data based on selected timeRange (Milk EC in mS/cm and Milk Yield in L)
+  const trendData: Record<"7d" | "30d" | "90d", { ec: number[]; yield: number[]; labels: string[] }> = {
     "7d": {
-      scc: [310, 295, 280, 265, 255, 248, avgSCC || 235],
+      ec: [5.2, 5.3, 5.1, 5.4, 5.6, 5.5, avgEC || 5.4],
       yield: [395, 402, 410, 415, 418, 421, parseFloat(totalMilkYield) || 424],
       labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Today"],
     },
     "30d": {
-      scc: [380, 360, 335, 310, 285, 260, avgSCC || 235],
+      ec: [5.8, 5.6, 5.5, 5.4, 5.3, 5.4, avgEC || 5.4],
       yield: [360, 375, 390, 405, 415, 420, parseFloat(totalMilkYield) || 424],
       labels: ["Wk 1", "Wk 2", "Wk 3", "Wk 4", "Wk 5", "Wk 6", "Today"],
     },
     "90d": {
-      scc: [440, 410, 380, 350, 310, 275, avgSCC || 235],
+      ec: [6.4, 6.1, 5.9, 5.7, 5.5, 5.4, avgEC || 5.4],
       yield: [330, 350, 375, 395, 410, 420, parseFloat(totalMilkYield) || 424],
       labels: ["M-3", "M-2.5", "M-2", "M-1.5", "M-1", "M-0.5", "Today"],
     },
   };
 
   const currentTrend = trendData[timeRange] || trendData["7d"];
-  const sccHistory = currentTrend.scc;
+  const ecHistory = currentTrend.ec;
   const yieldHistory = currentTrend.yield;
   const days = currentTrend.labels;
 
@@ -167,13 +169,13 @@ export function AnalyticsScreen({
               {t("avg_scc", lang)}
             </div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginTop: 4 }}>
-              <span style={{ fontFamily: "'Fraunces', serif", fontSize: 24, fontWeight: 800, color: avgSCC > 300 ? "#C47A10" : "#2A5C1F" }}>
-                {avgSCC}k
+              <span style={{ fontFamily: "'Fraunces', serif", fontSize: 24, fontWeight: 800, color: avgEC > 6.5 ? "#C47A10" : "#2A5C1F" }}>
+                {avgEC}
               </span>
-              <span style={{ fontSize: 11, color: "#9E8B75" }}>cells/mL</span>
+              <span style={{ fontSize: 11, color: "#9E8B75" }}>mS/cm</span>
             </div>
-            <div style={{ fontSize: 10.5, color: "#2A5C1F", fontWeight: 600, marginTop: 4 }}>
-              ↓ 18% vs last week
+            <div style={{ fontSize: 10.5, color: avgEC > 6.5 ? "#C47A10" : "#2A5C1F", fontWeight: 600, marginTop: 4 }}>
+              {avgEC > 6.5 ? "↑ Elevated (Risk)" : "✓ Normal (4.0–6.5)"}
             </div>
           </div>
 
@@ -208,7 +210,7 @@ export function AnalyticsScreen({
           </div>
         </div>
 
-        {/* SCC & Yield Correlation Trends */}
+        {/* EC & Yield Correlation Trends */}
         <Card style={{ marginBottom: 16 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
             <SectionLabel>{t("scc_trend", lang)} vs {t("milk_yield", lang)}</SectionLabel>
@@ -242,18 +244,18 @@ export function AnalyticsScreen({
               <line x1="20" y1="60" x2="320" y2="60" stroke="#EBE6DE" strokeDasharray="3,3" />
               <line x1="20" y1="100" x2="320" y2="100" stroke="#EBE6DE" strokeDasharray="3,3" />
 
-              {/* SCC Line (Amber / Red) */}
+              {/* EC Line (Conductivity) */}
               <polyline
                 fill="none"
                 stroke="#C47A10"
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                points={sccHistory
+                points={ecHistory
                   .map((val, idx) => {
                     const step = days.length > 1 ? 280 / (days.length - 1) : 280;
                     const x = 25 + idx * step;
-                    const y = 110 - ((val - 150) / 280) * 80;
+                    const y = 110 - ((val - 3.5) / 5.0) * 80;
                     return `${x},${Math.max(20, Math.min(115, y))}`;
                   })
                   .join(" ")}
@@ -278,13 +280,13 @@ export function AnalyticsScreen({
               />
 
               {/* Data points */}
-              {sccHistory.map((val, idx) => {
+              {ecHistory.map((val, idx) => {
                 const step = days.length > 1 ? 280 / (days.length - 1) : 280;
                 const x = 25 + idx * step;
-                const y = 110 - ((val - 150) / 280) * 80;
+                const y = 110 - ((val - 3.5) / 5.0) * 80;
                 return (
                   <circle
-                    key={`scc-${idx}`}
+                    key={`ec-${idx}`}
                     cx={x}
                     cy={Math.max(20, Math.min(115, y))}
                     r="3.5"
@@ -318,7 +320,7 @@ export function AnalyticsScreen({
           <div style={{ display: "flex", justifyContent: "center", gap: 16, marginTop: 8, fontSize: 11 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ width: 12, height: 3, background: "#C47A10", borderRadius: 2 }} />
-              <span style={{ color: "#544634", fontWeight: 600 }}>Avg SCC (cells/mL)</span>
+              <span style={{ color: "#544634", fontWeight: 600 }}>Avg EC (mS/cm)</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ width: 12, height: 3, background: "#2A5C1F", borderRadius: 2 }} />
@@ -327,11 +329,11 @@ export function AnalyticsScreen({
           </div>
         </Card>
 
-        {/* Somatic Cell Count Herd Spectrum */}
+        {/* Herd Mastitis Risk Spectrum (Milk Sensors) */}
         <Card style={{ marginBottom: 16 }}>
-          <SectionLabel>Herd Somatic Cell Spectrum</SectionLabel>
+          <SectionLabel>Herd Mastitis Risk Spectrum (Milk IoT Sensors)</SectionLabel>
           <div style={{ fontSize: 11.5, color: "#6B7A5C", marginBottom: 10 }}>
-            ICAR-NRC / NMC benchmark: &lt;200k = Healthy, 200k–400k = Subclinical (High Risk in 7–14d), &gt;400k = Clinical
+            Evaluated via live Milk pH (6.4–6.8), EC (4.0–6.5 mS/cm) &amp; Teat Temp (36.5–38.5°C)
           </div>
 
           {/* Stacked distribution bar */}
@@ -364,19 +366,19 @@ export function AnalyticsScreen({
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, fontSize: 11 }}>
             <div style={{ background: "#E8F5E9", padding: "8px 10px", borderRadius: 8, borderLeft: "3px solid #2E7D32" }}>
-              <div style={{ color: "#2E7D32", fontWeight: 700 }}>&lt;200k Healthy</div>
+              <div style={{ color: "#2E7D32", fontWeight: 700 }}>Normal &amp; Healthy</div>
               <div style={{ fontSize: 13, fontWeight: 800, color: "#1B5E20", marginTop: 2 }}>
                 {healthyCount} cows ({Math.round((healthyCount / totalCows) * 100)}%)
               </div>
             </div>
             <div style={{ background: "#FEF3C7", padding: "8px 10px", borderRadius: 8, borderLeft: "3px solid #F59E0B" }}>
-              <div style={{ color: "#B45309", fontWeight: 700 }}>200–400k Warning</div>
+              <div style={{ color: "#B45309", fontWeight: 700 }}>Chance (7–14d)</div>
               <div style={{ fontSize: 13, fontWeight: 800, color: "#92400E", marginTop: 2 }}>
                 {modRiskCount} cows ({Math.round((modRiskCount / totalCows) * 100)}%)
               </div>
             </div>
             <div style={{ background: "#FEE2E2", padding: "8px 10px", borderRadius: 8, borderLeft: "3px solid #DC2626" }}>
-              <div style={{ color: "#B91C1C", fontWeight: 700 }}>&gt;400k Critical</div>
+              <div style={{ color: "#B91C1C", fontWeight: 700 }}>Already Affected</div>
               <div style={{ fontSize: 13, fontWeight: 800, color: "#991B1B", marginTop: 2 }}>
                 {highRiskCount} cows ({Math.round((highRiskCount / totalCows) * 100)}%)
               </div>
@@ -444,8 +446,8 @@ export function AnalyticsScreen({
 
                 <div style={{ textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }}>
                   <RiskBadge level={animal.risk} risk={animal.risk} lang={lang} />
-                  <span style={{ fontSize: 11, fontWeight: 700, color: animal.scc > 300 ? "#B83220" : "#2A5C1F" }}>
-                    {animal.scc}k SCC
+                  <span style={{ fontSize: 11, fontWeight: 700, color: (animal.conductivity || 5.0) > 6.5 ? "#B83220" : "#2A5C1F" }}>
+                    EC {animal.conductivity || 5.2} mS/cm · pH {animal.ph || 6.6}
                   </span>
                 </div>
               </div>

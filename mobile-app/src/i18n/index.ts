@@ -59,5 +59,6 @@ export function sendWhatsAppAlert(
 }
 
 export { LANG_CODES, LANG_FLAGS, UI_STRINGS } from "./translations";
-export { SCREEN_SPEECH } from "./speech";
+export { SCREEN_SPEECH, generateLiveSituationSummary } from "./speech";
 export { useReadAloud } from "./useReadAloud";
+

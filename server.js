@@ -21,21 +21,26 @@ const MIME_TYPES = {
 let esp32State = {
   connected: false,
   isLive: false,
-  deviceId: "ESP32-MASTI-01",
+  deviceId: "ESP32-WROOM32",
   mac: "24:6F:28:B2:7D:9A",
   ip: "192.168.1.104",
-  firmware: "v2.4.1-masti",
+  firmware: "v2.5.0-masti",
   baudRate: 115200,
   connectionType: "USB-Serial / WiFi",
   rssi: -58,
   packetCount: 0,
   lastPing: null,
   lastTelemetry: {
-    temp: 39.4,
-    ec: 5.32,
-    pH: 6.84,
-    scc: 485000,
-    quarter: "Rear-Left",
+    cowId: "KA-001",
+    rfidTag: "RFID-001",
+    temp: 38.5,
+    ph: 6.7,
+    conductivity: 5.0,
+    weight: 0,
+    activity: 55,
+    shedTemp: 32.4,
+    humidity: 68,
+    battery: 94,
     voltage: 3.3
   }
 };
@@ -115,9 +120,28 @@ const server = http.createServer((req, res) => {
         esp32State.connectionType = "WiFi Direct";
         if (data.deviceId) esp32State.deviceId = data.deviceId;
         if (data.rssi) esp32State.rssi = data.rssi;
-        if (data.temp || data.ec || data.pH || data.scc) {
-          esp32State.lastTelemetry = { ...esp32State.lastTelemetry, ...data };
-        }
+
+        const phVal = data.ph !== undefined ? data.ph : data.pH;
+        const ecVal = data.conductivity !== undefined ? data.conductivity : data.ec;
+        const rfid = data.rfidTag || data.rfid;
+        const cowId = data.cowId || rfid || esp32State.lastTelemetry?.cowId || "KA-001";
+
+        esp32State.lastTelemetry = {
+          ...esp32State.lastTelemetry,
+          cowId,
+          rfidTag: rfid || esp32State.lastTelemetry?.rfidTag,
+          temp: data.temp !== undefined ? data.temp : esp32State.lastTelemetry?.temp,
+          ph: phVal !== undefined ? phVal : esp32State.lastTelemetry?.ph,
+          conductivity: ecVal !== undefined ? ecVal : esp32State.lastTelemetry?.conductivity,
+          weight: data.weight !== undefined ? data.weight : esp32State.lastTelemetry?.weight,
+          activity: data.activity !== undefined ? data.activity : esp32State.lastTelemetry?.activity,
+          shedTemp: data.shedTemp !== undefined ? data.shedTemp : esp32State.lastTelemetry?.shedTemp,
+          humidity: data.humidity !== undefined ? data.humidity : esp32State.lastTelemetry?.humidity,
+          battery: data.battery !== undefined ? data.battery : esp32State.lastTelemetry?.battery,
+          rssi: data.rssi !== undefined ? data.rssi : esp32State.rssi,
+          timestamp: new Date().toLocaleTimeString()
+        };
+
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, message: "ESP32 telemetry ingested", state: esp32State }));
       } catch (err) {
@@ -130,16 +154,69 @@ const server = http.createServer((req, res) => {
 
   // ESP32 Arduino Sketch Code endpoint for user
   if (reqPath === '/api/esp32/sketch') {
-    const sketch = `#include <WiFi.h>
+    const sketch = `// MooTracker ESP32 Clinical Telemetry Firmware
+// Hardware Pin Map:
+// RC522 RFID:   SDA/SS -> GPIO 5, SCK -> GPIO 18, MOSI -> GPIO 23, MISO -> GPIO 19, RST -> GPIO 2
+// MPU6050:       SDA -> GPIO 21, SCL -> GPIO 22
+// DS18B20 Temp:  Data -> GPIO 4 (with 4.7k pullup)
+// DHT22 Shed:    Data -> GPIO 27
+// HX711 Scale:   DOUT -> GPIO 32, SCK -> GPIO 33
+// pH Board:      Analog Out -> GPIO 34 (ADC1_CH6)
+// EC Board:      Analog Out -> GPIO 35 (ADC1_CH7)
+
+#include <WiFi.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include <SPI.h>
+#include <MFRC522.h>
+#include <Wire.h>
+#include <MPU6050.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#include <DHT.h>
+#include "HX711.h"
 
 const char* ssid = "YOUR_WIFI_SSID";
 const char* password = "YOUR_WIFI_PASSWORD";
-const char* serverUrl = "http://192.168.1.100:3000/api/esp32/telemetry"; // Replace with your laptop IP
+const char* serverUrl = "http://192.168.1.100:3000/api/esp32/telemetry";
+
+#define RFID_SS_PIN  5
+#define RFID_RST_PIN 2
+MFRC522 rfid(RFID_SS_PIN, RFID_RST_PIN);
+String currentRfidTag = "";
+
+MPU6050 mpu;
+
+#define DS18B20_PIN 4
+OneWire oneWire(DS18B20_PIN);
+DallasTemperature ds18b20(&oneWire);
+
+#define DHT_PIN  27
+#define DHT_TYPE DHT22
+DHT dht(DHT_PIN, DHT_TYPE);
+
+#define HX711_DOUT 32
+#define HX711_SCK  33
+HX711 scale;
+
+#define PH_PIN  34
+#define EC_PIN  35
+
+float adcToVoltage(int raw) { return raw * 3.3f / 4095.0f; }
+float voltageToPH(float v)  { return 7.0f + (2.5f - v) / 0.18f; }
+float voltageToEC(float v)  { return v * 2.8f; }
 
 void setup() {
   Serial.begin(115200);
+  SPI.begin();
+  rfid.PCD_Init();
+  Wire.begin(21, 22);
+  mpu.initialize();
+  ds18b20.begin();
+  dht.begin();
+  scale.begin(HX711_DOUT, HX711_SCK);
+  analogReadResolution(12);
+
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -149,32 +226,60 @@ void setup() {
 }
 
 void loop() {
+  if (rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial()) {
+    currentRfidTag = "";
+    for (byte i = 0; i < rfid.uid.size; i++) {
+      if (rfid.uid.uidByte[i] < 0x10) currentRfidTag += "0";
+      currentRfidTag += String(rfid.uid.uidByte[i], HEX);
+    }
+    currentRfidTag.toUpperCase();
+    rfid.PICC_HaltA();
+    rfid.PCD_StopCrypto1();
+    Serial.println("{\\"event\\":\\"rfid\\",\\"rfid\\":\\"" + currentRfidTag + "\\"}");
+  }
+
+  ds18b20.requestTemperatures();
+  float milkTemp   = ds18b20.getTempCByIndex(0);
+  float shedHum    = dht.readHumidity();
+  float shedTemp   = dht.readTemperature();
+  float weightKg   = scale.get_units(3);
+
+  int   phRaw  = analogRead(PH_PIN);
+  int   ecRaw  = analogRead(EC_PIN);
+  float phVal  = voltageToPH(adcToVoltage(phRaw));
+  float ecVal  = voltageToEC(adcToVoltage(ecRaw));
+
+  int16_t ax, ay, az, gx, gy, gz;
+  mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+  float accelMag = sqrt(sq(ax/16384.0f) + sq(ay/16384.0f) + sq(az/16384.0f));
+  int activity = constrain((int)((accelMag - 1.0f) * 100), 0, 100);
+
+  StaticJsonDocument<256> doc;
+  doc["deviceId"] = "ESP32-WROOM32";
+  doc["cowId"]    = currentRfidTag.length() > 0 ? currentRfidTag : "KA-001";
+  doc["rfid"]     = currentRfidTag;
+  doc["temp"]     = milkTemp;
+  doc["ph"]       = phVal;
+  doc["ec"]       = ecVal;
+  doc["weight"]   = weightKg;
+  doc["activity"] = activity;
+  doc["shedTemp"] = shedTemp;
+  doc["humidity"] = shedHum;
+  doc["battery"]  = 95;
+  doc["rssi"]     = WiFi.RSSI();
+
+  String payload;
+  serializeJson(doc, payload);
+  Serial.println(payload);
+
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     http.begin(serverUrl);
     http.addHeader("Content-Type", "application/json");
-
-    // Read real sensor inputs (EC probe on ADC34, DS18B20 Temp on GPIO4)
-    float temp = 38.5 + (random(0, 15) / 10.0);
-    float ec = 5.2 + (random(-20, 20) / 100.0);
-    float ph = 6.8 + (random(-10, 10) / 100.0);
-    long scc = random(350000, 520000);
-
-    StaticJsonDocument<200> doc;
-    doc["deviceId"] = "ESP32-MASTI-01";
-    doc["temp"] = temp;
-    doc["ec"] = ec;
-    doc["pH"] = ph;
-    doc["scc"] = scc;
-    doc["rssi"] = WiFi.RSSI();
-
-    String requestBody;
-    serializeJson(doc, requestBody);
-    int httpResponseCode = http.POST(requestBody);
-    Serial.printf("Telemetry sent! HTTP Response: %d\\n", httpResponseCode);
+    http.POST(payload);
     http.end();
   }
-  delay(3000); // stream every 3 seconds
+  delay(3000);
 }`;
     res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
     return res.end(sketch);

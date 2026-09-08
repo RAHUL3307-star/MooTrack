@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import {
   StatusBar,
   Card,
@@ -23,10 +23,10 @@ export function AlertsScreen({
       risk: "high" as RiskLevel,
       reason:
         lang === "Tamil"
-          ? "SCC 485k + பால் கடத்துதிறன் அதிகரிப்பு — மடிநோய் சாத்தியம்"
+          ? "பால் EC 9.4 mS/cm + pH 7.35 உயர்வு — மடிநோய் உறுதி"
           : lang === "Hindi"
-          ? "SCC 485k + दूध चालकता में वृद्धि — थनैला की संभावना"
-          : "SCC 485k + conductivity elevated — Mastitis likely",
+          ? "दूध चालकता 9.4 mS/cm + pH 7.35 असामान्य — थनैला पुष्टि"
+          : "Milk EC 9.4 mS/cm + pH 7.35 elevated — Clinical mastitis confirmed",
       urgency: lang === "Tamil" ? "உடனடி" : lang === "Hindi" ? "तुरंत" : "Immediate",
       time: "8 min ago",
       action:
@@ -42,10 +42,10 @@ export function AlertsScreen({
       risk: "high" as RiskLevel,
       reason:
         lang === "Tamil"
-          ? "SCC 620k — தீவிர மடிநோய் அறிகுறி"
+          ? "பால் EC 9.8 mS/cm + காய்ச்சல் 39.4°C — தீவிர மடிநோய் அறிகுறி"
           : lang === "Hindi"
-          ? "SCC 620k — थनैला के गंभीर लक्षण"
-          : "SCC 620k — Clinical mastitis suspected",
+          ? "दूध चालकता 9.8 mS/cm + बुखार 39.4°C — थनैला के गंभीर लक्षण"
+          : "Milk EC 9.8 mS/cm + Fever 39.4°C — Active clinical mastitis",
       urgency: lang === "Tamil" ? "உடனடி" : lang === "Hindi" ? "तुरंत" : "Immediate",
       time: "22 min ago",
       action:
@@ -61,10 +61,10 @@ export function AlertsScreen({
       risk: "moderate" as RiskLevel,
       reason:
         lang === "Tamil"
-          ? "SCC 3 நாட்களில் 25% உயர்ந்துள்ளது"
+          ? "பால் கடத்துதிறன் (EC) 3 நாட்களில் 6.8 mS/cm ஆக உயர்ந்துள்ளது (7-14 நாள் ஆபத்து)"
           : lang === "Hindi"
-          ? "SCC 3 दिनों में 25% बढ़ा"
-          : "SCC trending up 25% over 3 days",
+          ? "दूध चालकता (EC) 3 दिनों में 6.8 mS/cm तक बढ़ी (7-14 दिन का जोखिम)"
+          : "Milk EC trending up to 6.8 mS/cm over 3 days (7–14d mastitis risk)",
       urgency: lang === "Tamil" ? "இன்று" : lang === "Hindi" ? "आज" : "Today",
       time: "1 hr ago",
       action:

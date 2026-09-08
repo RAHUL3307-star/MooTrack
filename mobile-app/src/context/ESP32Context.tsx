@@ -83,9 +83,13 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
                 source: data.connectionType || "WiFi Direct",
                 lastTelemetry: {
                   cowId: data.lastTelemetry.cowId || "KA-001",
-                  temp: data.lastTelemetry.temp || 39.4,
-                  conductivity: data.lastTelemetry.ec || data.lastTelemetry.conductivity || 5.32,
-                  scc: data.lastTelemetry.scc || 485000,
+                  rfidTag: data.lastTelemetry.rfidTag,
+                  temp: data.lastTelemetry.temp || 38.5,
+                  ph: data.lastTelemetry.ph,
+                  conductivity: data.lastTelemetry.ec || data.lastTelemetry.conductivity || 5.0,
+                  weight: data.lastTelemetry.weight,
+                  activity: data.lastTelemetry.activity,
+                  shedTemp: data.lastTelemetry.shedTemp,
                   humidity: data.lastTelemetry.humidity,
                   battery: data.lastTelemetry.battery,
                   rssi: data.rssi,
@@ -102,9 +106,13 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
             if (nextLive) {
               const tel = {
                 cowId: data.lastTelemetry.cowId || "KA-001",
-                temp: data.lastTelemetry.temp || 39.4,
-                conductivity: data.lastTelemetry.ec || data.lastTelemetry.conductivity || 5.32,
-                scc: data.lastTelemetry.scc || 485000,
+                rfidTag: data.lastTelemetry.rfidTag,
+                temp: data.lastTelemetry.temp || 38.5,
+                ph: data.lastTelemetry.ph,
+                conductivity: data.lastTelemetry.ec || data.lastTelemetry.conductivity || 5.0,
+                weight: data.lastTelemetry.weight,
+                activity: data.lastTelemetry.activity,
+                shedTemp: data.lastTelemetry.shedTemp,
                 humidity: data.lastTelemetry.humidity,
                 battery: data.lastTelemetry.battery,
                 rssi: data.rssi,
@@ -121,11 +129,14 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
               triggerNotification({
                 id: Date.now(),
                 type: "connected",
-                deviceId: data.deviceId || "ESP32-WIFI-CLIENT",
+                deviceId: data.deviceId || "ESP32-WROOM32",
                 source: "WiFi Direct",
                 cowId: tel.cowId,
+                rfidTag: tel.rfidTag,
                 temp: tel.temp,
+                ph: tel.ph,
                 conductivity: tel.conductivity,
+                weight: tel.weight,
               });
             } else {
               setEsp32State((prev) => ({
@@ -147,9 +158,13 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
               ...prev,
               lastTelemetry: {
                 cowId: data.lastTelemetry.cowId || prev.lastTelemetry?.cowId || "KA-001",
-                temp: data.lastTelemetry.temp || prev.lastTelemetry?.temp || 39.4,
-                conductivity: data.lastTelemetry.ec || data.lastTelemetry.conductivity || prev.lastTelemetry?.conductivity || 5.32,
-                scc: data.lastTelemetry.scc || prev.lastTelemetry?.scc || 485000,
+                rfidTag: data.lastTelemetry.rfidTag ?? prev.lastTelemetry?.rfidTag,
+                temp: data.lastTelemetry.temp || prev.lastTelemetry?.temp || 38.5,
+                ph: data.lastTelemetry.ph ?? prev.lastTelemetry?.ph,
+                conductivity: data.lastTelemetry.ec || data.lastTelemetry.conductivity || prev.lastTelemetry?.conductivity || 5.0,
+                weight: data.lastTelemetry.weight ?? prev.lastTelemetry?.weight,
+                activity: data.lastTelemetry.activity ?? prev.lastTelemetry?.activity,
+                shedTemp: data.lastTelemetry.shedTemp ?? prev.lastTelemetry?.shedTemp,
                 humidity: data.lastTelemetry.humidity ?? prev.lastTelemetry?.humidity,
                 battery: data.lastTelemetry.battery ?? prev.lastTelemetry?.battery,
                 rssi: data.rssi ?? prev.lastTelemetry?.rssi,
@@ -197,10 +212,13 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
         baudRate: 115200,
         lastTelemetry: {
           cowId: "KA-001",
-          temp: 39.4,
-          conductivity: 6.85,
-          scc: 2450000,
-          humidity: 84,
+          temp: 38.5,
+          ph: 6.7,
+          conductivity: 5.0,
+          weight: 0,
+          activity: 55,
+          shedTemp: 32.4,
+          humidity: 68,
           battery: 94,
           rssi: -58,
           timestamp: "Just now",
@@ -213,8 +231,9 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
         deviceId: "ESP32-USB-COM",
         source: "USB Serial (115200 Baud)",
         cowId: "KA-001",
-        temp: 39.4,
-        conductivity: 6.85,
+        temp: 38.5,
+        ph: 6.7,
+        conductivity: 5.0,
       });
 
       const textDecoder = new TextDecoderStream();
@@ -237,10 +256,14 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
                   if (parsed.cowId || parsed.temp) {
                     const telemetry: ESP32Telemetry = {
                       cowId: parsed.cowId || "KA-001",
-                      temp: parsed.temp || 39.4,
-                      conductivity: parsed.conductivity || parsed.ec || 6.85,
-                      scc: parsed.scc || 2450000,
-                      humidity: parsed.humidity || 84,
+                      rfidTag: parsed.rfid || parsed.rfidTag,
+                      temp: parsed.temp || 38.5,
+                      ph: parsed.ph,
+                      conductivity: parsed.ec || parsed.conductivity || 5.0,
+                      weight: parsed.weight,
+                      activity: parsed.activity,
+                      shedTemp: parsed.shedTemp,
+                      humidity: parsed.humidity,
                       battery: parsed.battery || 92,
                       rssi: parsed.rssi || -60,
                       timestamp: new Date().toLocaleTimeString(),
@@ -283,7 +306,7 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({
           deviceId: "ESP32-HARDWARE-WROOM32",
           baudRate: 115200,
-          telemetry: { cowId: "KA-001", temp: 39.4, conductivity: 6.85, scc: 2450000, humidity: 84, battery: 94, rssi: -58 },
+          telemetry: { cowId: "KA-001", temp: 39.4, ph: 6.7, conductivity: 6.85, weight: 12.4, humidity: 84, battery: 94, rssi: -58 },
         }),
       });
     } catch (_) {}
@@ -292,14 +315,17 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
       ...prev,
       isLive: nextLive,
       connected: nextLive,
-      deviceId: nextLive ? "ESP32-HARDWARE-WROOM32" : "",
+      deviceId: nextLive ? "ESP32-WROOM32" : "",
       lastTelemetry: nextLive
         ? {
             cowId: "KA-001",
-            temp: 39.4,
-            conductivity: 6.85,
-            scc: 2450000,
-            humidity: 84,
+            temp: 38.5,
+            ph: 6.7,
+            conductivity: 5.0,
+            weight: 12.4,
+            activity: 55,
+            shedTemp: 32.4,
+            humidity: 68,
             battery: 94,
             rssi: -58,
             timestamp: new Date().toLocaleTimeString(),
@@ -310,11 +336,12 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
     triggerNotification({
       id: Date.now(),
       type: nextLive ? "connected" : "disconnected",
-      deviceId: "ESP32-HARDWARE-WROOM32",
+      deviceId: "ESP32-WROOM32",
       source: "Simulation / LAN",
       cowId: "KA-001",
-      temp: 39.4,
-      conductivity: 6.85,
+      temp: 38.5,
+      ph: 6.7,
+      conductivity: 5.0,
       message: nextLive ? undefined : "ESP32 disconnected. Resilient offline fallback active.",
     });
   }, [esp32State.isLive, triggerNotification]);

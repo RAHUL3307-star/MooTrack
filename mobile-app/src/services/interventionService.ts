@@ -34,7 +34,7 @@ const LOCAL_INTERVENTIONS: InterventionRecord[] = [
     animal_id: "KA-014",
     treatment_type: "Recovery Monitoring",
     performed_by: "Dr. Sharma",
-    notes: "SCC reduced by 52%. Full recovery confirmed.",
+    notes: "Milk conductivity normalized to 5.1 mS/cm, pH 6.6. Full recovery confirmed.",
     status: "completed",
     created_at: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
   },

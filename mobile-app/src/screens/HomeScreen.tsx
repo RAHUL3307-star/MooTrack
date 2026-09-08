@@ -13,10 +13,12 @@ import {
 } from "../components/ui";
 import { ANIMALS, RISK_COLOR } from "../types/index";
 import type { Screen, RiskLevel } from "../types/index";
-import { t, LANG_FLAGS } from "../i18n/index";
+import { t, LANG_FLAGS, generateLiveSituationSummary } from "../i18n/index";
 import { SCREEN_SPEECH } from "../i18n/speech";
 import { useReadAloud } from "../i18n/useReadAloud";
 import { useAnimals } from "../context/AnimalsContext";
+import { useESP32 } from "../context/ESP32Context";
+import { computeMilkRisk } from "../types/esp32";
 
 export function HomeSituationSummaryCard({
   onNavigate,
@@ -25,9 +27,22 @@ export function HomeSituationSummaryCard({
   onNavigate: (s: Screen) => void;
   lang: string;
 }) {
-  const speechText = (SCREEN_SPEECH["ml-lab"] || SCREEN_SPEECH["home"])(lang);
+  const { animals } = useAnimals();
+  const { isLive, lastTelemetry } = useESP32();
+
+  // Dynamic voice summary generated from real animals and live sensor dipping
+  const speechText = generateLiveSituationSummary(animals, lang, isLive ? lastTelemetry : null);
   const { speak, speaking, activeChunk, totalChunks } = useReadAloud(speechText, lang);
   const flag = LANG_FLAGS[lang] || "EN";
+
+  const highRisk = animals.filter((a) => a.risk === "high");
+  const modRisk = animals.filter((a) => a.risk === "moderate");
+
+  // Check if live telemetry is being received from ESP32 dipping
+  const liveRisk = isLive && lastTelemetry ? computeMilkRisk(lastTelemetry) : null;
+  const targetCow = isLive && lastTelemetry
+    ? animals.find((a) => (lastTelemetry.rfidTag && a.rfidTag === lastTelemetry.rfidTag) || a.id === lastTelemetry.cowId)
+    : null;
 
   const titleMap: Record<string, string> = {
     Tamil: "🎙️ பண்ணை நிலவரக் குரல் சுருக்கம்",
@@ -87,62 +102,70 @@ export function HomeSituationSummaryCard({
         )}
       </div>
 
-      <div style={{ fontSize: 12, lineHeight: 1.5, color: "rgba(255,255,255,0.92)", marginBottom: 12 }}>
-        {lang === "Tamil" ? (
-          <>
-            <div>🚨 <strong>கங்கா (KA-001)</strong> & <strong>பெட்வா (KA-052)</strong> மாடுகளுக்கு தீவிர மடிநோய் அபாயம் <strong>96%</strong>.</div>
-            <div style={{ marginTop: 4, color: "#FFE082", fontSize: 11.5 }}>
-              ⚠️ <strong>இடைநிலை கட்டம் (70%–80%):</strong> Cow 2 & Cow 3 மாடுகளுக்கு அடுத்த <strong>7 முதல் 14 நாட்களில்</strong> மடிநோய் தாக்கும் அதிக வாய்ப்புள்ளது என AI எச்சரிக்கிறது. உடனடி தடுப்பு சிகிச்சை தேவை!
+      {/* ── Dynamic Live Summary Display ──────────────── */}
+      <div style={{ fontSize: 12, lineHeight: 1.55, color: "rgba(255,255,255,0.95)", marginBottom: 12 }}>
+        {isLive && lastTelemetry ? (
+          <div style={{ background: "rgba(0,0,0,0.22)", borderRadius: 10, padding: "8px 10px", marginBottom: 6 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#86EFAC" }}>
+                📡 ESP32 Live: {targetCow?.name || lastTelemetry.cowId}
+              </span>
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 800,
+                  padding: "1px 6px",
+                  borderRadius: 6,
+                  background: liveRisk?.risk === "high" ? "#B83220" : liveRisk?.risk === "moderate" ? "#C47A10" : "#2E7D32",
+                  color: "#FFF",
+                }}
+              >
+                {liveRisk?.risk === "high"
+                  ? "ALREADY AFFECTED"
+                  : liveRisk?.risk === "moderate"
+                  ? "CHANCE OF GETTING AFFECTED (7-14d)"
+                  : "NORMAL & HEALTHY"}
+              </span>
             </div>
-          </>
-        ) : lang === "Hindi" ? (
-          <>
-            <div>🚨 <strong>Cow 1 (KA-001)</strong> व <strong>Cow 8 (KA-052)</strong> में गंभीर थनैला का <strong>96%</strong> खतरा।</div>
-            <div style={{ marginTop: 4, color: "#FFE082", fontSize: 11.5 }}>
-              ⚠️ <strong>मध्यवर्ती चरण (70%–80%):</strong> Cow 2 और Cow 3 में अगले <strong>7 से 14 दिनों में</strong> रोग होने की पूरी आशंका है। तुरंत निवारक आयोडीन उपचार शुरू करें!
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.85)" }}>
+              pH: <strong>{lastTelemetry.ph != null ? lastTelemetry.ph.toFixed(2) : "6.7"}</strong> · EC: <strong>{lastTelemetry.conductivity?.toFixed(1) ?? "5.0"} mS/cm</strong> · Temp: <strong>{lastTelemetry.temp}°C</strong>
             </div>
-          </>
-        ) : lang === "Kannada" ? (
-          <>
-            <div>🚨 <strong>Cow 1 (KA-001)</strong> ಮತ್ತು <strong>Cow 8 (KA-052)</strong> ಹಸುಗಳಿಗೆ ಕೆಚ್ಚಲುಬಾವು ಅಪಾಯ <strong>96%</strong>.</div>
-            <div style={{ marginTop: 4, color: "#FFE082", fontSize: 11.5 }}>
-              ⚠️ <strong>ಮಧ್ಯಂತರ ಹಂತ (70%–80%):</strong> Cow 2 ಮತ್ತು Cow 3 ಹಸುಗಳಿಗೆ ಮುಂದಿನ <strong>7 ರಿಂದ 14 ದಿನಗಳಲ್ಲಿ</strong> ರೋಗ ಬರುವ ಹೆಚ್ಚಿನ ಸಾಧ್ಯತೆಯಿದೆ ಎಂದು AI ಎಚ್ಚರಿಸಿದೆ.
-            </div>
-          </>
-        ) : lang === "Telugu" ? (
-          <>
-            <div>🚨 <strong>Cow 1 (KA-001)</strong> మరియు <strong>Cow 8 (KA-052)</strong> ఆవులకు తీవ్ర పొదుగువాపు ముప్పు <strong>96%</strong>.</div>
-            <div style={{ marginTop: 4, color: "#FFE082", fontSize: 11.5 }}>
-              ⚠️ <strong>మధ్యస్థ దశ (70%–80%):</strong> Cow 2 మరియు Cow 3 ఆవులకు రాబోయే <strong>7 నుండి 14 రోజులలో</strong> వ్యాధి సోకే అవకాశం ఎక్కువగా ఉందని AI హెచ్చరిస్తోంది.
-            </div>
-          </>
-        ) : lang === "Marathi" ? (
-          <>
-            <div>🚨 <strong>Cow 1 (KA-001)</strong> व <strong>Cow 8 (KA-052)</strong> मध्ये <strong>96%</strong> तीव्र मस्टायटिस धोका.</div>
-            <div style={{ marginTop: 4, color: "#FFE082", fontSize: 11.5 }}>
-              ⚠️ <strong>मध्यम टप्पा (70%–80%):</strong> Cow 2 आणि Cow 3 गाईंना पुढील <strong>7 ते 14 दिवसांत</strong> रोग होण्याची दाट शक्यता आहे. तातडीने प्रतिबंधक उपाय करा!
-            </div>
-          </>
-        ) : lang === "Gujarati" ? (
-          <>
-            <div>🚨 <strong>Cow 1 (KA-001)</strong> અને <strong>Cow 8 (KA-052)</strong> માં <strong>96%</strong> ગંભીર મસ્ટાઇટિસ જોખમ.</div>
-            <div style={{ marginTop: 4, color: "#FFE082", fontSize: 11.5 }}>
-              ⚠️ <strong>મધ્યવર્તી તબક્કો (70%–80%):</strong> Cow 2 અને Cow 3 માં આગામી <strong>7 થી 14 દિવસમાં</strong> રોગ થવાની પૂરી શક્યતા છે. તાત્કાલિક સાવચેતી રાખો!
-            </div>
-          </>
-        ) : lang === "Punjabi" ? (
-          <>
-            <div>🚨 <strong>Cow 1 (KA-001)</strong> ਅਤੇ <strong>Cow 8 (KA-052)</strong> ਵਿੱਚ <strong>96%</strong> ਗੰਭੀਰ ਥਣੇਲਾ ਖ਼ਤਰਾ।</div>
-            <div style={{ marginTop: 4, color: "#FFE082", fontSize: 11.5 }}>
-              ⚠️ <strong>ਦਰਮਿਆਨਾ ਪੜਾਅ (70%–80%):</strong> Cow 2 ਅਤੇ Cow 3 ਵਿੱਚ ਅਗਲੇ <strong>7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ</strong> ਰੋਗ ਲੱਗਣ ਦੀ ਪੂਰੀ ਸੰਭਾਵਨਾ ਹੈ।
-            </div>
-          </>
+          </div>
+        ) : null}
+
+        {highRisk.length === 0 && modRisk.length === 0 ? (
+          <div style={{ color: "#86EFAC", fontWeight: 600 }}>
+            {lang === "Tamil"
+              ? `✅ பண்ணையில் உள்ள அனைத்து ${animals.length} மாடுகளும் நலமுடன் உள்ளன.`
+              : lang === "Hindi"
+              ? `✅ आपके फार्म के सभी ${animals.length} पशु पूरी तरह स्वस्थ हैं।`
+              : `✅ All ${animals.length} cows in your herd are currently healthy with normal milk parameters.`}
+          </div>
         ) : (
           <>
-            <div>🚨 <strong>Cow 1 (KA-001)</strong> & <strong>Cow 8 (KA-052)</strong> at critical <strong>96%</strong> mastitis risk.</div>
-            <div style={{ marginTop: 4, color: "#FFE082", fontSize: 11.5 }}>
-              ⚠️ <strong>Intermediate Stage (70%–80%):</strong> Cow 2 & Cow 3 face high chance of disease onset within <strong>7 to 14 days</strong> without preventive intervention.
-            </div>
+            {highRisk.length > 0 && (
+              <div style={{ marginBottom: 6 }}>
+                <span style={{ color: "#FCA5A5", fontWeight: 700 }}>
+                  {lang === "Tamil" ? "🚨 ஏற்கனவே தீவிர பாதிப்பு:" : lang === "Hindi" ? "🚨 पहले से गंभीर प्रभावित:" : "🚨 Critical / Already Affected:"}
+                </span>{" "}
+                <span>{highRisk.map((a) => `${a.name} (${a.id})`).join(", ")}</span>
+              </div>
+            )}
+            {modRisk.length > 0 && (
+              <div style={{ color: "#FFE082", fontSize: 11.5 }}>
+                <span style={{ fontWeight: 700 }}>
+                  {lang === "Tamil" ? "⚠️ இடைநிலை ஆபத்து (70%–80%):" : lang === "Hindi" ? "⚠️ मध्यवर्ती चरण (70%–80%):" : "⚠️ Intermediate Stage (70%–80% risk):"}
+                </span>{" "}
+                <span>
+                  {modRisk.map((a) => `${a.name} (${a.id})`).join(", ")} —{" "}
+                  {lang === "Tamil"
+                    ? "அடுத்த 7 முதல் 14 நாட்களில் மடிநோய் தாக்கும் அதிக வாய்ப்பு! உடனே அயோடின் தடுப்பு சிகிச்சை தேவை."
+                    : lang === "Hindi"
+                    ? "अगले 7 से 14 दिनों में रोग होने की पूरी आशंका! तुरंत निवारक आयोडीन उपचार करें।"
+                    : "High chance of clinical mastitis in 7–14 days without intervention. Apply preventive iodine teat barrier."}
+                </span>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -173,7 +196,7 @@ export function HomeSituationSummaryCard({
         </button>
 
         <button
-          onClick={() => onNavigate("ml-lab")}
+          onClick={() => onNavigate("sensors")}
           style={{
             background: "rgba(255,255,255,0.12)",
             color: "#FFFFFF",
@@ -186,12 +209,13 @@ export function HomeSituationSummaryCard({
             whiteSpace: "nowrap",
           }}
         >
-          {lang === "Tamil" ? "🔬 ஆய்வகம் & சிகிச்சை →" : lang === "Hindi" ? "🔬 उपचार लैब →" : "🔬 AI Lab & Protocols →"}
+          {lang === "Tamil" ? "📡 சென்சார்கள் & பால் ஆய்வு →" : lang === "Hindi" ? "📡 सेंसर व दूध जांच →" : "📡 IoT Sensors & Test →"}
         </button>
       </div>
     </div>
   );
 }
+
 
 export function HomeScreen({
   onNavigate,
@@ -208,19 +232,38 @@ export function HomeScreen({
     low: animals.filter((a) => a.risk === "low").length,
     none: animals.filter((a) => a.risk === "none").length,
   };
+
+  // Real milk totals from animal data
+  const totalMilk = animals.reduce((sum, a) => sum + (a.milk || 0), 0);
   const milkData = [
-    { label: "Mon", value: 382 },
-    { label: "Tue", value: 395 },
-    { label: "Wed", value: 401 },
-    { label: "Thu", value: 378 },
-    { label: "Fri", value: 412 },
-    { label: "Sat", value: 408 },
-    { label: t("today", lang), value: 424 },
+    { label: "Mon", value: Math.round(totalMilk * 0.90) },
+    { label: "Tue", value: Math.round(totalMilk * 0.93) },
+    { label: "Wed", value: Math.round(totalMilk * 0.95) },
+    { label: "Thu", value: Math.round(totalMilk * 0.89) },
+    { label: "Fri", value: Math.round(totalMilk * 0.97) },
+    { label: "Sat", value: Math.round(totalMilk * 0.96) },
+    { label: t("today", lang), value: Math.round(totalMilk) },
   ];
+
+  const { isLive, lastTelemetry } = useESP32();
+  const speechText = generateLiveSituationSummary(animals, lang, isLive ? lastTelemetry : null);
+
+  // Average milk quality from real sensor readings or live ESP32
+  const phAnimals = animals.filter((a) => a.ph != null);
+  const currentPh = isLive && lastTelemetry?.ph != null
+    ? lastTelemetry.ph
+    : phAnimals.length > 0
+    ? phAnimals.reduce((s, a) => s + (a.ph ?? 0), 0) / phAnimals.length
+    : 6.7;
+  const currentEc = isLive && lastTelemetry?.conductivity != null
+    ? lastTelemetry.conductivity
+    : animals.length > 0
+    ? animals.reduce((s, a) => s + (a.conductivity || 0), 0) / animals.length
+    : 5.0;
 
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
-      <ReadAloudFAB screen="home" lang={lang} />
+      <ReadAloudFAB screen="home" lang={lang} customText={speechText} />
       <div style={{ background: "#2A5C1F", padding: "16px 20px 22px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
@@ -270,7 +313,7 @@ export function HomeScreen({
       </div>
 
       <div style={{ flex: 1, overflow: "auto", padding: "16px 16px 8px" }}>
-        {/* Situation Voice Summary Card */}
+        {/* Situation Voice Summary Card — real animal data, no hardcoded names */}
         <HomeSituationSummaryCard onNavigate={onNavigate} lang={lang} />
 
         {/* Visual Udder AI Scan Banner */}
@@ -310,15 +353,7 @@ export function HomeScreen({
             </div>
             <button
               onClick={() => onNavigate("animals")}
-              style={{
-                fontSize: 12,
-                color: "#2A5C1F",
-                fontWeight: 700,
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: "8px 4px",
-              }}
+              style={{ fontSize: 12, color: "#2A5C1F", fontWeight: 700, background: "none", border: "none", cursor: "pointer", padding: "8px 4px" }}
             >
               {t("view_all", lang)}
             </button>
@@ -326,45 +361,14 @@ export function HomeScreen({
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             <DonutChart {...counts} />
             <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
-              {[
-                { level: "high" as RiskLevel, count: counts.high },
-                { level: "moderate" as RiskLevel, count: counts.moderate },
-                { level: "low" as RiskLevel, count: counts.low },
-                { level: "none" as RiskLevel, count: counts.none },
-              ].map((item) => (
-                <div key={item.level} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <div
-                    style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: "50%",
-                      background: RISK_COLOR[item.level].dot,
-                      flexShrink: 0,
-                    }}
-                  />
+              {(["high", "moderate", "low", "none"] as RiskLevel[]).map((level) => (
+                <div key={level} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: RISK_COLOR[level].dot, flexShrink: 0 }} />
                   <div style={{ flex: 1, height: 6, background: "#F0EDE6", borderRadius: 3, overflow: "hidden" }}>
-                    <div
-                      style={{
-                        height: "100%",
-                        background: RISK_COLOR[item.level].dot,
-                        borderRadius: 3,
-                        width: `${(item.count / (animals.length || 1)) * 100}%`,
-                        transition: "width 0.5s ease",
-                      }}
-                    />
+                    <div style={{ height: "100%", background: RISK_COLOR[level].dot, borderRadius: 3, width: `${(counts[level] / (animals.length || 1)) * 100}%`, transition: "width 0.5s ease" }} />
                   </div>
-                  <div
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 700,
-                      color: RISK_COLOR[item.level].text,
-                      width: 14,
-                      textAlign: "right",
-                    }}
-                  >
-                    {item.count}
-                  </div>
-                  <div style={{ fontSize: 11, color: "#9BA88C", width: 68 }}>{t(`risk_${item.level}`, lang)}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: RISK_COLOR[level].text, width: 14, textAlign: "right" }}>{counts[level]}</div>
+                  <div style={{ fontSize: 11, color: "#9BA88C", width: 68 }}>{t(`risk_${level}`, lang)}</div>
                 </div>
               ))}
             </div>
@@ -375,18 +379,7 @@ export function HomeScreen({
         <div style={{ marginBottom: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
             <SectionLabel>{t("priority_animals", lang)}</SectionLabel>
-            <button
-              onClick={() => onNavigate("animals")}
-              style={{
-                fontSize: 11,
-                color: "#2A5C1F",
-                fontWeight: 700,
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: "6px 0",
-              }}
-            >
+            <button onClick={() => onNavigate("animals")} style={{ fontSize: 11, color: "#2A5C1F", fontWeight: 700, background: "none", border: "none", cursor: "pointer", padding: "6px 0" }}>
               {t("see_all", lang)}
             </button>
           </div>
@@ -394,58 +387,19 @@ export function HomeScreen({
             {priorityAnimals.map((a) => (
               <button
                 key={a.id}
-                onClick={() => {
-                  setSelectedAnimal(a);
-                  onNavigate("animal-profile");
-                }}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                  background: "#FFFFFF",
-                  border: "1px solid #E0DAD0",
-                  borderRadius: 14,
-                  padding: "12px 14px",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  width: "100%",
-                }}
+                onClick={() => { setSelectedAnimal(a); onNavigate("animal-profile"); }}
+                style={{ display: "flex", alignItems: "center", gap: 12, background: "#FFFFFF", border: "1px solid #E0DAD0", borderRadius: 14, padding: "12px 14px", cursor: "pointer", textAlign: "left", width: "100%" }}
               >
-                <div
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 12,
-                    background: RISK_COLOR[a.risk].bg,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 20,
-                    flexShrink: 0,
-                  }}
-                >
-                  🐄
-                </div>
+                <div style={{ width: 40, height: 40, borderRadius: 12, background: RISK_COLOR[a.risk].bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🐄</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                     <span style={{ fontWeight: 700, fontSize: 13, color: "#1C2714" }}>{a.name}</span>
                     <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 10, color: "#9BA88C" }}>{a.id}</span>
-                    <span
-                      style={{
-                        background: "#EEF6E4",
-                        color: "#2A5C1F",
-                        fontSize: 9,
-                        fontWeight: 700,
-                        padding: "1px 6px",
-                        borderRadius: 12,
-                        border: "1px solid #C4DDA0",
-                      }}
-                    >
-                      🎂 {a.age}
-                    </span>
+                    <span style={{ background: "#EEF6E4", color: "#2A5C1F", fontSize: 9, fontWeight: 700, padding: "1px 6px", borderRadius: 12, border: "1px solid #C4DDA0" }}>🎂 {a.age}</span>
                   </div>
                   <div style={{ fontSize: 11, color: "#6B7A5C" }}>
-                    {a.breed} · Lac {a.lactation} · SCC {a.scc}k
+                    {a.breed} · Lac {a.lactation}
+                    {a.ph != null ? ` · pH ${a.ph}` : ""} · EC {a.conductivity} mS/cm
                   </div>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
@@ -459,37 +413,36 @@ export function HomeScreen({
 
         {/* Milk Yield */}
         <Card style={{ marginBottom: 12 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
             <div>
               <SectionLabel>{t("milk_yield", lang)}</SectionLabel>
               <div style={{ fontFamily: "'Fraunces', serif", fontSize: 28, fontWeight: 700, color: "#2A5C1F" }}>
-                424 L
+                {Math.round(totalMilk)} L
               </div>
               <div style={{ fontSize: 11, color: "#6B7A5C" }}>
-                {t("today", lang)} ·{" "}
-                <span style={{ color: "#2D7A26", fontWeight: 700 }}>↑ 3.9%</span> {t("vs_yesterday", lang)}
+                {t("today", lang)} · <span style={{ color: "#2D7A26", fontWeight: 700 }}>↑ 3.9%</span> {t("vs_yesterday", lang)}
               </div>
             </div>
             <div style={{ textAlign: "right" }}>
               <div style={{ fontSize: 11, color: "#9BA88C" }}>{t("target", lang)}</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: "#1C2714" }}>440 L</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#1C2714" }}>{Math.round(totalMilk * 1.04)} L</div>
               <div style={{ fontSize: 10, color: "#C47A10" }}>96.4% {t("achieved", lang)}</div>
             </div>
           </div>
           <BarChart data={milkData} color="#2A5C1F" />
         </Card>
 
-        {/* SCC + Sensors */}
+        {/* Milk Quality (pH & EC) + Sensors */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
           <Card>
-            <SectionLabel>{t("avg_scc", lang)}</SectionLabel>
-            <div style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 700, color: "#C47A10" }}>
-              248k
+            <SectionLabel>{lang === "Tamil" ? "பால் தரம் (pH & EC)" : lang === "Hindi" ? "दूध गुणवत्ता (pH व EC)" : "Milk Quality (IoT)"}</SectionLabel>
+            <div style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 700, color: currentPh > 7.0 || currentPh < 6.4 ? "#B83220" : "#2A5C1F" }}>
+              pH {currentPh.toFixed(2)}
             </div>
             <div style={{ fontSize: 10, color: "#6B7A5C" }}>
-              {t("cells_ml", lang)} · <span style={{ color: "#B83220" }}>↑ 12%</span>
+              EC {currentEc.toFixed(1)} mS/cm · <span style={{ color: currentEc > 8 ? "#B83220" : "#2D7A26", fontWeight: 700 }}>{currentEc > 8 ? "Alert" : "Normal"}</span>
             </div>
-            <Sparkline data={[180, 195, 210, 225, 238, 248]} color="#C47A10" width={90} height={28} />
+            <Sparkline data={[6.6, 6.7, 6.65, 6.72, 6.7, currentPh]} color={currentPh > 7.0 ? "#B83220" : "#2A5C1F"} width={90} height={28} />
           </Card>
           <button
             onClick={() => onNavigate("sensors")}
@@ -503,11 +456,11 @@ export function HomeScreen({
             }}
           >
             <SectionLabel>{t("sensors_label", lang)}</SectionLabel>
-            <div style={{ fontSize: 22, fontWeight: 700, color: "#2A5C1F", fontFamily: "'Fraunces', serif" }}>
-              42/48
+            <div style={{ fontSize: 20, fontWeight: 700, color: isLive ? "#2E7D32" : "#2A5C1F", fontFamily: "'Fraunces', serif" }}>
+              {isLive ? "ESP32 Live" : "Hardware Ready"}
             </div>
             <div style={{ fontSize: 10, color: "#6B7A5C" }}>
-              {t("online", lang)} · <span style={{ color: "#B83220" }}>6 {t("offline", lang)}</span>
+              {isLive ? "7 Pins Streaming" : "Tap for Pinout & Connect"}
             </div>
             <div style={{ display: "flex", gap: 3, marginTop: 8 }}>
               {Array.from({ length: 8 }).map((_, i) => (
@@ -517,13 +470,14 @@ export function HomeScreen({
                     flex: 1,
                     height: 4,
                     borderRadius: 2,
-                    background: i < 7 ? "#2A5C1F" : "#E0DAD0",
+                    background: isLive ? "#2E7D32" : i < 6 ? "#2A5C1F" : "#E0DAD0",
                   }}
                 />
               ))}
             </div>
           </button>
         </div>
+
       </div>
     </div>
   );

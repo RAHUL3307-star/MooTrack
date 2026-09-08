@@ -16,73 +16,187 @@ export function SensorsScreen({
 
   const readings = [
     {
-      label: lang === "Tamil" ? "பால் கடத்துதிறன் (சராசரி)" : "Conductivity (avg)",
-      value: isLive && lastTelemetry ? `${lastTelemetry.conductivity} mS/cm` : "10.4 mS/cm",
-      status: "Normal",
-      icon: "⚡",
-      color: "#2A5C1F",
-    },
-    {
-      label: lang === "Tamil" ? "பால் pH அளவு" : "Milk pH (avg)",
-      value: "6.7",
-      status: "Normal",
+      label: lang === "Tamil" ? "பால் pH" : "Milk pH (GPIO 34)",
+      value: isLive && lastTelemetry?.ph != null ? `${lastTelemetry.ph.toFixed(2)}` : "6.7",
+      status: isLive && lastTelemetry?.ph != null
+        ? (lastTelemetry.ph < 6.3 || lastTelemetry.ph > 7.0 ? "Abnormal" : "Normal")
+        : "Normal",
       icon: "🧪",
+      color: isLive && lastTelemetry?.ph != null && (lastTelemetry.ph < 6.3 || lastTelemetry.ph > 7.0) ? "#C47A10" : "#2A5C1F",
+    },
+    {
+      label: lang === "Tamil" ? "பால் EC (கடத்துதிறன்)" : "Milk EC (GPIO 35)",
+      value: isLive && lastTelemetry ? `${lastTelemetry.conductivity.toFixed(1)} mS/cm` : "5.0 mS/cm",
+      status: isLive && lastTelemetry && lastTelemetry.conductivity > 10 ? "High ⚠️" : "Normal",
+      icon: "⚡",
+      color: isLive && lastTelemetry && lastTelemetry.conductivity > 10 ? "#B83220" : "#2A5C1F",
+    },
+    {
+      label: lang === "Tamil" ? "பால் வெப்பநிலை (DS18B20)" : "Milk Temp DS18B20 (GPIO 4)",
+      value: isLive && lastTelemetry ? `${lastTelemetry.temp}°C` : "38.5°C",
+      status: isLive && lastTelemetry && lastTelemetry.temp > 39.2 ? "Elevated ⚠️" : "Normal",
+      icon: "🌡",
+      color: isLive && lastTelemetry && lastTelemetry.temp > 39.2 ? "#C47A10" : "#2A5C1F",
+    },
+    {
+      label: lang === "Tamil" ? "எடை (HX711 Load Cell)" : "Milk Weight HX711 (GPIO 32/33)",
+      value: isLive && lastTelemetry?.weight != null ? `${lastTelemetry.weight.toFixed(1)} kg` : "—",
+      status: "Live",
+      icon: "⚖️",
       color: "#2A5C1F",
     },
     {
-      label: lang === "Tamil" ? "மடி வெப்பநிலை" : "Milk Temperature",
-      value: isLive && lastTelemetry ? `${lastTelemetry.temp}°C` : "37.8°C",
-      status: "Normal",
-      icon: "🌡",
-      color: "#2A5C1F",
-    },
-    {
-      label: lang === "Tamil" ? "கொட்டகை வெப்பநிலை" : "Shed Temp",
-      value: "32.4°C",
-      status: "Warm",
-      icon: "🌡",
-      color: "#C47A10",
-    },
-    {
-      label: lang === "Tamil" ? "கொட்டகை ஈரப்பதம்" : "Shed Humidity",
-      value: isLive && lastTelemetry?.humidity ? `${lastTelemetry.humidity}%` : "84%",
-      status: "High",
+      label: lang === "Tamil" ? "கொட்டகை ஈரப்பதம் (DHT22)" : "Shed Humidity DHT22 (GPIO 27)",
+      value: isLive && lastTelemetry?.humidity != null ? `${lastTelemetry.humidity}%` : "68%",
+      status: isLive && lastTelemetry?.humidity != null && lastTelemetry.humidity > 80 ? "High" : "Normal",
       icon: "💧",
-      color: "#B83220",
+      color: isLive && lastTelemetry?.humidity != null && lastTelemetry.humidity > 80 ? "#B83220" : "#2A5C1F",
+    },
+    {
+      label: lang === "Tamil" ? "செயல்பாட்டு அளவீடு (MPU6050)" : "Activity MPU6050 (GPIO 21/22)",
+      value: isLive && lastTelemetry?.activity != null ? `${lastTelemetry.activity}%` : "—",
+      status: isLive && lastTelemetry?.activity != null && lastTelemetry.activity < 30 ? "Low ⚠️" : "Normal",
+      icon: "📐",
+      color: isLive && lastTelemetry?.activity != null && lastTelemetry.activity < 30 ? "#C47A10" : "#2A5C1F",
     },
   ];
 
-  const arduinoSketch = `#include <WiFi.h>
+  const arduinoSketch = `// ═══════════════════════════════════════════════════════════
+// MooTracker ESP32 DevKit V1 — Full Hardware Firmware
+// Pin Mapping (as provided):
+//   RC522 RFID : SDA→5, SCK→18, MOSI→23, MISO→19, RST→2
+//   MPU6050    : SDA→21, SCL→22
+//   DS18B20    : Data→4  (4.7kΩ pull-up to 3.3V)
+//   DHT22      : Data→27
+//   HX711      : DOUT→32, SCK→33
+//   pH module  : AO→34 (ADC1, voltage divider to 3.3V)
+//   EC module  : AO→35 (ADC1, voltage divider to 3.3V)
+// ═══════════════════════════════════════════════════════════
+#include <WiFi.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include <SPI.h>
+#include <MFRC522.h>
+#include <Wire.h>
+#include <MPU6050.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#include <DHT.h>
+#include "HX711.h"
 
-const char* ssid = "YOUR_WIFI_SSID";
+// ── WiFi & Server ──────────────────────────────────────────
+const char* ssid     = "YOUR_WIFI_SSID";
 const char* password = "YOUR_WIFI_PASSWORD";
-const char* serverUrl = "http://YOUR_COMPUTER_IP:3000/api/esp32/telemetry";
+const char* serverUrl = "http://YOUR_PC_IP:3000/api/esp32/telemetry";
+
+// ── RC522 RFID (SPI) ───────────────────────────────────────
+#define RFID_SS_PIN  5
+#define RFID_RST_PIN 2
+MFRC522 rfid(RFID_SS_PIN, RFID_RST_PIN);
+String currentRfidTag = "";
+
+// ── MPU6050 (I2C on SDA=21, SCL=22) ──────────────────────
+MPU6050 mpu;
+
+// ── DS18B20 (GPIO 4) ──────────────────────────────────────
+#define DS18B20_PIN 4
+OneWire oneWire(DS18B20_PIN);
+DallasTemperature ds18b20(&oneWire);
+
+// ── DHT22 (GPIO 27) ───────────────────────────────────────
+#define DHT_PIN  27
+#define DHT_TYPE DHT22
+DHT dht(DHT_PIN, DHT_TYPE);
+
+// ── HX711 Load Cell (DOUT=32, SCK=33) ────────────────────
+#define HX711_DOUT 32
+#define HX711_SCK  33
+HX711 scale;
+
+// ── Analog pH → GPIO 34, EC → GPIO 35 ────────────────────
+#define PH_PIN  34
+#define EC_PIN  35
+// Convert ADC reading (0–4095) to voltage (0–3.3V via divider)
+float adcToVoltage(int raw) { return raw * 3.3f / 4095.0f; }
+// Approximate calibrations — adjust slope/intercept per your probe
+float voltageToPH(float v)  { return 7.0f + (2.5f - v) / 0.18f; }
+float voltageToEC(float v)  { return v * 2.8f; }  // mS/cm approx
 
 void setup() {
   Serial.begin(115200);
+  SPI.begin();
+  rfid.PCD_Init();
+  Wire.begin(21, 22);
+  mpu.initialize();
+  ds18b20.begin();
+  dht.begin();
+  scale.begin(HX711_DOUT, HX711_SCK);
+  scale.set_scale(2280.f);  // calibrate this value
+  scale.tare();
+  analogReadResolution(12);
+
   WiFi.begin(ssid, password);
+  Serial.print("Connecting WiFi");
   while (WiFi.status() != WL_CONNECTED) { delay(500); Serial.print("."); }
-  Serial.println("\\nESP32 WiFi Connected!");
+  Serial.println("\\nWiFi OK! IP: " + WiFi.localIP().toString());
 }
 
 void loop() {
-  // Read sensors (DS18B20 Temp + EC Analog Pin 34)
-  float temp = 39.4;
-  float ec = 6.85;
-  long scc = 2450000;
+  // ── 1. RFID scan ──────────────────────────────────────────
+  if (rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial()) {
+    currentRfidTag = "";
+    for (byte i = 0; i < rfid.uid.size; i++) {
+      if (rfid.uid.uidByte[i] < 0x10) currentRfidTag += "0";
+      currentRfidTag += String(rfid.uid.uidByte[i], HEX);
+    }
+    currentRfidTag.toUpperCase();
+    rfid.PICC_HaltA();
+    rfid.PCD_StopCrypto1();
+    Serial.println("{\\"event\\":\\"rfid\\",\\"rfid\\":\\"" + currentRfidTag + "\\"}");
+  }
 
-  // 1. Output Serial JSON for USB WebSerial connection
-  Serial.printf("{\\"cowId\\":\\"KA-001\\",\\"temp\\":%.2f,\\"conductivity\\":%.2f,\\"scc\\":%ld}\\n", temp, ec, scc);
+  // ── 2. Sensor readings ────────────────────────────────────
+  ds18b20.requestTemperatures();
+  float milkTemp   = ds18b20.getTempCByIndex(0);
+  float shedHumidity = dht.readHumidity();
+  float shedTemp   = dht.readTemperature();
+  float weightKg   = scale.get_units(5);
 
-  // 2. Stream HTTP POST to MooTracker LAN Server
+  int   phRaw  = analogRead(PH_PIN);
+  int   ecRaw  = analogRead(EC_PIN);
+  float phVal  = voltageToPH(adcToVoltage(phRaw));
+  float ecVal  = voltageToEC(adcToVoltage(ecRaw));
+
+  // MPU6050 activity index (magnitude of acceleration vector)
+  int16_t ax, ay, az, gx, gy, gz;
+  mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+  float accelMag = sqrt(sq(ax/16384.0f) + sq(ay/16384.0f) + sq(az/16384.0f));
+  int   activity = constrain((int)((accelMag - 1.0f) * 100), 0, 100);
+
+  // ── 3. Serial JSON (USB Web Serial connection) ────────────
+  StaticJsonDocument<256> doc;
+  doc["cowId"]    = currentRfidTag.length() > 0 ? currentRfidTag : "KA-001";
+  doc["rfid"]     = currentRfidTag;
+  doc["temp"]     = milkTemp;
+  doc["ph"]       = phVal;
+  doc["ec"]       = ecVal;
+  doc["weight"]   = weightKg;
+  doc["shedTemp"] = shedTemp;
+  doc["humidity"] = shedHumidity;
+  doc["activity"] = activity;
+  doc["rssi"]     = WiFi.RSSI();
+  serializeJson(doc, Serial);
+  Serial.println();
+
+  // ── 4. HTTP POST to MooTracker LAN server ─────────────────
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     http.begin(serverUrl);
     http.addHeader("Content-Type", "application/json");
-    String payload = "{\\"deviceId\\":\\"ESP32-HARDWARE-WROOM32\\",\\"cowId\\":\\"KA-001\\",\\"temp\\":39.4,\\"conductivity\\":6.85,\\"scc\\":2450000,\\"humidity\\":84,\\"battery\\":94,\\"rssi\\":-58}";
-    http.POST(payload);
+    String payload;
+    serializeJson(doc, payload);
+    int code = http.POST(payload);
+    Serial.println("HTTP " + String(code));
     http.end();
   }
   delay(2000);

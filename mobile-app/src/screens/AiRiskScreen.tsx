@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import {
   StatusBar,
   BackHeader,
@@ -122,7 +122,7 @@ export function AIRiskScreen({
           <SectionLabel>{t("why_risk", lang)}</SectionLabel>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {[
-              { label: lang === "Tamil" ? "எஸ்.சி.சி அதிகரிப்பு" : "SCC Rising Trend", weight: 0.82, detail: "485k cells/mL, ↑31%" },
+              { label: lang === "Tamil" ? "பால் pH காரத்தன்மை மாறுபாடு" : lang === "Hindi" ? "दूध pH असंतुलन (क्षारीय)" : "Milk pH Shift (Alkaline)", weight: 0.82, detail: "pH 7.35 (alkaline shift ↑)" },
               { label: lang === "Tamil" ? "பால் கடத்துதிறன் அதிகம்" : "Conductivity Elevated", weight: 0.76, detail: "14.2 mS/cm Front-Right" },
               { label: lang === "Tamil" ? "பால் உற்பத்தி குறைவு" : "Milk Yield Decline", weight: 0.71, detail: "10.2L vs 14.8L baseline (↓31%)" },
               { label: lang === "Tamil" ? "உடல் வெப்பநிலை அதிகம்" : "Body Temperature", weight: 0.68, detail: "39.4°C > 39.0°C" },

@@ -62,7 +62,9 @@ export async function fetchAnimals(): Promise<Animal[]> {
       lactation: row.lactation,
       risk: row.risk_level as RiskLevel,
       trend: row.trend,
-      scc: row.scc,
+      ph: (row as any).ph ?? 6.6,
+      conductivity: (row as any).conductivity ?? 5.2,
+      weight: (row as any).weight ?? 12.0,
       temp: row.temperature,
       activity: row.activity,
       milk: row.milk_yield,
@@ -79,7 +81,7 @@ export async function fetchAnimals(): Promise<Animal[]> {
 export async function updateAnimalRisk(
   animalId: string,
   risk: RiskLevel,
-  scc: number,
+  conductivity: number,
   temp: number
 ): Promise<boolean> {
   if (!isSupabaseConfigured || !supabase) return false;
@@ -88,30 +90,28 @@ export async function updateAnimalRisk(
     .from("animals")
     .update({
       risk_level: risk,
-      scc,
+      conductivity,
       temperature: temp,
       last_sync: new Date().toLocaleTimeString("en-IN"),
     })
     .eq("id", animalId);
 
   if (error) {
-    console.error("[animalService] updateAnimalRisk failed:", error.message);
+    console.error("[animalService] updateAnimalRisk error:", error.message);
     return false;
   }
   return true;
 }
 
-// ─── Seed / Reseed Animals ────────────────────────────────────────────────────
-// Uses localStorage versioning: if DATA_VERSION changed, forces update of all names
+// ─── Seed Initial Animals (Cow 1–8) ──────────────────────────────────────────
 export async function seedAnimals(): Promise<void> {
   if (!isSupabaseConfigured || !supabase) return;
 
   const storedVersion = localStorage.getItem("mootracker_data_version");
-  const needsUpdate = storedVersion !== DATA_VERSION;
 
-  if (needsUpdate) {
-    // Force-update all animal names to match current ANIMALS array
-    console.info(`[animalService] Data version changed (${storedVersion} → ${DATA_VERSION}), updating names...`);
+  // If already seeded with an older version, wipe and re-seed to ensure clean names
+  if (storedVersion !== DATA_VERSION) {
+    console.info(`[animalService] Upgrading data to ${DATA_VERSION}: resetting names to Cow 1–8...`);
 
     for (const a of ANIMALS) {
       await supabase
@@ -127,7 +127,9 @@ export async function seedAnimals(): Promise<void> {
           lactation: a.lactation,
           risk_level: a.risk,
           trend: a.trend,
-          scc: a.scc,
+          ph: a.ph ?? 6.6,
+          conductivity: a.conductivity ?? 5.2,
+          weight: a.weight ?? 12.0,
           temperature: a.temp,
           activity: a.activity,
           milk_yield: a.milk,
@@ -156,7 +158,9 @@ export async function seedAnimals(): Promise<void> {
     lactation: a.lactation,
     risk_level: a.risk,
     trend: a.trend,
-    scc: a.scc,
+    ph: a.ph ?? 6.6,
+    conductivity: a.conductivity ?? 5.2,
+    weight: a.weight ?? 12.0,
     temperature: a.temp,
     activity: a.activity,
     milk_yield: a.milk,

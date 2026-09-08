@@ -12,8 +12,8 @@ interface AnimalsContextType {
   setSelectedAnimal: (animal: Animal | null) => void;
   loading: boolean;
   refreshAnimals: () => Promise<void>;
-  updateRisk: (animalId: string, risk: RiskLevel, scc: number, temp: number) => Promise<void>;
-  addAnimal: (rfidTag: string, ageYears: number, ageMonths: number, breed: string) => Animal;
+  updateRisk: (animalId: string, risk: RiskLevel, temp: number, ph?: number, conductivity?: number) => Promise<void>;
+  addAnimal: (rfidTag: string, name: string, ageYears: number, ageMonths: number, breed: string) => Animal;
 }
 
 const AnimalsContext = createContext<AnimalsContextType>({
@@ -96,30 +96,31 @@ export function AnimalsProvider({ children }: { children: React.ReactNode }) {
   }, [loadData]);
 
   const updateRisk = useCallback(
-    async (animalId: string, risk: RiskLevel, scc: number, temp: number) => {
+    async (animalId: string, risk: RiskLevel, temp: number, ph?: number, conductivity?: number) => {
       setBaseAnimals((prev) =>
-        prev.map((a) => (a.id === animalId ? { ...a, risk, scc, temp, lastSync: "Just now" } : a))
+        prev.map((a) => (a.id === animalId ? { ...a, risk, temp, ph: ph ?? a.ph, conductivity: conductivity ?? a.conductivity, lastSync: "Just now" } : a))
       );
       setCustomAnimals((prev) =>
-        prev.map((a) => (a.id === animalId ? { ...a, risk, scc, temp, lastSync: "Just now" } : a))
+        prev.map((a) => (a.id === animalId ? { ...a, risk, temp, ph: ph ?? a.ph, conductivity: conductivity ?? a.conductivity, lastSync: "Just now" } : a))
       );
+      // Supabase update (no SCC column)
       if (isSupabaseConfigured) {
-        await updateAnimalRisk(animalId, risk, scc, temp);
+        await updateAnimalRisk(animalId, risk, 0, temp);
       }
     },
     []
   );
 
-  // Add a new cow via RFID scan
+  // Add a new cow via RFID scan — name entered by farmer at scan time
   const addAnimal = useCallback(
-    (rfidTag: string, ageYears: number, ageMonths: number, breed: string): Animal => {
+    (rfidTag: string, name: string, ageYears: number, ageMonths: number, breed: string): Animal => {
       const totalAnimals = baseAnimals.length + customAnimals.length;
       const cowNumber = totalAnimals + 1;
       const padded = String(cowNumber).padStart(3, "0");
 
       const newAnimal: Animal = {
         id: `KA-${padded}`,
-        name: `Cow ${cowNumber}`,
+        name: name.trim() || `Cow ${cowNumber}`,
         breed: breed || "Mixed",
         age: `${ageYears}y ${ageMonths}m`,
         ageYears,
@@ -128,8 +129,9 @@ export function AnimalsProvider({ children }: { children: React.ReactNode }) {
         lactation: 1,
         risk: "none",
         trend: "stable",
-        scc: 80,
         temp: 38.5,
+        ph: 6.7,
+        conductivity: 5.0,
         activity: "normal",
         milk: 0,
         lastSync: "Just now",

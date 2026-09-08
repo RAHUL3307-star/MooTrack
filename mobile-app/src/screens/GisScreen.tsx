@@ -58,7 +58,7 @@ export function GISScreen({
       ammonia: "4 ppm (Clean)",
       humidity: "68%",
       temp: "28.5°C",
-      notes: "Biosecure Zone: All cattle healthy with low somatic cell count.",
+      notes: "Biosecure Zone: All cattle healthy with normal milk conductivity and temperature.",
     },
     {
       id: "Quarantine",
@@ -299,7 +299,7 @@ export function GISScreen({
                         {cow.name} ({cow.id})
                       </span>
                       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        <span style={{ fontSize: 11, color: "#7B6F5D" }}>{cow.scc}k SCC</span>
+                        <span style={{ fontSize: 11, color: "#7B6F5D" }}>EC {cow.conductivity || 5.2} mS/cm</span>
                         <RiskBadge risk={cow.risk} lang={lang} />
                       </div>
                     </div>

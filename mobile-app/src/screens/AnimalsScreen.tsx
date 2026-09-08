@@ -13,14 +13,17 @@ function RFIDRegisterModal({
   lang,
 }: {
   onClose: () => void;
-  onRegister: (rfid: string, ageYears: number, ageMonths: number, breed: string) => void;
+  onRegister: (rfid: string, name: string, ageYears: number, ageMonths: number, breed: string) => void;
   lang: string;
 }) {
   const { isLive, lastTelemetry } = useESP32();
+  const { animals } = useAnimals();
+  const defaultName = `Cow ${animals.length + 1}`;
+  const [name, setName] = useState(defaultName);
   const [rfidTag, setRfidTag] = useState(
-    isLive && lastTelemetry?.cowId ? lastTelemetry.cowId : ""
+    isLive && lastTelemetry?.rfidTag ? lastTelemetry.rfidTag : isLive && lastTelemetry?.cowId ? lastTelemetry.cowId : ""
   );
-  const [ageYears, setAgeYears] = useState("0");
+  const [ageYears, setAgeYears] = useState("3");
   const [ageMonths, setAgeMonths] = useState("0");
   const [breed, setBreed] = useState("HF Cross");
   const [scanning, setScanning] = useState(false);
@@ -31,18 +34,18 @@ function RFIDRegisterModal({
   const handleScan = () => {
     setScanning(true);
     setTimeout(() => {
-      const tag = isLive && lastTelemetry?.cowId
-        ? lastTelemetry.cowId
+      const tag = isLive && (lastTelemetry?.rfidTag || lastTelemetry?.cowId)
+        ? (lastTelemetry.rfidTag || lastTelemetry.cowId)
         : `RFID-${Math.floor(Math.random() * 9000) + 1000}`;
       setRfidTag(tag);
       setScanning(false);
       setScanned(true);
-    }, 1800);
+    }, 1200);
   };
 
   const handleSubmit = () => {
     if (!rfidTag.trim()) return;
-    onRegister(rfidTag.trim(), parseInt(ageYears) || 0, parseInt(ageMonths) || 0, breed);
+    onRegister(rfidTag.trim(), name.trim() || defaultName, parseInt(ageYears) || 0, parseInt(ageMonths) || 0, breed);
     onClose();
   };
 
@@ -153,6 +156,19 @@ function RFIDRegisterModal({
           </div>
         </div>
 
+        {/* Cow Name */}
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#6B7A5C", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            🏷️ {lang === "Hindi" ? "गाय का नाम" : lang === "Tamil" ? "மாட்டின் பெயர்" : "Cow Name"}
+          </div>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. Cow 1, Cow 2, Lakshmi..."
+            style={inputStyle}
+          />
+        </div>
+
         {/* Age */}
         <div>
           <div style={{ fontSize: 12, fontWeight: 700, color: "#6B7A5C", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em" }}>
@@ -251,8 +267,8 @@ export function AnimalsScreen({
         (a.rfidTag?.toLowerCase().includes(search.toLowerCase()) ?? false))
   );
 
-  const handleRegister = (rfid: string, ageYears: number, ageMonths: number, breed: string) => {
-    const newAnimal = addAnimal(rfid, ageYears, ageMonths, breed);
+  const handleRegister = (rfid: string, cowName: string, ageYears: number, ageMonths: number, breed: string) => {
+    const newAnimal = addAnimal(rfid, cowName, ageYears, ageMonths, breed);
     setJustAdded(newAnimal.id);
     setTimeout(() => setJustAdded(null), 3000);
   };
@@ -439,7 +455,10 @@ export function AnimalsScreen({
                   </div>
                   <div style={{ display: "flex", gap: 12, fontSize: 11 }}>
                     <span style={{ color: "#6B7A5C" }}>
-                      SCC <strong style={{ color: "#1C2714" }}>{a.scc}k</strong>
+                      pH <strong style={{ color: a.ph && (a.ph > 7.0 || a.ph < 6.4) ? "#B83220" : "#1C2714" }}>{a.ph != null ? a.ph.toFixed(2) : "6.7"}</strong>
+                    </span>
+                    <span style={{ color: "#6B7A5C" }}>
+                      EC <strong style={{ color: a.conductivity > 8 ? "#B83220" : "#1C2714" }}>{a.conductivity}</strong>
                     </span>
                     <span style={{ color: "#6B7A5C" }}>
                       🌡 <strong style={{ color: a.temp > 39 ? "#B83220" : "#1C2714" }}>{a.temp}°C</strong>

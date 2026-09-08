@@ -21,7 +21,10 @@ export interface Database {
           lactation: number;
           risk_level: "none" | "low" | "moderate" | "high";
           trend: "up" | "down" | "stable";
-          scc: number;
+
+          ph?: number | null;
+          conductivity?: number | null;
+          weight?: number | null;
           temperature: number;
           activity: "low" | "normal" | "high";
           milk_yield: number;
@@ -41,7 +44,10 @@ export interface Database {
           lactation: number;
           risk_level: "none" | "low" | "moderate" | "high";
           trend: "up" | "down" | "stable";
-          scc: number;
+
+          ph?: number | null;
+          conductivity?: number | null;
+          weight?: number | null;
           temperature: number;
           activity: "low" | "normal" | "high";
           milk_yield: number;
@@ -61,7 +67,10 @@ export interface Database {
           lactation?: number;
           risk_level?: "none" | "low" | "moderate" | "high";
           trend?: "up" | "down" | "stable";
-          scc?: number;
+
+          ph?: number | null;
+          conductivity?: number | null;
+          weight?: number | null;
           temperature?: number;
           activity?: "low" | "normal" | "high";
           milk_yield?: number;
@@ -79,7 +88,9 @@ export interface Database {
           cow_id: string;
           temperature: number;
           conductivity: number;
-          scc: number;
+          ph?: number | null;
+          weight?: number | null;
+
           humidity: number | null;
           battery: number | null;
           rssi: number | null;
@@ -91,7 +102,9 @@ export interface Database {
           cow_id: string;
           temperature: number;
           conductivity: number;
-          scc: number;
+          ph?: number | null;
+          weight?: number | null;
+
           humidity?: number | null;
           battery?: number | null;
           rssi?: number | null;
@@ -103,7 +116,9 @@ export interface Database {
           cow_id?: string;
           temperature?: number;
           conductivity?: number;
-          scc?: number;
+          ph?: number | null;
+          weight?: number | null;
+
           humidity?: number | null;
           battery?: number | null;
           rssi?: number | null;

@@ -333,7 +333,7 @@ function MainAppShell() {
           maxWidth: isEdgeToEdge ? (isMobileScreen ? "100%" : 460) : 390,
           minHeight: isEdgeToEdge ? "100dvh" : 844,
           height: isEdgeToEdge ? "100dvh" : 844,
-          background: "#FFFFFF",
+          background: "#1C2714",
           borderRadius: isEdgeToEdge ? 0 : 48,
           boxShadow: isEdgeToEdge
             ? (isMobileScreen ? "none" : "0 8px 30px rgba(0,0,0,0.12)")

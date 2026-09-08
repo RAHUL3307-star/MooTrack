@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { StatusBar, BackHeader, ReadAloudFAB } from "../components/ui";
 import { t } from "../i18n/index";
 
@@ -63,7 +63,7 @@ export function RecommendationsScreen({
           p: 1,
           text:
             lang === "Tamil"
-              ? "கங்கா மற்றும் பெட்வா மாடுகளுக்காக டாக்டர் சர்மாவை உடனே தொடர்பு கொள்ளவும்"
+              ? "Cow 1 மற்றும் Cow 8 மாடுகளுக்காக டாக்டர் சர்மாவை உடனே தொடர்பு கொள்ளவும்"
               : "Contact Vet Dr. Sharma for Cow 1 and Cow 8 — clinical exam required",
           tag: "Immediate",
         },

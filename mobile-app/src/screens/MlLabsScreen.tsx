@@ -7,9 +7,11 @@ import {
   AudioEqualizerBars,
   ReadAloudFAB,
 } from "../components/ui";
-import { t, LANG_FLAGS, sendWhatsAppAlert } from "../i18n/index";
+import { t, LANG_FLAGS, sendWhatsAppAlert, generateLiveSituationSummary } from "../i18n/index";
 import { SCREEN_SPEECH } from "../i18n/speech";
 import { useReadAloud } from "../i18n/useReadAloud";
+import { useAnimals } from "../context/AnimalsContext";
+import { useESP32 } from "../context/ESP32Context";
 
 export function MLLabScreen({
   onBack,
@@ -18,6 +20,8 @@ export function MLLabScreen({
   onBack: () => void;
   lang: string;
 }) {
+  const { animals } = useAnimals();
+  const { isLive, lastTelemetry } = useESP32();
   const [selectedPreset, setSelectedPreset] = useState("KA-001");
   const [showTranscript, setShowTranscript] = useState(false);
 
@@ -27,9 +31,9 @@ export function MLLabScreen({
       name: "Cow 1",
       badge: "High Risk (96%)",
       color: "#B83220",
-      scc: "2,450,000",
+      weight: "10.2 kg",
       temp: "40.4°C",
-      ec: "5.85",
+      ec: "12.85",
       qdr: "1.82",
       pH: "7.28",
       rum: "295 min",
@@ -40,9 +44,9 @@ export function MLLabScreen({
       name: "Cow 8",
       badge: "High Risk (94%)",
       color: "#B83220",
-      scc: "2,180,000",
+      weight: "8.4 kg",
       temp: "40.1°C",
-      ec: "5.72",
+      ec: "11.72",
       qdr: "1.74",
       pH: "7.18",
       rum: "320 min",
@@ -53,11 +57,11 @@ export function MLLabScreen({
       name: "Cow 2",
       badge: "Moderate (68%)",
       color: "#C47A10",
-      scc: "485,000",
+      weight: "14.8 kg",
       temp: "39.2°C",
-      ec: "5.32",
+      ec: "7.32",
       qdr: "1.34",
-      pH: "6.84",
+      pH: "6.92",
       rum: "410 min",
       status: "Subclinical Early Window (7-10 Days)",
     },
@@ -66,9 +70,9 @@ export function MLLabScreen({
       name: "Cow 3",
       badge: "Low Risk (28%)",
       color: "#5E9E2A",
-      scc: "215,000",
+      weight: "9.6 kg",
       temp: "38.8°C",
-      ec: "5.08",
+      ec: "5.48",
       qdr: "1.18",
       pH: "6.72",
       rum: "445 min",
@@ -79,7 +83,7 @@ export function MLLabScreen({
       name: "Cow 5",
       badge: "Healthy (2%)",
       color: "#2D7A26",
-      scc: "58,000",
+      weight: "19.2 kg",
       temp: "38.5°C",
       ec: "4.82",
       qdr: "1.06",
@@ -91,7 +95,7 @@ export function MLLabScreen({
 
   const curr = presets.find((p) => p.id === selectedPreset) || presets[0];
 
-  const speechText = (SCREEN_SPEECH["ml-lab"] || SCREEN_SPEECH["home"])(lang);
+  const speechText = generateLiveSituationSummary(animals, lang, isLive ? lastTelemetry : null);
   const { speak, speaking, activeChunk, totalChunks } = useReadAloud(speechText, lang);
   const flag = LANG_FLAGS[lang] || "EN";
 
@@ -120,7 +124,7 @@ export function MLLabScreen({
       </div>
 
       <div style={{ flex: 1, overflow: "auto", padding: 14 }}>
-        {/* PS Badge */}
+        {/* Hardware Sensing Subtitle */}
         <div
           style={{
             background: "#E6F0E2",
@@ -133,9 +137,9 @@ export function MLLabScreen({
             gap: 6,
           }}
         >
-          <span style={{ fontSize: 13 }}>🏛️</span>
+          <span style={{ fontSize: 13 }}>📡</span>
           <span style={{ fontSize: 10, fontWeight: 700, color: "#2A5C1F", fontFamily: "'Outfit', sans-serif" }}>
-            Problem Statement #26109 · ICAR-NRC Dairying
+            Real-Time IoT Milk Analysis (pH · EC · Temp · Weight)
           </span>
         </div>
 
@@ -172,10 +176,10 @@ export function MLLabScreen({
 
           <p style={{ fontSize: 12, lineHeight: 1.5, color: "rgba(255,255,255,0.9)", margin: "0 0 10px" }}>
             {lang === "Tamil"
-              ? "கங்கா மற்றும் பெட்வா மாடுகளுக்கு தீவிர மடிநோய் அபாயம். 24 லட்சம் பால் அணுக்கள், 40.4°C காய்ச்சல். 6 சிகிச்சை நெறிமுறைகள் & மருத்துவ எச்சரிக்கை."
+              ? "Cow 1 மற்றும் Cow 8 மாடுகளுக்கு தீவிர மடிநோய் அபாயம். 12.4 mS/cm பால் மின்கடத்துதிறன், 40.4°C காய்ச்சல். உடனடி சிகிச்சை நெறிமுறைகள் & மருத்துவ எச்சரிக்கை."
               : lang === "Hindi"
-              ? "गंगा और बेतवा में थनैला का गंभीर 96% जोखिम। 24 लाख सोमैटिक कोशिकाएं, 40.4°C बुखार। 6 उपचार दिशानिर्देश व आपातकालीन अलर्ट।"
-              : "Cow 1 & Cow 8 at critical 96% mastitis risk. 2.45M somatic cells, 40.4°C hyperthermia. 6-step treatment protocol & emergency dispatch."}
+              ? "Cow 1 और Cow 8 में थनैला का गंभीर 96% जोखिम। 12.4 mS/cm दूध चालकता, 40.4°C बुखार। उपचार दिशानिर्देश व आपातकालीन अलर्ट।"
+              : "Cow 1 & Cow 8 at critical 96% mastitis risk. 12.4 mS/cm milk EC, 40.4°C hyperthermia. Immediate treatment protocol & veterinary dispatch."}
           </p>
 
           <button
@@ -305,9 +309,9 @@ export function MLLabScreen({
           <SectionLabel>{lang === "Tamil" ? "சாதாரண நிலை vs தற்போதைய அளவு" : "Normal Baseline vs Current Cow"}</SectionLabel>
           <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 11 }}>
             <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #F0EDE6", paddingBottom: 4 }}>
-              <span style={{ color: "#6B7A5C" }}>Somatic Cells (SCC):</span>
+              <span style={{ color: "#6B7A5C" }}>Milk Yield / Weight (HX711):</span>
               <span>
-                <strong>{curr.scc}</strong> <span style={{ color: "#9BA88C" }}>(Normal: &lt;100k)</span>
+                <strong>{curr.weight}</strong> <span style={{ color: "#9BA88C" }}>(Expected: ~14 kg)</span>
               </span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #F0EDE6", paddingBottom: 4 }}>
@@ -348,9 +352,9 @@ export function MLLabScreen({
           <SectionLabel>{lang === "Tamil" ? "தீவிர ஆபத்தின் முக்கிய காரணங்கள் (ML Factors)" : "Why is this Cow at High Risk? (ML Factors)"}</SectionLabel>
           <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 11 }}>
             <div style={{ background: "#FCE8E5", border: "1px solid #F0B4AA", borderRadius: 8, padding: "8px 10px" }}>
-              <strong style={{ color: "#B83220" }}>1. Somatic Cell Count Surge (+9.87 weight):</strong>
+              <strong style={{ color: "#B83220" }}>1. Electrical Conductivity Spike (+9.87 weight):</strong>
               <div style={{ color: "#6B7A5C", marginTop: 2 }}>
-                Surpassed 2,000,000 cells/mL signaling heavy leukocyte infiltration into mammary gland.
+                Surpassed 10.0 mS/cm signaling heavy electrolyte and sodium/chloride ion leakage into milk.
               </div>
             </div>
             <div style={{ background: "#FEF3E2", border: "1px solid #F0C882", borderRadius: 8, padding: "8px 10px" }}>
@@ -429,7 +433,7 @@ export function MLLabScreen({
             sendWhatsAppAlert(
               curr.name,
               curr.badge,
-              `SCC ${curr.scc}, Temp ${curr.temp}, pH ${curr.pH}`,
+              `Temp ${curr.temp}, pH ${curr.pH}, EC ${curr.ec} mS/cm`,
               "Isolate cow, apply iodine post-dip, veterinary visit required",
               "Immediate 24h",
               lang
