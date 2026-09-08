@@ -381,7 +381,7 @@ export function InterventionsScreen({
                   type="text"
                   value={performedBy}
                   onChange={(e) => setPerformedBy(e.target.value)}
-                  placeholder="e.g. Dr. Sharma / Ramesh Patel"
+                  placeholder="e.g. Dr. Sharma / Farm Attendant"
                   style={{
                     width: "100%",
                     padding: "10px 12px",

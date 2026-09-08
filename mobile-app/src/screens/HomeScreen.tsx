@@ -18,6 +18,7 @@ import { SCREEN_SPEECH } from "../i18n/speech";
 import { useReadAloud } from "../i18n/useReadAloud";
 import { useAnimals } from "../context/AnimalsContext";
 import { useESP32 } from "../context/ESP32Context";
+import { useUser } from "../context/UserContext";
 import { computeMilkRisk } from "../types/esp32";
 
 export function HomeSituationSummaryCard({
@@ -246,6 +247,9 @@ export function HomeScreen({
   ];
 
   const { isLive, lastTelemetry } = useESP32();
+  const { user } = useUser();
+  const farmerName = user?.name || "Farmer";
+  const farmLabel = [user?.farmName, user?.village, user?.state].filter(Boolean).join(" · ") || "My Dairy Farm";
   const speechText = generateLiveSituationSummary(animals, lang, isLive ? lastTelemetry : null);
 
   // Average milk quality from real sensor readings or live ESP32
@@ -278,10 +282,10 @@ export function HomeScreen({
             >
               {t("greeting", lang)}
               <br />
-              {t("farmer_name", lang)}
+              {farmerName} 🌅
             </div>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,0.75)", marginTop: 3 }}>
-              {t("farm_sub", lang)}
+              {farmLabel}
             </div>
           </div>
         </div>

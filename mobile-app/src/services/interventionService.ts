@@ -24,7 +24,7 @@ const LOCAL_INTERVENTIONS: InterventionRecord[] = [
     id: "int-002",
     animal_id: "KA-052",
     treatment_type: "Isolation + Iodine Teat Dip",
-    performed_by: "Ramesh Patel",
+    performed_by: "Farm Manager",
     notes: "Isolated to Pen B. Iodine dipping 3x daily.",
     status: "in_progress",
     created_at: new Date(Date.now() - 5 * 3600 * 1000).toISOString(),

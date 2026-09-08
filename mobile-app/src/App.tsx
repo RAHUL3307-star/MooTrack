@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ESP32Provider, useESP32 } from "./context/ESP32Context";
 import { AnimalsProvider, useAnimals } from "./context/AnimalsContext";
+import { UserProvider } from "./context/UserContext";
 import { ESP32TopBannerNotification, BottomNav } from "./components/ui";
 import type { Screen, Tab } from "./types/index";
 import { t } from "./i18n/index";
@@ -435,7 +436,9 @@ export default function App() {
   return (
     <ESP32Provider>
       <AnimalsProvider>
-        <MainAppShell />
+        <UserProvider>
+          <MainAppShell />
+        </UserProvider>
       </AnimalsProvider>
     </ESP32Provider>
   );
