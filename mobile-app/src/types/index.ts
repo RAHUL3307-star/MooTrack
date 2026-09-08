@@ -18,6 +18,10 @@ export interface VisualScanResult {
   clinicalNotes: string;
   timestamp: string;
   imagePreviewUrl?: string;
+  matchedDatasetCase?: string;
+  matchedDatasetImage?: string;
+  datasetMatchSimilarity?: number;
+  bovineConfidence?: number;
 }
 
 export interface Animal {
