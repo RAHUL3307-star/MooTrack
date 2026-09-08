@@ -1,4 +1,4 @@
-﻿import { supabase, isSupabaseConfigured } from "../lib/supabase";
+import { supabase, isSupabaseConfigured } from "../lib/supabase";
 
 export interface AlertItem {
   id: string;
@@ -47,7 +47,7 @@ export async function fetchAlerts(status?: string): Promise<AlertItem[]> {
 
   try {
     let query = supabase.from("alerts").select("*").order("created_at", { ascending: false });
-    if (status) query = query.eq("status", status);
+    if (status) query = query.eq("status", status as AlertItem["status"]);
 
     const { data, error } = await query;
     if (error || !data || data.length === 0) {

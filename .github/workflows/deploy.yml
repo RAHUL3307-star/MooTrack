@@ -46,24 +46,25 @@ jobs:
 
       - name: Prepare GitHub Pages output
         run: |
-          mkdir -p dist-pages/app
+          mkdir -p dist-pages/app dist-pages/assets dist-pages/app/assets
+          # Copy root landing page & static files
           cp index.html dist-pages/index.html
           cp style.css dist-pages/ 2>/dev/null || true
           cp app.js data.js ml_engine.js dist-pages/ 2>/dev/null || true
           cp manifest.json sw.js dist-pages/ 2>/dev/null || true
           cp icon.svg icon-192.png icon-512.png dist-pages/ 2>/dev/null || true
-          cp -r assets dist-pages/ 2>/dev/null || true
+          cp -r assets/* dist-pages/assets/ 2>/dev/null || true
+          
+          # Deploy fresh React mobile app to dist-pages/app and dist-pages/mobile.html
           cp -r mobile-app/dist/. dist-pages/app/
-          # Use our root mobile.html (with correct manifest path), not the Vite build output
-          cp mobile.html dist-pages/mobile.html
-          # Also copy manifest + icons into app/ so /MooTrack/app/manifest.json works
+          cp mobile-app/dist/index.html dist-pages/mobile.html
+          cp -r mobile-app/dist/assets/* dist-pages/assets/ 2>/dev/null || true
+          cp -r mobile-app/dist/assets/* dist-pages/app/assets/ 2>/dev/null || true
+          
+          # Copy manifest and icons for PWA
           cp manifest.json dist-pages/app/manifest.json
           cp sw.js dist-pages/app/sw.js
-          cp icon.svg dist-pages/app/ 2>/dev/null || true
-          cp icon-192.png icon-512.png dist-pages/app/ 2>/dev/null || true
-          mkdir -p dist-pages/app/assets
-          cp assets/icon-*.png dist-pages/app/assets/ 2>/dev/null || true
-          cp assets/screenshot-mobile.png dist-pages/app/assets/ 2>/dev/null || true
+          cp icon.svg icon-192.png icon-512.png dist-pages/app/ 2>/dev/null || true
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

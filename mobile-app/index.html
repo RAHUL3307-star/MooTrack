@@ -22,9 +22,25 @@
     <script type="module" src="/src/main.tsx"></script>
     <script>
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(() => {});
-        });
+        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+          // Dev mode: Unregister any existing service worker to prevent stale cache
+          navigator.serviceWorker.getRegistrations().then((registrations) => {
+            for (const reg of registrations) {
+              reg.unregister();
+            }
+          });
+          if ('caches' in window) {
+            caches.keys().then((keys) => {
+              for (const key of keys) {
+                if (key.startsWith('mootracker')) caches.delete(key);
+              }
+            });
+          }
+        } else {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+          });
+        }
       }
     </script>
     <!-- figma:body-end -->

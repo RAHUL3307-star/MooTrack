@@ -75,7 +75,8 @@ export function AnimalsProvider({ children }: { children: React.ReactNode }) {
     loadData();
 
     if (isSupabaseConfigured && supabase) {
-      const channel = supabase
+      const client = supabase;
+      const channel = client
         .channel("animals_realtime")
         .on(
           "postgres_changes",
@@ -89,7 +90,7 @@ export function AnimalsProvider({ children }: { children: React.ReactNode }) {
         .subscribe();
 
       return () => {
-        supabase.removeChannel(channel);
+        client.removeChannel(channel);
       };
     }
   }, [loadData]);

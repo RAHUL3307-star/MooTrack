@@ -11,25 +11,41 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <title>MooTracker Mobile</title>
-    <link rel="manifest" href="/manifest.json" />
-    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
-    <link rel="apple-touch-icon" href="/icon.svg" />
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+    <link rel="apple-touch-icon" href="./icon.svg" />
     
     <meta name="description" content="Predicts bovine health risks for Indian dairy farmers using sensor data and analytics to improve herd health, alerts, and farm management decisions.">
     <meta name="robots" content="noindex, nofollow">
     <meta property="og:title" content="MooTracker - Smart Cattle Health Monitoring">
     <meta property="og:description" content="Predicts bovine health risks for Indian dairy farmers using sensor data and analytics to improve herd health, alerts, and farm management decisions.">
-    <script type="module" crossorigin src="/assets/index-Chp-vWJ0.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BvMi-Jg2.css">
+    <script type="module" crossorigin src="./assets/index-Bgdr2UNk.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DmttH5kC.css">
   </head>
   <body>
     
     <div id="root"></div>
     <script>
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(() => {});
-        });
+        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+          // Dev mode: Unregister any existing service worker to prevent stale cache
+          navigator.serviceWorker.getRegistrations().then((registrations) => {
+            for (const reg of registrations) {
+              reg.unregister();
+            }
+          });
+          if ('caches' in window) {
+            caches.keys().then((keys) => {
+              for (const key of keys) {
+                if (key.startsWith('mootracker')) caches.delete(key);
+              }
+            });
+          }
+        } else {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+          });
+        }
       }
     </script>
     

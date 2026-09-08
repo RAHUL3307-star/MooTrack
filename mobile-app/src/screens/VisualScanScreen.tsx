@@ -563,6 +563,18 @@ export function VisualScanScreen({
     }, 1500);
   };
 
+  // Manually trigger analysis (used by the "Run AI Visual Analysis" button)
+  const runVisualAnalysis = () => {
+    if (uploadedImage) {
+      // Re-analyze uploaded image by re-triggering the preset flow
+      setValidationError(null);
+      setScanResult(null);
+      runPresetAnalysis(selectedPreset);
+    } else {
+      runPresetAnalysis(selectedPreset);
+    }
+  };
+
   // Handle file upload / camera capture with intelligent subject validation and dataset matching
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -639,7 +651,7 @@ export function VisualScanScreen({
 
       {/* Header */}
       <div style={{ background: "#2A5C1F", padding: "12px 16px 16px", color: "#FFFFFF" }}>
-        <StatusBar dark />
+        <StatusBar />
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 6 }}>
           <button
             onClick={() => onNavigate("animals")}
