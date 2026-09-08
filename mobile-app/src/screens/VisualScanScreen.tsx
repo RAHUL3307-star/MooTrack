@@ -9,6 +9,7 @@ interface PresetCase {
   id: string;
   name: string;
   sub: string;
+  imagePath: string;
   riskLevel: RiskLevel;
   visualRisk: number;
   erythemaScore: number;
@@ -27,6 +28,7 @@ const PRESET_CASES: PresetCase[] = [
     id: "healthy",
     name: "Healthy Udder",
     sub: "Normal Pinkish Tone · Symmetric",
+    imagePath: "samples/score1_healthy.jpg",
     riskLevel: "none",
     visualRisk: 8,
     erythemaScore: 12,
@@ -43,6 +45,7 @@ const PRESET_CASES: PresetCase[] = [
     id: "hyperkeratosis",
     name: "Teat Rough Ring",
     sub: "Grade 2 Roughness · Early Warning",
+    imagePath: "samples/score2_smooth_ring.jpg",
     riskLevel: "low",
     visualRisk: 38,
     erythemaScore: 34,
@@ -59,6 +62,7 @@ const PRESET_CASES: PresetCase[] = [
     id: "asymmetry",
     name: "Moderate Swelling",
     sub: "Udder Asymmetry 1.7x · Grade 3 Teat",
+    imagePath: "samples/score3_rough_ring.jpg",
     riskLevel: "moderate",
     visualRisk: 74,
     erythemaScore: 68,
@@ -75,6 +79,7 @@ const PRESET_CASES: PresetCase[] = [
     id: "severe_mastitis",
     name: "Acute Clinical Mastitis",
     sub: "Severe Erythema · High Heat/Swelling",
+    imagePath: "samples/score4_severe_crack.jpg",
     riskLevel: "high",
     visualRisk: 94,
     erythemaScore: 92,
@@ -397,35 +402,45 @@ export function VisualScanScreen({
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
             ) : (
-              /* Synthetic SVG Udder Simulation */
-              <svg width="220" height="150" viewBox="0 0 220 150">
-                {/* Cow Back & Udder Base */}
-                <ellipse cx="110" cy="55" rx="80" ry="38" fill={PRESET_CASES.find(p => p.id === selectedPreset)?.svgColor || "#E8A89A"} />
-                {/* 4 Teats with Quarters */}
-                {/* Front-Left */}
-                <rect x="75" y="80" width="16" height="34" rx="8" fill="#D88A7A" />
-                {/* Front-Right (Affected hotspot in mastitis case) */}
-                <rect
-                  x="129"
-                  y="80"
-                  width="18"
-                  height={selectedPreset === "severe_mastitis" ? "42" : "34"}
-                  rx="8"
-                  fill={selectedPreset === "severe_mastitis" ? "#B83220" : selectedPreset === "asymmetry" ? "#DC6A55" : "#D88A7A"}
+              <div style={{ position: "relative", width: "100%", height: "100%" }}>
+                <img
+                  src={PRESET_CASES.find(p => p.id === selectedPreset)?.imagePath || "samples/score4_severe_crack.jpg"}
+                  alt="Clinical Udder Sample"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
-                {/* Rear-Left */}
-                <rect x="55" y="75" width="14" height="28" rx="7" fill={selectedPreset === "hyperkeratosis" ? "#E2907A" : "#C87A6A"} />
-                {/* Rear-Right */}
-                <rect x="149" y="75" width="14" height="28" rx="7" fill="#C87A6A" />
-
-                {/* Hotspot bounding box if mastitis */}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: 8,
+                    left: 8,
+                    background: "rgba(0,0,0,0.65)",
+                    color: "#FFFFFF",
+                    padding: "3px 8px",
+                    borderRadius: 6,
+                    fontSize: 10,
+                    fontFamily: "'JetBrains Mono'",
+                  }}
+                >
+                  Cornell NMC Labeled Clinical Dataset
+                </div>
                 {selectedPreset === "severe_mastitis" && (
-                  <g>
-                    <rect x="118" y="45" width="45" height="80" fill="none" stroke="#B83220" strokeWidth="2" strokeDasharray="4,4" />
-                    <text x="122" y="40" fill="#B83220" fontSize="10" fontWeight="bold">FR: 94% Risk</text>
-                  </g>
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                      background: "rgba(184,50,32,0.9)",
+                      color: "#FFFFFF",
+                      padding: "3px 8px",
+                      borderRadius: 6,
+                      fontSize: 10,
+                      fontWeight: 700,
+                    }}
+                  >
+                    🔴 FR Hotspot: 94%
+                  </div>
                 )}
-              </svg>
+              </div>
             )}
 
             {/* Scanning Overlay Animation */}
