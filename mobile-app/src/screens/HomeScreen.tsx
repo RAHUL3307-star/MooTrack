@@ -241,17 +241,6 @@ export function HomeScreen({
               {t("farm_sub", lang)}
             </div>
           </div>
-          <div
-            style={{
-              background: "rgba(255,255,255,0.15)",
-              borderRadius: 12,
-              padding: "8px 12px",
-              textAlign: "center",
-            }}
-          >
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.9)", fontWeight: 600 }}>7 Sep 2026</div>
-            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.65)", marginTop: 2 }}>{t("today", lang)}</div>
-          </div>
         </div>
         {counts.high > 0 && (
           <div
