@@ -134,14 +134,14 @@ VALUES ('Ramesh Patel', '+919876543210', 'Shri Balaji Dairy Farm', 'COw sensing'
 ON CONFLICT DO NOTHING;
 
 INSERT INTO public.animals (id, name, breed, age, lactation, risk_level, trend, scc, temperature, activity, milk_yield, last_sync, quarter) VALUES
-('KA-001', 'Ganga', 'HF Cross', '5y 3m', 3, 'high', 'up', 485, 39.4, 'low', 10.2, '8 min ago', 'Front-Right'),
-('KA-007', 'Kaveri', 'Murrah Buf.', '4y 1m', 2, 'moderate', 'up', 312, 38.9, 'normal', 14.8, '12 min ago', 'Rear-Left'),
-('KA-014', 'Saraswati', 'Sahiwal', '6y 8m', 5, 'moderate', 'stable', 248, 38.7, 'normal', 9.6, '5 min ago', 'All Clear'),
-('KA-022', 'Narmada', 'Jersey X', '3y 2m', 1, 'low', 'down', 145, 38.5, 'high', 18.4, '3 min ago', 'All Clear'),
-('KA-031', 'Yamuna', 'HF Cross', '4y 6m', 3, 'none', 'stable', 82, 38.4, 'normal', 19.2, '6 min ago', 'All Clear'),
-('KA-038', 'Godavari', 'Gir', '7y 0m', 6, 'low', 'stable', 178, 38.6, 'normal', 7.8, '15 min ago', 'All Clear'),
-('KA-045', 'Chambal', 'Sahiwal', '2y 9m', 1, 'none', 'stable', 68, 38.3, 'high', 12.1, '4 min ago', 'All Clear'),
-('KA-052', 'Betwa', 'HF Cross', '5y 5m', 4, 'high', 'up', 620, 39.6, 'low', 8.4, '22 min ago', 'Rear-Right')
+('KA-001', 'Cow 1', 'HF Cross', '5y 3m', 3, 'high', 'up', 485, 39.4, 'low', 10.2, '8 min ago', 'Front-Right'),
+('KA-007', 'Cow 2', 'Murrah Buf.', '4y 1m', 2, 'moderate', 'up', 312, 38.9, 'normal', 14.8, '12 min ago', 'Rear-Left'),
+('KA-014', 'Cow 3', 'Sahiwal', '6y 8m', 5, 'moderate', 'stable', 248, 38.7, 'normal', 9.6, '5 min ago', 'All Clear'),
+('KA-022', 'Cow 4', 'Jersey X', '3y 2m', 1, 'low', 'down', 145, 38.5, 'high', 18.4, '3 min ago', 'All Clear'),
+('KA-031', 'Cow 5', 'HF Cross', '4y 6m', 3, 'none', 'stable', 82, 38.4, 'normal', 19.2, '6 min ago', 'All Clear'),
+('KA-038', 'Cow 6', 'Gir', '7y 0m', 6, 'low', 'stable', 178, 38.6, 'normal', 7.8, '15 min ago', 'All Clear'),
+('KA-045', 'Cow 7', 'Sahiwal', '2y 9m', 1, 'none', 'stable', 68, 38.3, 'high', 12.1, '4 min ago', 'All Clear'),
+('KA-052', 'Cow 8', 'HF Cross', '5y 5m', 4, 'high', 'up', 620, 39.6, 'low', 8.4, '22 min ago', 'Rear-Right')
 ON CONFLICT (id) DO UPDATE SET
     risk_level = EXCLUDED.risk_level,
     scc = EXCLUDED.scc,

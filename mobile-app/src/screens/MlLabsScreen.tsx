@@ -24,7 +24,7 @@ export function MLLabScreen({
   const presets = [
     {
       id: "KA-001",
-      name: "Ganga",
+      name: "Cow 1",
       badge: "High Risk (96%)",
       color: "#B83220",
       scc: "2,450,000",
@@ -37,7 +37,7 @@ export function MLLabScreen({
     },
     {
       id: "KA-052",
-      name: "Betwa",
+      name: "Cow 8",
       badge: "High Risk (94%)",
       color: "#B83220",
       scc: "2,180,000",
@@ -50,7 +50,7 @@ export function MLLabScreen({
     },
     {
       id: "KA-007",
-      name: "Kaveri",
+      name: "Cow 2",
       badge: "Moderate (68%)",
       color: "#C47A10",
       scc: "485,000",
@@ -63,7 +63,7 @@ export function MLLabScreen({
     },
     {
       id: "KA-014",
-      name: "Saraswati",
+      name: "Cow 3",
       badge: "Low Risk (28%)",
       color: "#5E9E2A",
       scc: "215,000",
@@ -76,7 +76,7 @@ export function MLLabScreen({
     },
     {
       id: "KA-022",
-      name: "Yamuna",
+      name: "Cow 5",
       badge: "Healthy (2%)",
       color: "#2D7A26",
       scc: "58,000",
@@ -175,7 +175,7 @@ export function MLLabScreen({
               ? "கங்கா மற்றும் பெட்வா மாடுகளுக்கு தீவிர மடிநோய் அபாயம். 24 லட்சம் பால் அணுக்கள், 40.4°C காய்ச்சல். 6 சிகிச்சை நெறிமுறைகள் & மருத்துவ எச்சரிக்கை."
               : lang === "Hindi"
               ? "गंगा और बेतवा में थनैला का गंभीर 96% जोखिम। 24 लाख सोमैटिक कोशिकाएं, 40.4°C बुखार। 6 उपचार दिशानिर्देश व आपातकालीन अलर्ट।"
-              : "Ganga & Betwa at critical 96% mastitis risk. 2.45M somatic cells, 40.4°C hyperthermia. 6-step treatment protocol & emergency dispatch."}
+              : "Cow 1 & Cow 8 at critical 96% mastitis risk. 2.45M somatic cells, 40.4°C hyperthermia. 6-step treatment protocol & emergency dispatch."}
           </p>
 
           <button

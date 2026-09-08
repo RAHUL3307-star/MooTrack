@@ -47,7 +47,7 @@ This landing page and interactive command center replicates the exact UI/UX desi
    - **Farm Console Sidebar:** Overview, Active Alerts counter, Signal health, Field guide, and Demo farm card.
    - **Toolbar:** Real-time IST clock, live status indicator, and risk filter dropdown (*All, Elevated, Watch, Low*).
    - **Summary Stats Cards:** Animals tracked (48), Needs attention (02), Watch (06), Last sync (04m).
-   - **Herd Animals List:** Searchable & filterable cattle list (Ganga, Kaveri, Moti, Narmada + dataset entries).
+   - **Herd Animals List:** Searchable & filterable cattle list (Cow 1, Cow 2, Cow 3, Cow 4 + dataset entries).
    - **Interactive Detail Panel:** Dynamic risk score gauge (0-100), contributing physiological signals, and *"Next sensible step"* recommendations.
    - **Alerts Stream:** Active alert notifications with one-click *"Acknowledge"* action.
    - **Figma Integration Bar:** Direct button linking to Figma Make URL and an in-page interactive Mobile App Simulator modal.

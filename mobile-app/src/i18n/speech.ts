@@ -1,4 +1,4 @@
-export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
+﻿export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
   home: (lang: string) => {
     switch (lang) {
       case "Tamil":
@@ -16,7 +16,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Punjabi":
         return "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ ਕਿਸਾਨ ਵੀਰੋ! ਇਹ ਤੁਹਾਡੇ ਡੇਅਰੀ ਫਾਰਮ ਦਾ ਮੁੱਖ ਸਾਰ ਹੈ। ਤੁਹਾਡੇ ਫਾਰਮ ਵਿੱਚ ਗੰਗਾ ਅਤੇ ਬੇਤਵਾ ਗੰਭੀਰ ਖ਼ਤਰੇ ਵਿੱਚ ਹਨ। ਸਭ ਤੋਂ ਜ਼ਰੂਰੀ ਗੱਲ ਇਹ ਹੈ ਕਿ 70 ਤੋਂ 80 ਪ੍ਰਤੀਸ਼ਤ ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਾਲੀਆਂ ਗਾਵਾਂ ਜਿਵੇਂ ਕਿ ਕਾਵੇਰੀ ਅਤੇ ਸਰਸਵਤੀ ਵਿੱਚ ਅਗਲੇ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਥਣੇਲਾ ਰੋਗ ਲੱਗਣ ਦੀ ਪੂਰੀ ਸੰਭਾਵਨਾ ਹੈ। ਅੱਜ ਦਾ ਕੁੱਲ ਦੁੱਧ 424 ਲੀਟਰ ਹੈ। ਤੁਰੰਤ ਇਹਨਾਂ ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਾਲੀਆਂ ਗਾਵਾਂ ਦਾ ਬਚਾਅ ਇਲਾਜ ਸ਼ੁਰੂ ਕਰੋ ਅਤੇ ਡਾਕਟਰ ਨੂੰ ਸੂਚਿਤ ਕਰੋ।";
       default:
-        return "Hello farmer! Here is your daily dairy situation summary. Out of 48 cows in your herd, Ganga and Betwa are at critical mastitis risk. More importantly, cows in the intermediate stage with 70 to 80 percent risk, such as Kaveri and Saraswati, have high chances of getting attacked by the disease in 7 to 14 days. Today's total milk yield is 424 litres, up 4 percent, and 42 IoT sensors are active. Immediate action: start preventive iodine teat dipping for intermediate-stage cows, and isolate Ganga and Betwa right away.";
+        return "Hello farmer! Here is your daily dairy situation summary. Out of 48 cows in your herd, Cow 1 and Cow 8 are at critical mastitis risk. More importantly, cows in the intermediate stage with 70 to 80 percent risk, such as Cow 2 and Cow 3, have high chances of getting attacked by the disease in 7 to 14 days. Today's total milk yield is 424 litres, up 4 percent, and 42 IoT sensors are active. Immediate action: start preventive iodine teat dipping for intermediate-stage cows, and isolate Cow 1 and Cow 8 right away.";
     }
   },
   animals: (lang: string) => {
@@ -36,7 +36,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Punjabi":
         return "ਪਸ਼ੂ ਸੂਚੀ ਸਾਰ। ਗੰਗਾ ਅਤੇ ਬੇਤਵਾ ਗੰਭੀਰ ਖ਼ਤਰੇ ਵਿੱਚ ਹਨ। ਕਾਵੇਰੀ ਅਤੇ ਸਰਸਵਤੀ 70 ਤੋਂ 80 ਪ੍ਰਤੀਸ਼ਤ ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਿੱਚ ਹਨ ਅਤੇ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਬਿਮਾਰੀ ਹੋਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ।";
       default:
-        return "Cattle list summary. Ganga and Betwa have critical mastitis risk above 90%. Kaveri and Saraswati are in the intermediate stage with 70 to 80 percent risk, and our AI models predict a high chance of clinical disease appearing in 7 to 14 days without preventive care. Yamuna and Chambal are completely healthy. Tap any animal's card to view its detailed health records.";
+        return "Cattle list summary. Cow 1 and Cow 8 have critical mastitis risk above 90%. Cow 2 and Cow 3 are in the intermediate stage with 70 to 80 percent risk, and our AI models predict a high chance of clinical disease appearing in 7 to 14 days without preventive care. Cow 5 and Cow 7 are completely healthy. Tap any animal's card to view its detailed health records.";
     }
   },
   "animal-profile": (lang: string) => {
@@ -56,7 +56,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Punjabi":
         return "ਸਿਹਤ ਰਿਪੋਰਟ ਸਾਰ। ਗੰਗਾ ਨੂੰ 88% ਗੰਭੀਰ ਖ਼ਤਰਾ ਹੈ। ਇਸ ਤੋਂ ਇਲਾਵਾ 70 ਤੋਂ 80% ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਾਲੀਆਂ ਗਾਵਾਂ ਵਿੱਚ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਬਿਮਾਰੀ ਹੋਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ।";
       default:
-        return "Health summary for Ganga. Ganga has an 88% high risk of clinical mastitis with elevated 39.4°C temperature. Crucially, intermediate stage cows at 70% to 80% risk, like Kaveri and Saraswati, show early warning signs and have a high chance of clinical infection in 7 to 14 days without preventive intervention. Inspect and disinfect udder teats immediately.";
+        return "Health summary for Cow 1. Cow 1 has an 88% high risk of clinical mastitis with elevated 39.4°C temperature. Crucially, intermediate stage cows at 70% to 80% risk, like Cow 2 and Cow 3, show early warning signs and have a high chance of clinical infection in 7 to 14 days without preventive intervention. Inspect and disinfect udder teats immediately.";
     }
   },
   "ai-risk": (lang: string) => {
@@ -76,7 +76,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Punjabi":
         return "AI ਜੋਖਮ ਵਿਸ਼ਲੇਸ਼ਣ ਸਾਰ। 70 ਤੋਂ 80 ਪ੍ਰਤੀਸ਼ਤ ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਾਲੀਆਂ ਗਾਵਾਂ ਵਿੱਚ ਅਗਲੇ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਰੋਗ ਲੱਗਣ ਦੀ ਪੂਰੀ ਸੰਭਾਵਨਾ ਹੈ। ਸਮੇਂ ਸਿਰ ਇਲਾਜ ਸ਼ੁਰੂ ਕਰੋ।";
       default:
-        return "AI Risk Assessment summary. Our smart AI has detected critical mastitis flags for Ganga. Crucially, cows entering the 70% to 80% intermediate stage, such as Kaveri and Saraswati, face high chances of contracting clinical mastitis in 7 to 14 days. Early intervention during this 7 to 14 day window prevents acute inflammation.";
+        return "AI Risk Assessment summary. Our smart AI has detected critical mastitis flags for Cow 1. Crucially, cows entering the 70% to 80% intermediate stage, such as Cow 2 and Cow 3, face high chances of contracting clinical mastitis in 7 to 14 days. Early intervention during this 7 to 14 day window prevents acute inflammation.";
     }
   },
   alerts: (lang: string) => {
@@ -96,7 +96,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Punjabi":
         return "ਐਮਰਜੈਂਸੀ ਚੇਤਾਵਨੀ ਸਾਰ। 70 ਤੋਂ 80% ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਾਲੀਆਂ ਗਾਵਾਂ ਵਿੱਚ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਬਿਮਾਰੀ ਹੋਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ। ਡਾਕਟਰ ਨੂੰ ਸੂਚਿਤ ਕਰੋ।";
       default:
-        return "Emergency alerts summary. Ganga and Betwa are at critical risk and must be isolated immediately. Furthermore, cows in the 70% to 80% intermediate stage like Kaveri and Saraswati have high chance of getting clinical mastitis in 7 to 14 days, and need pre-milking iodine teat sanitization right now. Tap the WhatsApp button to alert your veterinarian.";
+        return "Emergency alerts summary. Cow 1 and Cow 8 are at critical risk and must be isolated immediately. Furthermore, cows in the 70% to 80% intermediate stage like Cow 2 and Cow 3 have high chance of getting clinical mastitis in 7 to 14 days, and need pre-milking iodine teat sanitization right now. Tap the WhatsApp button to alert your veterinarian.";
     }
   },
   recommendations: (lang: string) => {
@@ -158,7 +158,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Telugu":
         return "ఫారమ్ ಮ್ಯಾప్ సారాంశం. షెడ్ ఎ లో వ్యాధి వ్యాప్తి చెందే అవకాశం ఉంది. గంగ మరియు బెత్వా పక్కపక్కనే ఉన్నాయి. నీటి తొట్టిని మరియు నేలను క్రిమిసంహారకంతో శుభ్రం చేయండి.";
       default:
-        return "Farm map summary. A disease cluster is detected in Pen A where high-risk cows Ganga and Betwa are co-located. Disinfect the shared water trough and shed floor immediately to stop infection spread.";
+        return "Farm map summary. A disease cluster is detected in Pen A where high-risk cows Cow 1 and Cow 8 are co-located. Disinfect the shared water trough and shed floor immediately to stop infection spread.";
     }
   },
   interventions: (lang: string) => {
@@ -172,7 +172,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Telugu":
         return "చికిత్స నివేదిక సారాంశం. గంగకు సిఎంటి పరీక్ష చేసి ల్యాబ్‌కు పంపారు. బెత్వాను వేరు చేశారు. సరస్వతి ఆవు 52 శాతం మెరుగుదలతో కోలుకుంది.";
       default:
-        return "Interventions summary. Ganga has completed CMT testing with lab results pending. Betwa is safely isolated. Great news: Saraswati has achieved full recovery with a 52% reduction in somatic cell count.";
+        return "Interventions summary. Cow 1 has completed CMT testing with lab results pending. Cow 8 is safely isolated. Great news: Cow 3 has achieved full recovery with a 52% reduction in somatic cell count.";
     }
   },
   profile: (lang: string) => {
@@ -216,7 +216,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Punjabi":
         return "AI ਭਵਿੱਖਬਾਣੀ ਅਤੇ ਇਲਾਜ ਲੈਬ। 70 ਤੋਂ 80 ਪ੍ਰਤੀਸ਼ਤ ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਾਲੀਆਂ ਗਾਵਾਂ ਵਿੱਚ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਬਿਮਾਰੀ ਹੋਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ। ਤੁਰੰਤ ਬਚਾਅ ਇਲਾਜ ਸ਼ੁਰੂ ਕਰੋ।";
       default:
-        return "AI Predictive Modeling and Treatment Lab for Problem Statement 26109. High mastitis risk of 96% is forecasted for Ganga with 2.4 million somatic cells and 40.4°C temperature. Crucially, intermediate stage cows at 70% to 80% risk, including Kaveri and Saraswati, have high chances of getting attacked by the disease in 7 to 14 days without intervention. Immediately apply iodine teat barrier, isolate critical cows, and alert your veterinarian Dr. Sharma.";
+        return "AI Predictive Modeling and Treatment Lab for Problem Statement 26109. High mastitis risk of 96% is forecasted for Cow 1 with 2.4 million somatic cells and 40.4°C temperature. Crucially, intermediate stage cows at 70% to 80% risk, including Cow 2 and Cow 3, have high chances of getting attacked by the disease in 7 to 14 days without intervention. Immediately apply iodine teat barrier, isolate critical cows, and alert your veterinarian Dr. Sharma.";
     }
   },
   login: (lang: string) => {

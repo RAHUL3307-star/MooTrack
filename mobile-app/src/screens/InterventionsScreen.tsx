@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { StatusBar, BackHeader, Card, SectionLabel, ReadAloudFAB } from "../components/ui";
 import { t } from "../i18n/index";
 
@@ -18,7 +18,7 @@ export function InterventionsScreen({
       <div style={{ flex: 1, overflow: "auto", padding: 16 }}>
         <Card>
           <SectionLabel>{lang === "Tamil" ? "நடவடிக்கை நிலை" : "Active Treatments"}</SectionLabel>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#1C2714", marginBottom: 4 }}>Ganga (KA-001)</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#1C2714", marginBottom: 4 }}>Cow 1 (KA-001)</div>
           <div style={{ fontSize: 12, color: "#6B7A5C" }}>
             {lang === "Tamil"
               ? "சி.எம்.டி பரிசோதனை செய்யப்பட்டது · ஆய்வக முடிவு எதிர்பார்க்கப்படுகிறது"

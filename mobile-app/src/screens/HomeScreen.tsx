@@ -139,9 +139,9 @@ export function HomeSituationSummaryCard({
           </>
         ) : (
           <>
-            <div>🚨 <strong>Ganga (KA-001)</strong> & <strong>Betwa (KA-052)</strong> at critical <strong>96%</strong> mastitis risk.</div>
+            <div>🚨 <strong>Cow 1 (KA-001)</strong> & <strong>Cow 8 (KA-052)</strong> at critical <strong>96%</strong> mastitis risk.</div>
             <div style={{ marginTop: 4, color: "#FFE082", fontSize: 11.5 }}>
-              ⚠️ <strong>Intermediate Stage (70%–80%):</strong> Kaveri & Saraswati face high chance of disease onset within <strong>7 to 14 days</strong> without preventive intervention.
+              ⚠️ <strong>Intermediate Stage (70%–80%):</strong> Cow 2 & Cow 3 face high chance of disease onset within <strong>7 to 14 days</strong> without preventive intervention.
             </div>
           </>
         )}
@@ -402,6 +402,19 @@ export function HomeScreen({
                   <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                     <span style={{ fontWeight: 700, fontSize: 13, color: "#1C2714" }}>{a.name}</span>
                     <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 10, color: "#9BA88C" }}>{a.id}</span>
+                    <span
+                      style={{
+                        background: "#EEF6E4",
+                        color: "#2A5C1F",
+                        fontSize: 9,
+                        fontWeight: 700,
+                        padding: "1px 6px",
+                        borderRadius: 12,
+                        border: "1px solid #C4DDA0",
+                      }}
+                    >
+                      🎂 {a.age}
+                    </span>
                   </div>
                   <div style={{ fontSize: 11, color: "#6B7A5C" }}>
                     {a.breed} · Lac {a.lactation} · SCC {a.scc}k

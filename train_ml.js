@@ -146,7 +146,7 @@ const ML_MODEL_CONFIG = {
 const ML_PRESET_ANIMALS = [
   {
     id: "KA-001",
-    name: "Ganga (गंगा / கங்கா)",
+    name: "Cow 1",
     breed: "HF Cross",
     age: 5,
     parity: 3,
@@ -173,7 +173,7 @@ const ML_PRESET_ANIMALS = [
   },
   {
     id: "KA-052",
-    name: "Betwa (बेतवा / பெட்வா)",
+    name: "Cow 8",
     breed: "Jersey Cross",
     age: 6,
     parity: 4,
@@ -200,7 +200,7 @@ const ML_PRESET_ANIMALS = [
   },
   {
     id: "KA-007",
-    name: "Kaveri (कावेरी / காவேரி)",
+    name: "Cow 2",
     breed: "HF Cross",
     age: 4,
     parity: 2,
@@ -227,7 +227,7 @@ const ML_PRESET_ANIMALS = [
   },
   {
     id: "KA-014",
-    name: "Saraswati (सरस्वती / சரஸ்வதி)",
+    name: "Cow 3",
     breed: "Gir Cross",
     age: 5,
     parity: 3,
@@ -254,7 +254,7 @@ const ML_PRESET_ANIMALS = [
   },
   {
     id: "KA-022",
-    name: "Yamuna (यमुना / யமுனா)",
+    name: "Cow 4",
     breed: "Sahiwal",
     age: 4,
     parity: 2,

@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import {
   StatusBar,
   BackHeader,
@@ -74,7 +74,7 @@ export function AIRiskScreen({
               </span>
             </div>
             <div style={{ fontSize: 12, color: "#6B7A5C", lineHeight: 1.4 }}>
-              Ganga (KA-001) {t("high_risk_alert", lang)}
+              Cow 1 (KA-001) {t("high_risk_alert", lang)}
             </div>
             <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
               <span style={{ fontSize: 10, background: "#FFFFFF", border: "1px solid #E0DAD0", padding: "2px 8px", borderRadius: 6, color: "#6B7A5C", fontWeight: 600 }}>

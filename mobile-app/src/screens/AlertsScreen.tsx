@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import {
   StatusBar,
   Card,
@@ -19,7 +19,7 @@ export function AlertsScreen({
   const alerts = [
     {
       id: 1,
-      animal: "Ganga (KA-001)",
+      animal: "Cow 1 (KA-001)",
       risk: "high" as RiskLevel,
       reason:
         lang === "Tamil"
@@ -38,7 +38,7 @@ export function AlertsScreen({
     },
     {
       id: 2,
-      animal: "Betwa (KA-052)",
+      animal: "Cow 8 (KA-052)",
       risk: "high" as RiskLevel,
       reason:
         lang === "Tamil"
@@ -57,7 +57,7 @@ export function AlertsScreen({
     },
     {
       id: 3,
-      animal: "Kaveri (KA-007)",
+      animal: "Cow 2 (KA-007)",
       risk: "moderate" as RiskLevel,
       reason:
         lang === "Tamil"

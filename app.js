@@ -6,8 +6,8 @@
 // Initial Animals Data from Replit
 const defaultAnimals = [
   {
-    id: "C-042",
-    name: "Ganga",
+    id: "KA-001",
+    name: "Cow 1",
     breed: "HF cross",
     parity: "Lactation 2",
     temp: "38.7°C",
@@ -17,8 +17,8 @@ const defaultAnimals = [
     recommendation: "Check udder symmetry at the next milking and review bedding dryness."
   },
   {
-    id: "C-117",
-    name: "Kaveri",
+    id: "KA-007",
+    name: "Cow 2",
     breed: "Sahiwal",
     parity: "Lactation 3",
     temp: "38.3°C",
@@ -28,8 +28,8 @@ const defaultAnimals = [
     recommendation: "Keep on watch for 48 hours; confirm a clean pre-milking routine."
   },
   {
-    id: "C-088",
-    name: "Moti",
+    id: "KA-014",
+    name: "Cow 3",
     breed: "Jersey cross",
     parity: "Lactation 1",
     temp: "38.1°C",
@@ -39,8 +39,8 @@ const defaultAnimals = [
     recommendation: "No additional action. Continue normal observation rounds."
   },
   {
-    id: "C-031",
-    name: "Narmada",
+    id: "KA-022",
+    name: "Cow 4",
     breed: "HF cross",
     parity: "Lactation 4",
     temp: "39.0°C",
@@ -433,7 +433,7 @@ function onBackdropClick(event) {
 
 // Simulate WhatsApp alert dispatch
 function dispatchWhatsAppAlert() {
-  alert("WhatsApp Priority Alert sent to Veterinarian Dr. Sharma with Cow C-042 (Ganga) multi-sensor telemetry summary!");
+  alert("WhatsApp Priority Alert sent to Veterinarian Dr. Sharma with Cow KA-001 (Cow 1) multi-sensor telemetry summary!");
 }
 
 

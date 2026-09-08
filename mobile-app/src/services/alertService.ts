@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from "../lib/supabase";
+﻿import { supabase, isSupabaseConfigured } from "../lib/supabase";
 
 export interface AlertItem {
   id: string;
@@ -16,7 +16,7 @@ const LOCAL_ALERTS: AlertItem[] = [
     id: "alert-001",
     animal_id: "KA-001",
     risk_level: "high",
-    message: "Ganga — SCC critical: 485,000 cells/mL. Fever 39.4°C. Immediate teat inspection required.",
+    message: "Cow 1 — SCC critical: 485,000 cells/mL. Fever 39.4°C. Immediate teat inspection required.",
     status: "active",
     urgency: "Immediate",
     created_at: new Date(Date.now() - 8 * 60 * 1000).toISOString(),
@@ -25,7 +25,7 @@ const LOCAL_ALERTS: AlertItem[] = [
     id: "alert-002",
     animal_id: "KA-052",
     risk_level: "high",
-    message: "Betwa — SCC 620,000 cells/mL. Rear-Right quarter affected. Veterinary escalation required.",
+    message: "Cow 8 — SCC 620,000 cells/mL. Rear-Right quarter affected. Veterinary escalation required.",
     status: "active",
     urgency: "Critical",
     created_at: new Date(Date.now() - 22 * 60 * 1000).toISOString(),
@@ -34,7 +34,7 @@ const LOCAL_ALERTS: AlertItem[] = [
     id: "alert-003",
     animal_id: "KA-007",
     risk_level: "moderate",
-    message: "Kaveri — Rising SCC trend. Pre-milking teat dipping recommended.",
+    message: "Cow 2 — Rising SCC trend. Pre-milking teat dipping recommended.",
     status: "active",
     urgency: "Monitor",
     created_at: new Date(Date.now() - 45 * 60 * 1000).toISOString(),

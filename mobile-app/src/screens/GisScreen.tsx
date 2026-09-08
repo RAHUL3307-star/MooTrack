@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { StatusBar, BackHeader, Card, ReadAloudFAB } from "../components/ui";
 import { t } from "../i18n/index";
 
@@ -26,7 +26,7 @@ export function GISScreen({
           <p style={{ fontSize: 12, color: "#6B7A5C", lineHeight: 1.5, margin: 0 }}>
             {lang === "Tamil"
               ? "கங்கா மற்றும் பெட்வா மாடுகள் அருகருகே உள்ளன. நீர் தொட்டி மற்றும் தரையை உடனே கிருமிநாசினி கொண்டு சுத்தம் செய்யவும்."
-              : "High risk animals Ganga (KA-001) and Betwa (KA-052) are co-located in Pen A. Immediate disinfection of shared water trough is advised."}
+              : "High risk animals Cow 1 (KA-001) and Cow 8 (KA-052) are co-located in Pen A. Immediate disinfection of shared water trough is advised."}
           </p>
         </Card>
       </div>
