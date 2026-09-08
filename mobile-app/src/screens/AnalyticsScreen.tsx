@@ -15,7 +15,6 @@ export function AnalyticsScreen({
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "#F7F4EE", position: "relative" }}>
       <ReadAloudFAB screen="analytics" lang={lang} />
       <div style={{ background: "#FFFFFF" }}>
-        <StatusBar />
         <BackHeader title={t("analytics_title", lang)} onBack={onBack} />
       </div>
       <div style={{ flex: 1, overflow: "auto", padding: 16 }}>

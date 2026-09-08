@@ -13,8 +13,7 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
 
   return (
     <div style={{ flex: 1, background: "#F7F4EE", display: "flex", flexDirection: "column" }}>
-      <StatusBar />
-      <div style={{ background: "#2A5C1F", padding: "20px 24px 28px" }}>
+      <div style={{ background: "#2A5C1F", padding: "24px 24px 28px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
           <span style={{ fontSize: 26 }}>🐄</span>
           <span

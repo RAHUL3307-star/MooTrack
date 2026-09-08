@@ -34,47 +34,9 @@ export function AudioEqualizerBars({
   );
 }
 
-// ─── StatusBar ────────────────────────────────────────────────────────────────
-export function StatusBar({ light = false }: { light?: boolean }) {
-  const { isLive } = useESP32();
-  if (!isLive) return null;
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "flex-end",
-        alignItems: "center",
-        padding: "6px 16px 2px",
-      }}
-    >
-      <span
-        style={{
-          fontSize: 9,
-          background: light ? "rgba(255,255,255,0.2)" : "#E6F0E2",
-          color: light ? "#FFFFFF" : "#2A5C1F",
-          border: `1px solid ${light ? "rgba(255,255,255,0.4)" : "#2A5C1F"}`,
-          borderRadius: 6,
-          padding: "2px 8px",
-          fontWeight: 800,
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 4,
-        }}
-      >
-        <span
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: "50%",
-            background: "#22C55E",
-            display: "inline-block",
-            boxShadow: "0 0 4px #22C55E",
-          }}
-        />
-        ESP32 LIVE
-      </span>
-    </div>
-  );
+// ─── StatusBar (Removed fake mockup time & battery) ───────────────────────────
+export function StatusBar() {
+  return null;
 }
 
 // ─── ESP32TopBannerNotification ───────────────────────────────────────────────

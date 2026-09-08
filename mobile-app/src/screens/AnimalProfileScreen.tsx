@@ -40,7 +40,6 @@ export function AnimalProfileScreen({
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "#F7F4EE", position: "relative" }}>
       <ReadAloudFAB screen="animal-profile" lang={lang} />
       <div style={{ background: "#FFFFFF" }}>
-        <StatusBar />
         <BackHeader
           title={t("animal_profile", lang)}
           onBack={onBack}

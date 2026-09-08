@@ -24,8 +24,7 @@ export function LanguageScreen({
 
   return (
     <div style={{ flex: 1, background: "#F7F4EE", display: "flex", flexDirection: "column" }}>
-      <StatusBar />
-      <div style={{ padding: "24px 24px 16px" }}>
+      <div style={{ padding: "28px 24px 16px" }}>
         <div
           style={{
             fontFamily: "'Fraunces', serif",

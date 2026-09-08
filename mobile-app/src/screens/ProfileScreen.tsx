@@ -14,8 +14,7 @@ export function ProfileScreen({
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "#F7F4EE" }}>
       <div style={{ background: "#FFFFFF", borderBottom: "1px solid #E0DAD0" }}>
-        <StatusBar />
-        <div style={{ padding: "12px 16px 16px" }}>
+        <div style={{ padding: "16px 16px 16px" }}>
           <div style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 700, color: "#1C2714" }}>
             {t("profile_title", lang)}
           </div>

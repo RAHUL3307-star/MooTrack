@@ -33,9 +33,8 @@ export function AnimalsScreen({
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "#F7F4EE", position: "relative" }}>
       <ReadAloudFAB screen="animals" lang={lang} />
-      <div style={{ background: "#FFFFFF", borderBottom: "1px solid #E0DAD0", padding: "8px 0 0" }}>
-        <StatusBar />
-        <div style={{ padding: "8px 16px 12px" }}>
+      <div style={{ background: "#FFFFFF", borderBottom: "1px solid #E0DAD0", padding: "12px 0 0" }}>
+        <div style={{ padding: "4px 16px 12px" }}>
           <div style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 700, color: "#1C2714", marginBottom: 12 }}>
             {t("tab_animals", lang)}{" "}
             <span style={{ fontSize: 14, fontWeight: 500, color: "#9BA88C", fontFamily: "'Outfit', sans-serif" }}>

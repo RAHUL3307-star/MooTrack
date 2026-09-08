@@ -75,7 +75,6 @@ export function RecommendationsScreen({
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "#F7F4EE", position: "relative" }}>
       <ReadAloudFAB screen="recommendations" lang={lang} />
       <div style={{ background: "#FFFFFF" }}>
-        <StatusBar />
         <BackHeader title={t("recs_title", lang)} onBack={onBack} />
         <div style={{ padding: "8px 16px 12px", background: "#E6F0E2", borderBottom: "1px solid #C4DDA0" }}>
           <div style={{ fontSize: 12, color: "#2A5C1F", fontWeight: 600 }}>

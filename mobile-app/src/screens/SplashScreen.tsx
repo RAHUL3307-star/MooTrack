@@ -19,7 +19,6 @@ export function SplashScreen({ onNext }: { onNext: () => void }) {
         gap: 0,
       }}
     >
-      <StatusBar light />
       <div
         style={{
           flex: 1,

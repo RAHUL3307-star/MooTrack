@@ -221,9 +221,8 @@ export function HomeScreen({
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
       <ReadAloudFAB screen="home" lang={lang} />
-      <div style={{ background: "#2A5C1F", padding: "12px 20px 22px" }}>
-        <StatusBar light />
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginTop: 4 }}>
+      <div style={{ background: "#2A5C1F", padding: "16px 20px 22px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
             <div
               style={{

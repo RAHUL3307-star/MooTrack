@@ -82,8 +82,7 @@ export function AlertsScreen({
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "#F7F4EE", position: "relative" }}>
       <ReadAloudFAB screen="alerts" lang={lang} />
       <div style={{ background: "#FFFFFF", borderBottom: "1px solid #E0DAD0" }}>
-        <StatusBar />
-        <div style={{ padding: "8px 16px 12px" }}>
+        <div style={{ padding: "12px 16px 12px" }}>
           <div style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 700, color: "#1C2714" }}>
             {t("alerts_title", lang)}{" "}
             <span
