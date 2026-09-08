@@ -273,6 +273,34 @@ export function HomeScreen({
         {/* Situation Voice Summary Card */}
         <HomeSituationSummaryCard onNavigate={onNavigate} lang={lang} />
 
+        {/* Visual Udder AI Scan Banner */}
+        <div
+          onClick={() => onNavigate("visual-ai")}
+          style={{
+            background: "linear-gradient(135deg, #1C2714, #2A5C1F)",
+            borderRadius: 14,
+            padding: "12px 14px",
+            marginBottom: 12,
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            cursor: "pointer",
+            boxShadow: "0 4px 12px rgba(42,92,31,0.2)",
+            color: "#FFFFFF",
+          }}
+        >
+          <div style={{ fontSize: 22, background: "rgba(255,255,255,0.15)", borderRadius: 10, padding: "6px 8px" }}>📸</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 700 }}>
+              {lang === "Hindi" ? "अयन फोटो एआई जांच" : lang === "Tamil" ? "மடி புகைப்பட ஏஐ ஆய்வு" : "Visual Udder AI Scan"}
+            </div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.8)" }}>
+              {lang === "Hindi" ? "फोटो खींचकर तुरंत बीमारी का पता लगाएं" : lang === "Tamil" ? "படத்தை பதிவேற்றி உடனே நோய் கண்டறியுங்கள்" : "Upload udder photo for instant clinical diagnosis"}
+            </div>
+          </div>
+          <span style={{ fontSize: 14, color: "#8AE68A", fontWeight: 700 }}>→</span>
+        </div>
+
         {/* Herd Overview */}
         <Card style={{ marginBottom: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>

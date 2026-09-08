@@ -1,4 +1,4 @@
-﻿export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
+export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
   home: (lang: string) => {
     switch (lang) {
       case "Tamil":
@@ -217,6 +217,20 @@
         return "AI ਭਵਿੱਖਬਾਣੀ ਅਤੇ ਇਲਾਜ ਲੈਬ। 70 ਤੋਂ 80 ਪ੍ਰਤੀਸ਼ਤ ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਾਲੀਆਂ ਗਾਵਾਂ ਵਿੱਚ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਬਿਮਾਰੀ ਹੋਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ। ਤੁਰੰਤ ਬਚਾਅ ਇਲਾਜ ਸ਼ੁਰੂ ਕਰੋ।";
       default:
         return "AI Predictive Modeling and Treatment Lab for Problem Statement 26109. High mastitis risk of 96% is forecasted for Cow 1 with 2.4 million somatic cells and 40.4°C temperature. Crucially, intermediate stage cows at 70% to 80% risk, including Cow 2 and Cow 3, have high chances of getting attacked by the disease in 7 to 14 days without intervention. Immediately apply iodine teat barrier, isolate critical cows, and alert your veterinarian Dr. Sharma.";
+    }
+  },
+  "visual-ai": (lang: string) => {
+    switch (lang) {
+      case "Tamil":
+        return "மடி மற்றும் காம்பு புகைப்பட ஏஐ ஆய்வு. கேமரா அல்லது கேலரி மூலம் மடிப் படத்தை பதிவேற்றுங்கள். கணினி தானாகவே மடி சிவத்தல், வீக்கம், காம்பு தடிப்பு மற்றும் உடல் நிலையை கணக்கிட்டு உடனடி மருத்துவ வழிகாட்டலை வழங்கும்.";
+      case "Hindi":
+        return "अयन और थन फोटो एआई जांच। अपने कैमरे या गैलरी से गाय के अयन की फोटो अपलोड करें। एआई तुरंत लालिमा, सूजन, थन का खुरदरापन और बॉडी कंडीशन स्कोर जांचकर पूरी पशु चिकित्सा रिपोर्ट तैयार करता है।";
+      case "Kannada":
+        return "ಹಸುವಿನ ಕೆಚ್ಚಲು ಫೋಟೋ AI ತಪಾಸಣೆ. ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ, AI ತಕ್ಷಣವೇ ಕೆಂಪು ಬಣ್ಣ, ಊತ ಮತ್ತು ರೋಗದ ಲಕ್ಷಣಗಳನ್ನು ಪತ್ತೆ ಮಾಡುತ್ತದೆ.";
+      case "Telugu":
+        return "ఆవు పొదుగు ఫోటో AI విశ్లేషణ. ఫోటో అప్‌లోడ్ చేసి వెంటనే వాపు, ఎరుపుదనం మరియు వ్యాధి ముప్పును తెలుసుకోండి.";
+      default:
+        return "Udder and teat visual computer vision inspection. Upload or snap an udder photo to instantly compute erythema redness, swelling asymmetry, teat hyperkeratosis grade, and body condition score with immediate veterinary action guidelines.";
     }
   },
   login: (lang: string) => {

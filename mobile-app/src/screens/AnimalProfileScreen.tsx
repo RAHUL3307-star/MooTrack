@@ -194,13 +194,36 @@ export function AnimalProfileScreen({
               <SectionLabel>{t("temp_trend", lang)}</SectionLabel>
               <Sparkline data={tempHistory} color="#C47A10" width={280} height={44} />
             </Card>
-            <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={() => onNavigate("ai-risk")} style={{ flex: 1, background: "#2A5C1F", color: "#FFFFFF", border: "none", borderRadius: 12, padding: "14px 0", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-                {t("view_ai_risk", lang)}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <button
+                onClick={() => onNavigate("visual-ai")}
+                style={{
+                  width: "100%",
+                  background: "linear-gradient(135deg, #1C2714, #2A5C1F)",
+                  color: "#FFFFFF",
+                  border: "none",
+                  borderRadius: 12,
+                  padding: "13px 0",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  boxShadow: "0 4px 12px rgba(42,92,31,0.25)",
+                }}
+              >
+                📸 {lang === "Hindi" ? "अयन फोटो एआई जांच" : lang === "Tamil" ? "மடி புகைப்பட ஏஐ ஆய்வு" : "Scan Udder Photo with AI"}
               </button>
-              <button onClick={() => onNavigate("interventions")} style={{ flex: 1, background: "#FFFFFF", color: "#2A5C1F", border: "1.5px solid #2A5C1F", borderRadius: 12, padding: "14px 0", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-                {t("log_intervention", lang)}
-              </button>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => onNavigate("ai-risk")} style={{ flex: 1, background: "#2A5C1F", color: "#FFFFFF", border: "none", borderRadius: 12, padding: "14px 0", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                  {t("view_ai_risk", lang)}
+                </button>
+                <button onClick={() => onNavigate("interventions")} style={{ flex: 1, background: "#FFFFFF", color: "#2A5C1F", border: "1.5px solid #2A5C1F", borderRadius: 12, padding: "14px 0", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                  {t("log_intervention", lang)}
+                </button>
+              </div>
             </div>
           </div>
         )}

@@ -13,3 +13,4 @@ export { GISScreen } from "./GisScreen";
 export { InterventionsScreen } from "./InterventionsScreen";
 export { MLLabScreen } from "./MlLabsScreen";
 export { ProfileScreen } from "./ProfileScreen";
+export { VisualScanScreen } from "./VisualScanScreen";

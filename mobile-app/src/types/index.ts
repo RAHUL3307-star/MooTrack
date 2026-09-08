@@ -1,11 +1,24 @@
 export type Screen =
   | "splash" | "language" | "login" | "home" | "animals" | "animal-profile"
   | "ai-risk" | "alerts" | "recommendations" | "analytics" | "sensors"
-  | "gis" | "interventions" | "profile" | "ml-lab";
+  | "gis" | "interventions" | "profile" | "ml-lab" | "visual-ai";
 
 export type RiskLevel = "none" | "low" | "moderate" | "high";
 
 export type Tab = "home" | "animals" | "alerts" | "analytics" | "profile";
+
+export interface VisualScanResult {
+  erythemaScore: number;       // 0-100% (Redness / Acute inflammation)
+  asymmetryRatio: number;      // 1.0 (symmetric) to 2.5+ (severe asymmetry)
+  teatGrade: number;           // 1 (normal) to 4 (severe hyperkeratosis / cracks)
+  bcs: number;                 // Body Condition Score (1.0 to 5.0)
+  visualRisk: number;          // 0-100% visual mastitis risk
+  riskLevel: RiskLevel;
+  affectedQuarter: string;
+  clinicalNotes: string;
+  timestamp: string;
+  imagePreviewUrl?: string;
+}
 
 export interface Animal {
   id: string;
@@ -24,6 +37,7 @@ export interface Animal {
   milk: number;
   lastSync: string;
   quarter: string;
+  lastVisualScan?: VisualScanResult;
 }
 
 export interface RiskColorMap {

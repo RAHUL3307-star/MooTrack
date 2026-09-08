@@ -20,6 +20,7 @@ import {
   InterventionsScreen,
   MLLabScreen,
   ProfileScreen,
+  VisualScanScreen,
 } from "./screens/index";
 
 function MainAppShell() {
@@ -128,6 +129,8 @@ function MainAppShell() {
         return <InterventionsScreen onBack={goBack} lang={lang} />;
       case "ml-lab":
         return <MLLabScreen onBack={goBack} lang={lang} />;
+      case "visual-ai":
+        return <VisualScanScreen onNavigate={navigate} lang={lang} />;
       case "profile":
         return <ProfileScreen onBack={goBack} lang={lang} onLangChange={setLang} />;
       default:
