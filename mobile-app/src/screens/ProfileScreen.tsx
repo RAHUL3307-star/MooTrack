@@ -1,5 +1,5 @@
 import React from "react";
-import { StatusBar, Card, SectionLabel } from "../components/ui";
+import { Card, SectionLabel } from "../components/ui";
 import { t, LANG_FLAGS } from "../i18n/index";
 import { useUser } from "../context/UserContext";
 
@@ -12,10 +12,15 @@ export function ProfileScreen({
   lang: string;
   onLangChange: (l: string) => void;
 }) {
-  const { user } = useUser();
+  const { user, clearUser } = useUser();
   const farmerName = user?.name || "Farmer";
   const farmLabel = [user?.farmName, user?.village, user?.state].filter(Boolean).join(" · ") || "My Dairy Farm";
   const roleIcon = user?.role === "vet" ? "🩺" : user?.role === "officer" ? "📋" : "👨‍🌾";
+
+  const handleSignOut = () => {
+    clearUser();
+    onBack();
+  };
 
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "#F7F4EE" }}>
@@ -40,16 +45,53 @@ export function ProfileScreen({
               fontSize: 28,
               color: "#FFFFFF",
               flexShrink: 0,
+              overflow: "hidden",
             }}
           >
-            {roleIcon}
+            {user?.avatar ? (
+              <img
+                src={user.avatar}
+                alt={farmerName}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                onError={(e) => {
+                  // If image fails, replace with role icon
+                  (e.target as HTMLElement).style.display = "none";
+                }}
+              />
+            ) : (
+              roleIcon
+            )}
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontFamily: "'Fraunces', serif", fontSize: 18, fontWeight: 700, color: "#1C2714" }}>
+            <div
+              style={{
+                fontFamily: "'Fraunces', serif",
+                fontSize: 18,
+                fontWeight: 700,
+                color: "#1C2714",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
               {farmerName}
+              {user?.authProvider === "google" && (
+                <span title="Signed in with Google" style={{ fontSize: 13 }}>
+                  🌐
+                </span>
+              )}
             </div>
             <div style={{ fontSize: 12, color: "#6B7A5C" }}>{farmLabel}</div>
-            {user?.phone && <div style={{ fontSize: 11, color: "#9BA88C", marginTop: 2 }}>📱 +91 {user.phone}</div>}
+            {user?.email && (
+              <div style={{ fontSize: 11, color: "#2A5C1F", marginTop: 2, fontWeight: 600 }}>
+                ✉️ {user.email}
+              </div>
+            )}
+            {user?.phone && (
+              <div style={{ fontSize: 11, color: "#9BA88C", marginTop: 2 }}>
+                📱 +91 {user.phone}
+              </div>
+            )}
           </div>
         </Card>
 
@@ -80,7 +122,7 @@ export function ProfileScreen({
         </Card>
 
         <button
-          onClick={onBack}
+          onClick={handleSignOut}
           style={{
             width: "100%",
             background: "#FCE8E5",
