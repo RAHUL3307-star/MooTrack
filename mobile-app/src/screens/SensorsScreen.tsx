@@ -1,18 +1,30 @@
 import React, { useState } from "react";
-import { StatusBar, BackHeader, Card, SectionLabel, ReadAloudFAB } from "../components/ui";
+import { StatusBar, BackHeader, Card, SectionLabel, ReadAloudFAB, RiskBadge } from "../components/ui";
 import { useESP32 } from "../context/ESP32Context";
+import { useAnimals } from "../context/AnimalsContext";
+import { computeMilkRisk } from "../types/esp32";
+import type { Screen } from "../types/index";
 import { t } from "../i18n/index";
 
 export function SensorsScreen({
   onBack,
+  onNavigate,
   lang,
 }: {
   onBack: () => void;
+  onNavigate?: (s: Screen) => void;
   lang: string;
 }) {
   const { isLive, deviceId, lastTelemetry, connectUsbSerial, toggleEsp32 } = useESP32();
+  const { animals, setSelectedAnimal } = useAnimals();
   const [showSketch, setShowSketch] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Run trained ML model on live ESP32 telemetry (30,000 dataset baseline)
+  const mlSummary = isLive && lastTelemetry ? computeMilkRisk(lastTelemetry) : null;
+  const matchedCow = isLive && lastTelemetry
+    ? animals.find((a) => (lastTelemetry.rfidTag && a.rfidTag === lastTelemetry.rfidTag) || a.id === lastTelemetry.cowId)
+    : null;
 
   const readings = [
     {
@@ -317,6 +329,147 @@ void loop() {
                 <span>ΔEC Ratio: <strong style={{ color: "#FDE047" }}>{lastTelemetry?.quarterRatio ? `${lastTelemetry.quarterRatio}x` : "1.02x"}</strong></span>
                 <span>Thermal Asymmetry: <strong style={{ color: "#FDE047" }}>{lastTelemetry?.thermalAsymmetry ? `${lastTelemetry.thermalAsymmetry}°C` : "0.18°C"}</strong></span>
               </div>
+            </div>
+          )}
+
+          {/* ── AI PREDICTIVE FORECASTING SUMMARY CARD (TRAINED ML MODEL) ── */}
+          {isLive && mlSummary && (
+            <div
+              style={{
+                background: mlSummary.risk === "high"
+                  ? "linear-gradient(135deg, rgba(184,50,32,0.25) 0%, rgba(127,29,29,0.35) 100%)"
+                  : mlSummary.risk === "moderate"
+                  ? "linear-gradient(135deg, rgba(196,122,16,0.25) 0%, rgba(146,64,14,0.35) 100%)"
+                  : "linear-gradient(135deg, rgba(42,92,31,0.25) 0%, rgba(20,83,45,0.35) 100%)",
+                borderRadius: 14,
+                padding: "12px 14px",
+                marginBottom: 12,
+                border: `1.5px solid ${
+                  mlSummary.risk === "high" ? "#EF4444" : mlSummary.risk === "moderate" ? "#F59E0B" : "#22C55E"
+                }`,
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ fontSize: 14 }}>🤖</span>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: "#FFFFFF", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                    AI ML Prediction Summary
+                  </span>
+                </div>
+                <RiskBadge level={mlSummary.risk} />
+              </div>
+
+              {/* Scanned Cow and RFID Identification */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 11, marginBottom: 8, color: "#E2E8F0" }}>
+                <span>
+                  🐄 Cow: <strong style={{ color: "#FDE047" }}>{matchedCow ? `${matchedCow.name} (${matchedCow.id})` : (lastTelemetry?.cowId || "KA-001")}</strong>
+                </span>
+                {lastTelemetry?.rfidTag && (
+                  <span style={{ fontSize: 9.5, background: "rgba(255,255,255,0.12)", padding: "1px 6px", borderRadius: 4, fontFamily: "'JetBrains Mono'" }}>
+                    RFID: {lastTelemetry.rfidTag}
+                  </span>
+                )}
+              </div>
+
+              {/* Verdict banner */}
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: mlSummary.risk === "high" ? "#FCA5A5" : mlSummary.risk === "moderate" ? "#FDE68A" : "#86EFAC",
+                  marginBottom: 8,
+                  lineHeight: 1.4,
+                }}
+              >
+                {lang === "Tamil"
+                  ? mlSummary.tamilVerdict
+                  : lang === "Hindi"
+                  ? mlSummary.hindiVerdict
+                  : mlSummary.verdict}
+              </div>
+
+              {/* Probability bar */}
+              <div style={{ marginBottom: 10 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#CBD5E1", marginBottom: 3 }}>
+                  <span>Trained Dataset ML Probability:</span>
+                  <strong style={{ color: "#FFFFFF", fontFamily: "'JetBrains Mono'" }}>{mlSummary.probability}%</strong>
+                </div>
+                <div style={{ height: 6, background: "rgba(255,255,255,0.15)", borderRadius: 4, overflow: "hidden" }}>
+                  <div
+                    style={{
+                      height: "100%",
+                      width: `${mlSummary.probability}%`,
+                      background: mlSummary.risk === "high" ? "#EF4444" : mlSummary.risk === "moderate" ? "#F59E0B" : "#22C55E",
+                      borderRadius: 4,
+                      transition: "width 0.4s ease",
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Real-Time Sensor vs ML Dataset Norms Comparison Matrix */}
+              <div style={{ background: "rgba(0,0,0,0.3)", borderRadius: 8, padding: 8, marginBottom: 10 }}>
+                <div style={{ fontSize: 9.5, fontWeight: 700, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>
+                  📊 Real-Time vs 30k Veterinary Dataset Baseline:
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  {mlSummary.comparisons.map((c) => (
+                    <div
+                      key={c.name}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        fontSize: 10.5,
+                        color: "#E2E8F0",
+                      }}
+                    >
+                      <span>{c.name}:</span>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ fontFamily: "'JetBrains Mono'", fontWeight: 700, color: c.status === "critical" ? "#F87171" : c.status === "elevated" ? "#FDE047" : "#86EFAC" }}>
+                          {c.current}
+                        </span>
+                        <span style={{ fontSize: 9, color: "#94A3B8" }}>
+                          (Norm: {c.datasetNormal})
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Step 2 Handoff: Take Cow Udder Photo (Image ML Scan) */}
+              <button
+                onClick={() => {
+                  if (matchedCow) setSelectedAnimal(matchedCow);
+                  if (onNavigate) onNavigate("visual-scan");
+                }}
+                style={{
+                  width: "100%",
+                  background: "linear-gradient(135deg, #22C55E 0%, #16A34A 100%)",
+                  color: "#052E16",
+                  border: "none",
+                  borderRadius: 10,
+                  padding: "10px 14px",
+                  fontSize: 12,
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  boxShadow: "0 4px 14px rgba(34,197,94,0.35)",
+                }}
+              >
+                <span>📸</span>
+                <span>
+                  {lang === "Tamil"
+                    ? "மடி புகைப்பட ஆய்வு செய்க (Image ML) →"
+                    : lang === "Hindi"
+                    ? "अयन फोटो स्कैन करें (Image ML) →"
+                    : "📸 Scan Cow Udder Photo (Image ML) →"}
+                </span>
+              </button>
             </div>
           )}
 

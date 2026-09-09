@@ -136,7 +136,7 @@ function MainAppShell() {
           />
         );
       case "sensors":
-        return <SensorsScreen onBack={goBack} lang={lang} />;
+        return <SensorsScreen onBack={goBack} onNavigate={navigate} lang={lang} />;
       case "gis":
         return (
           <GISScreen
