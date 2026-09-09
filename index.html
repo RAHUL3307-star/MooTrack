@@ -1,52 +1,348 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#2A5C1F" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    <title>MooTracker Mobile</title>
-    <link rel="manifest" href="./manifest.json" />
-    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
-    <link rel="apple-touch-icon" href="./icon.svg" />
-    
-    <meta name="description" content="Predicts bovine health risks for Indian dairy farmers using sensor data and analytics to improve herd health, alerts, and farm management decisions.">
-    <meta name="robots" content="noindex, nofollow">
-    <meta property="og:title" content="MooTracker - Smart Cattle Health Monitoring">
-    <script type="module" crossorigin src="./assets/index-cXLeVczE.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-Dum9Zp46.css">
-  </head>
-  <body>
-    
-    <div id="root"></div>
-    <script>
-      if ('serviceWorker' in navigator) {
-        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-          // Dev mode: Unregister any existing service worker to prevent stale cache
-          navigator.serviceWorker.getRegistrations().then((registrations) => {
-            for (const reg of registrations) {
-              reg.unregister();
-            }
-          });
-          if ('caches' in window) {
-            caches.keys().then((keys) => {
-              for (const key of keys) {
-                if (key.startsWith('mootracker')) caches.delete(key);
-              }
-            });
-          }
-        } else {
-          window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js').catch(() => {});
-          });
-        }
-      }
-    </script>
-    
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+  <title>MooTracker — MooTracker</title>
+  <meta name="description" content="Notice the change before the udder does. MooTracker brings together milk, movement, temperature, and farm context." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e79813' stroke-width='2'><path d='M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1'/><path d='M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1'/><path d='M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1'/></svg>" />
+  
+  <!-- Preconnect Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <main class="app-shell" id="top">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="brand-lockup" type="button" id="btn-brand-home" onclick="resetToTop()">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>
+            <path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>
+            <path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>
+          </svg>
+        </span>
+        <span>
+          <span class="brand-name">MooTracker</span>
+          <span class="brand-subtitle" id="txt-brand-subtitle">herd intelligence / भारत</span>
+        </span>
+      </button>
+
+      <nav class="topnav" aria-label="Primary navigation">
+        <a href="#how-it-works" id="nav-how-it-reads">How it reads</a>
+        <a href="#field-principles" id="nav-field-principles">Field principles</a>
+      </nav>
+
+      <div class="topbar-actions">
+        <div class="lang-toggle" aria-label="Language selection">
+          <button type="button" class="active" id="btn-lang-en" onclick="setAppLanguage('en')">EN</button>
+          <button type="button" id="btn-lang-hi" onclick="setAppLanguage('hi')">हिं</button>
+        </div>
+        <a class="auth-link" href="https://www.figma.com/make/TEwg9UH9OtGABvCOR3kszj/MooTracker-Mobile-App-Design?p=f&t=m2I9Uw1O3PQlXKM1-0" target="_blank" rel="noopener noreferrer">Sign in</a>
+        <button class="outline-button" type="button" id="btn-top-dashboard" onclick="openFigmaModal()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.48 12H2"/>
+          </svg>
+          <span id="btn-top-demo-txt">Open demo</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy reveal">
+        <span class="hero-kicker">
+          <span class="pulse-dot"></span>
+          <span id="hero-kicker-txt">Field intelligence for healthier herds</span>
+        </span>
+
+        <h1 class="display" id="hero-title">Notice the change before the udder does.</h1>
+
+        <p class="hero-lede" id="hero-lede-txt">
+          MooTracker brings together milk, movement, temperature, and farm context to help teams act 7–14 days before visible clinical signs may appear.
+        </p>
+
+        <div class="hero-actions">
+          <button class="solid-button" type="button" id="btn-hero-dashboard" onclick="openFigmaModal()">
+            <span id="hero-primary-btn-txt">See the command center</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m7 7 10 10"/>
+              <path d="M17 7v10H7"/>
+            </svg>
+          </button>
+
+          <a class="outline-button" href="#how-it-works" id="link-hero-story">
+            <span id="hero-secondary-btn-txt">How it reads the herd</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m9 18 6-6-6-6"/>
+            </svg>
+          </a>
+        </div>
+
+        <p class="hero-note" id="hero-note-txt">
+          Prototype experience · demo data · not a diagnostic tool
+        </p>
+      </div>
+    </section>
+
+    <!-- SECTION 01: THE SIGNAL FIELD -->
+    <section class="section" id="how-it-works" aria-labelledby="signals-title">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">01 / The signal field</span>
+          <h2 class="display" id="signals-title">The early clue is rarely in one place.</h2>
+        </div>
+        <p>Farm teams already notice hundreds of small changes. The system gives those observations a shared memory, a time horizon, and a reason to look closer.</p>
+      </div>
+
+      <div class="signal-strip">
+        <article class="signal-cell">
+          <span class="signal-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 2h8"/>
+              <path d="M9 2v3a3 3 0 0 1-.88 2.12L7 8.24A4 4 0 0 0 6 11v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-8a4 4 0 0 0-1-2.76l-1.12-1.12A3 3 0 0 1 15 5V2"/>
+            </svg>
+          </span>
+          <h3>Milk pattern</h3>
+          <p>Conductivity and yield changes, read as a trend rather than a single spike.</p>
+        </article>
+
+        <article class="signal-cell">
+          <span class="signal-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.48 12H2"/>
+            </svg>
+          </span>
+          <h3>Movement</h3>
+          <p>Rest, steps, feeding visits, and a quiet change in daily rhythm.</p>
+        </article>
+
+        <article class="signal-cell">
+          <span class="signal-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>
+            </svg>
+          </span>
+          <h3>Temperature</h3>
+          <p>A local heat pattern that adds context to the other observations.</p>
+        </article>
+
+        <article class="signal-cell">
+          <span class="signal-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v2"/>
+              <path d="m4.93 4.93 1.41 1.41"/>
+              <path d="M20 12h2"/>
+              <path d="m19.07 4.93-1.41 1.41"/>
+              <path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"/>
+              <path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"/>
+            </svg>
+          </span>
+          <h3>Farm context</h3>
+          <p>Weather, bedding, pen, lactation stage, and milking conditions.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- SECTION 02: FROM NOISE TO ACTION (STORY BAND) -->
+    <section class="story-band" id="principles-story" aria-labelledby="story-title">
+      <div class="section">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">02 / From noise to action</span>
+            <h2 class="display" id="story-title">A risk window, not a black box.</h2>
+          </div>
+          <p>Every watch comes with the small set of signals that moved it, so a farmer, veterinarian, or cooperative lead can decide what deserves attention.</p>
+        </div>
+
+        <div class="story-steps">
+          <article class="story-step">
+            <span class="story-step-number">01 — notice</span>
+            <h3>Signals converge</h3>
+            <p>Milk, motion, temperature, and context are aligned against that animal’s own rhythm.</p>
+          </article>
+
+          <article class="story-step">
+            <span class="story-step-number">02 — explain</span>
+            <h3>Risk surfaces early</h3>
+            <p>Animals move into Low, Watch, or Elevated categories with a visible reason, not just a score.</p>
+          </article>
+
+          <article class="story-step">
+            <span class="story-step-number">03 — respond</span>
+            <h3>Teams choose the next step</h3>
+            <p>Check bedding, observe the next milking, or call a veterinarian. Prevention stays human-led.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+
+
+    <!-- SECTION 03: BUILT FOR THE FIELD (PRINCIPLES) -->
+    <section class="section" id="field-principles" aria-labelledby="principles-title">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">03 / Built for the field</span>
+          <h2 class="display" id="principles-title">Trust is a feature in the shed.</h2>
+        </div>
+        <p>Designed for uneven connectivity, multiple roles, and the judgement that only a person who knows the herd can bring.</p>
+      </div>
+
+      <div class="principles-grid">
+        <article class="principle-card feature">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+          <h3>Explain before you escalate.</h3>
+          <p>Risk categories are prompts for observation and professional judgement. The prototype intentionally avoids presenting a clinical diagnosis.</p>
+        </article>
+
+        <article class="principle-card">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="hsl(18 57% 42%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 20h10"/>
+            <path d="M10 20c5.5-2.5.8-6.4 3-10"/>
+            <path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/>
+            <path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/>
+          </svg>
+          <h3>Made for prevention.</h3>
+          <p>Small, practical next steps fit the rhythm of milking, bedding checks, and veterinary rounds.</p>
+        </article>
+
+        <article class="principle-card">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="hsl(18 57% 42%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 21a6 6 0 0 0-12 0"/>
+            <circle cx="12" cy="11" r="4"/>
+            <rect width="18" height="18" x="3" y="3" rx="2"/>
+          </svg>
+          <h3>One herd, many hands.</h3>
+          <p>Farmers, vets, cooperatives, and health authorities can share the same readable picture.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-inner">
+        <div>
+          <div class="brand-lockup">
+            <span class="brand-mark" aria-hidden="true">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>
+                <path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>
+                <path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>
+              </svg>
+            </span>
+            <span>
+              <span class="brand-name">MooTracker</span>
+              <span class="brand-subtitle">observe early / act wisely</span>
+            </span>
+          </div>
+          <p class="footer-note">
+            An original product experience for Indian dairy systems. Prototype content and herd readings shown here are illustrative demo data.
+          </p>
+        </div>
+
+        <div class="footer-meta">
+          <p>DESIGNED FOR FIELD CLARITY</p>
+          <p>© 2025 · PRODUCT CONCEPT · MooTracker</p>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <!-- FIGMA MAKE MOBILE APP SIMULATOR MODAL -->
+  <div class="figma-modal-backdrop" id="figma-modal" onclick="onBackdropClick(event)">
+    <div class="figma-modal-card">
+      <div class="figma-modal-header">
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <span class="brand-mark" style="width:2.2rem; height:2.2rem; border-radius:0.55rem; background:hsl(159 31% 22%); color:#fff; display:flex; align-items:center; justify-content:center;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 16V9h14V2"/><path d="M5 9a4 4 0 0 1 8 0v7a4 4 0 0 1-8 0v-7Z"/></svg>
+          </span>
+          <div>
+            <strong style="font-size:1rem; font-family:var(--app-font-serif); color:hsl(159 31% 22%);">MooTracker Mobile App & Command Center</strong>
+            <span style="display:block; font-size:0.68rem; color:hsl(159 13% 41%); font-family:var(--app-font-mono);">Live React Mobile Application · Precision Livestock Intelligence</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.6rem;">
+          <a href="app/" target="_blank" class="outline-button" style="min-height:2.1rem; padding:0.35rem 0.8rem; font-size:0.75rem;">
+            📱 Open Fullscreen App ↗
+          </a>
+          <a href="https://www.figma.com/make/TEwg9UH9OtGABvCOR3kszj/MooTracker-Mobile-App-Design?p=f&t=m2I9Uw1O3PQlXKM1-0" target="_blank" rel="noopener noreferrer" class="outline-button" style="min-height:2.1rem; padding:0.35rem 0.8rem; font-size:0.75rem;">
+            Figma Make ↗
+          </a>
+          <button class="close-modal-btn" type="button" onclick="closeFigmaModal()" title="Close Simulator">&times;</button>
+        </div>
+      </div>
+
+      <div class="figma-modal-body">
+        <!-- LIVE INTERACTIVE SMARTPHONE SHELL -->
+        <div class="phone-device-wrapper">
+          <div class="phone-island-notch">
+            <div class="phone-island-camera"></div>
+            <div style="width: 4px; height: 4px; border-radius: 50%; background: #10b981;"></div>
+          </div>
+          <div class="phone-screen-frame">
+            <iframe 
+              src="mobile.html" 
+              class="phone-screen-iframe" 
+              id="mobile-app-iframe"
+              title="MooTracker Mobile App Live Experience"
+              loading="eager">
+            </iframe>
+          </div>
+        </div>
+
+        <!-- APP FEATURES & CONTROLS -->
+        <div style="max-width: 460px; display: flex; flex-direction: column; gap: 1.25rem;">
+          <div>
+            <span class="eyebrow" style="color:hsl(159 31% 22%);">Field Application</span>
+            <h3 style="font-family:var(--app-font-serif); font-size:1.75rem; color:hsl(159 31% 22%); margin:0.35rem 0 0.6rem; line-height: 1.15;">
+              Farmer Mobile Command Center
+            </h3>
+            <p style="color:hsl(159 13% 41%); font-size:0.88rem; line-height:1.55; margin:0;">
+              This interactive application is compiled directly from the design in <code style="font-family:var(--app-font-mono); background:hsl(38 24% 90%); padding:0.15rem 0.4rem; border-radius:4px; font-size:0.75rem;">MooTracker Mobile App Design</code>. Try navigating the tabs, inspecting individual cow telemetry, triggering voice read-aloud, and viewing AI risk insights.
+            </p>
+          </div>
+
+          <div style="background:#fff; border:1px solid hsl(38 24% 85%); border-radius:1rem; padding:1.15rem; display: flex; flex-direction: column; gap: 0.65rem;">
+            <strong style="font-size:0.82rem; color:hsl(159 31% 22%); text-transform:uppercase; letter-spacing:0.04em;">Integrated Core Capabilities:</strong>
+            <ul style="margin:0; padding-left:1.15rem; font-size:0.8rem; color:hsl(159 13% 38%); line-height:1.6;">
+              <li><strong>Real-time Herd Dashboard:</strong> Active animals, risk tiers, and daily milk yield telemetry.</li>
+              <li><strong>4-Quarter In-Line Milk Sensors:</strong> Conductivity, pH, and SCC quarter breakdown.</li>
+              <li><strong>Explainable AI Lead Time:</strong> Early warning flags 7–14 days ahead of acute symptoms.</li>
+              <li><strong>Multi-Language Audio (FAB):</strong> Native voice read-aloud in Hindi, English, Marathi, Punjabi, Gujarati & more.</li>
+              <li><strong>WhatsApp Veterinarian Dispatch:</strong> Pre-filled telemetry summaries sent with 1 tap.</li>
+              <li><strong>GIS Shed Heatmap:</strong> Disease clustering and pen-level hotspot tracking.</li>
+            </ul>
+          </div>
+
+          <div style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items: center;">
+            <a href="app/" target="_blank" class="solid-button" style="flex: 1; min-height: 2.6rem; justify-content: center;">
+              Launch Fullscreen App
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <button type="button" class="outline-button" onclick="closeFigmaModal()" style="min-height: 2.6rem;">
+              Back to Landing Page
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Scripts -->
+  <script src="ml_engine.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
 </html>
