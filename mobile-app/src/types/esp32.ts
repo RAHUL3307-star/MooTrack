@@ -17,6 +17,12 @@ export interface ESP32Telemetry {
   temp: number;           // DS18B20 milk temperature °C (GPIO 4)
   ph?: number;            // pH electrode → interface board → GPIO 34
   conductivity: number;   // EC probe → interface board → GPIO 35 (mS/cm)
+  ec_fl?: number;         // Front Left Quarter EC (mS/cm)
+  ec_fr?: number;         // Front Right Quarter EC (mS/cm)
+  ec_rl?: number;         // Rear Left Quarter EC (mS/cm)
+  ec_rr?: number;         // Rear Right Quarter EC (mS/cm)
+  quarterRatio?: number;  // Max Quarter / Min Quarter EC ratio (alert > 1.15)
+  thermalAsymmetry?: number; // Left vs Right udder skin temp diff °C
   weight?: number;        // HX711 load cell milk weight in kg (GPIO 32/33)
 
   // Animal & Environment Monitoring Unit (GPIO 21/22, 27)
@@ -24,9 +30,11 @@ export interface ESP32Telemetry {
   shedTemp?: number;      // DHT22 shed temperature °C (GPIO 27)
   humidity?: number;      // DHT22 shed humidity % (GPIO 27)
 
-  // Device health
+  // Device health & risk
   battery?: number;       // Battery % (0–100)
   rssi?: number;          // WiFi signal strength dBm
+  riskScore?: number;     // 0-100 calculated risk score
+  riskTier?: string;      // "Low" | "Watch" | "Elevated"
 
   timestamp: string;
 }

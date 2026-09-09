@@ -34,9 +34,6 @@ COPY_MAP = [
     ("zenodo_14908264", "Data_management.do",
      "zenodo_14908264_data_management.do"),
 
-    # Zenodo 15619247 – TIDS Thermal Imaging Dataset (218 MB ZIP – keep in place)
-    ("zenodo_15619247", None, None),
-
     # Mendeley d8kgk57b9h/v3 – SCC milk data RAR
     ("mendeley_d8kgk57b9h_v3", "data_SCC.rar",
      "mendeley_d8kgk57b9h_scc_milk_data.rar"),

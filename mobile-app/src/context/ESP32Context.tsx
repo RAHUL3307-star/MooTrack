@@ -62,126 +62,128 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
     setNotification(null);
   }, []);
 
-  // Poll /api/esp32/status every 3s to detect real hardware without repeating popups
+  // Connect to SSE stream (/api/esp32/stream) with fallback polling
   useEffect(() => {
+    let sseSource: EventSource | null = null;
+    let pollInterval: any = null;
+
+    const applyTelemetryData = (data: any) => {
+      if (!data) return;
+      const nextLive = !!(data.isLive && data.lastTelemetry);
+
+      if (!isInitializedRef.current) {
+        isInitializedRef.current = true;
+        prevLiveRef.current = nextLive;
+      }
+
+      if (nextLive && data.lastTelemetry) {
+        const raw = data.lastTelemetry;
+        const tel: ESP32Telemetry = {
+          cowId: raw.cowId || "KA-001",
+          rfidTag: raw.rfidTag,
+          temp: raw.temp || 38.5,
+          ph: raw.ph,
+          conductivity: raw.ec ?? raw.conductivity ?? 5.0,
+          ec_fl: raw.ec_fl,
+          ec_fr: raw.ec_fr,
+          ec_rl: raw.ec_rl,
+          ec_rr: raw.ec_rr,
+          quarterRatio: raw.quarterRatio,
+          thermalAsymmetry: raw.thermalAsymmetry,
+          weight: raw.weight,
+          activity: raw.activity,
+          shedTemp: raw.shedTemp,
+          humidity: raw.humidity,
+          battery: raw.battery,
+          rssi: data.rssi || raw.rssi,
+          riskScore: raw.riskScore,
+          riskTier: raw.riskTier,
+          timestamp: raw.timestamp || new Date().toLocaleTimeString(),
+        };
+
+        setEsp32State((prev) => ({
+          isLive: true,
+          connected: true,
+          deviceId: data.deviceId || prev.deviceId || "ESP32-CLINICAL",
+          baudRate: 115200,
+          source: data.connectionType || prev.source || "WiFi Direct",
+          lastTelemetry: tel,
+        }));
+
+        if (!prevLiveRef.current) {
+          prevLiveRef.current = true;
+          triggerNotification({
+            id: Date.now(),
+            type: "connected",
+            deviceId: data.deviceId || "ESP32-WROOM32",
+            source: data.connectionType || "WiFi SSE Stream",
+            cowId: tel.cowId,
+            rfidTag: tel.rfidTag,
+            temp: tel.temp,
+            ph: tel.ph,
+            conductivity: tel.conductivity,
+            weight: tel.weight,
+          });
+        }
+      } else if (!nextLive && prevLiveRef.current) {
+        prevLiveRef.current = false;
+        setEsp32State((prev) => ({
+          ...prev,
+          isLive: false,
+          connected: false,
+        }));
+        triggerNotification({
+          id: Date.now(),
+          type: "disconnected",
+          deviceId: esp32State.deviceId || "ESP32-HARDWARE-WROOM32",
+          source: "lan-wifi",
+          message: "Hardware telemetry stream disconnected. Resilient offline mode active.",
+        });
+      }
+    };
+
+    // Try EventSource first for real-time push streaming
+    try {
+      if (typeof window !== "undefined" && "EventSource" in window) {
+        sseSource = new EventSource("/api/esp32/stream");
+        sseSource.onmessage = (event) => {
+          try {
+            const parsed = JSON.parse(event.data);
+            applyTelemetryData(parsed);
+          } catch (err) {
+            console.warn("Error parsing SSE telemetry:", err);
+          }
+        };
+        sseSource.onerror = () => {
+          if (sseSource) {
+            sseSource.close();
+            sseSource = null;
+          }
+        };
+      }
+    } catch {
+      // SSE unsupported or blocked
+    }
+
+    // Polling fallback
     const checkServerStatus = async () => {
       try {
         const res = await fetch("/api/esp32/status", { signal: AbortSignal.timeout(2000) });
         if (res.ok) {
           const data = await res.json();
-          const nextLive = !!(data.isLive && data.lastTelemetry);
-
-          if (!isInitializedRef.current) {
-            isInitializedRef.current = true;
-            prevLiveRef.current = nextLive;
-            if (nextLive) {
-              setEsp32State({
-                isLive: true,
-                connected: true,
-                deviceId: data.deviceId || "ESP32-WIFI-CLIENT",
-                baudRate: 115200,
-                source: data.connectionType || "WiFi Direct",
-                lastTelemetry: {
-                  cowId: data.lastTelemetry.cowId || "KA-001",
-                  rfidTag: data.lastTelemetry.rfidTag,
-                  temp: data.lastTelemetry.temp || 38.5,
-                  ph: data.lastTelemetry.ph,
-                  conductivity: data.lastTelemetry.ec || data.lastTelemetry.conductivity || 5.0,
-                  weight: data.lastTelemetry.weight,
-                  activity: data.lastTelemetry.activity,
-                  shedTemp: data.lastTelemetry.shedTemp,
-                  humidity: data.lastTelemetry.humidity,
-                  battery: data.lastTelemetry.battery,
-                  rssi: data.rssi,
-                  timestamp: new Date().toLocaleTimeString(),
-                },
-              });
-            }
-            return;
-          }
-
-          // ONLY trigger notification if state actually changed!
-          if (nextLive !== prevLiveRef.current) {
-            prevLiveRef.current = nextLive;
-            if (nextLive) {
-              const tel = {
-                cowId: data.lastTelemetry.cowId || "KA-001",
-                rfidTag: data.lastTelemetry.rfidTag,
-                temp: data.lastTelemetry.temp || 38.5,
-                ph: data.lastTelemetry.ph,
-                conductivity: data.lastTelemetry.ec || data.lastTelemetry.conductivity || 5.0,
-                weight: data.lastTelemetry.weight,
-                activity: data.lastTelemetry.activity,
-                shedTemp: data.lastTelemetry.shedTemp,
-                humidity: data.lastTelemetry.humidity,
-                battery: data.lastTelemetry.battery,
-                rssi: data.rssi,
-                timestamp: new Date().toLocaleTimeString(),
-              };
-              setEsp32State({
-                isLive: true,
-                connected: true,
-                deviceId: data.deviceId || "ESP32-WIFI-CLIENT",
-                baudRate: 115200,
-                source: data.connectionType || "WiFi Direct",
-                lastTelemetry: tel,
-              });
-              triggerNotification({
-                id: Date.now(),
-                type: "connected",
-                deviceId: data.deviceId || "ESP32-WROOM32",
-                source: "WiFi Direct",
-                cowId: tel.cowId,
-                rfidTag: tel.rfidTag,
-                temp: tel.temp,
-                ph: tel.ph,
-                conductivity: tel.conductivity,
-                weight: tel.weight,
-              });
-            } else {
-              setEsp32State((prev) => ({
-                ...prev,
-                isLive: false,
-                connected: false,
-              }));
-              triggerNotification({
-                id: Date.now(),
-                type: "disconnected",
-                deviceId: esp32State.deviceId || "ESP32-HARDWARE-WROOM32",
-                source: "lan-wifi",
-                message: "Hardware telemetry stream disconnected. Resilient offline mode active.",
-              });
-            }
-          } else if (nextLive && data.lastTelemetry) {
-            // Keep telemetry updated silently without re-popping the banner
-            setEsp32State((prev) => ({
-              ...prev,
-              lastTelemetry: {
-                cowId: data.lastTelemetry.cowId || prev.lastTelemetry?.cowId || "KA-001",
-                rfidTag: data.lastTelemetry.rfidTag ?? prev.lastTelemetry?.rfidTag,
-                temp: data.lastTelemetry.temp || prev.lastTelemetry?.temp || 38.5,
-                ph: data.lastTelemetry.ph ?? prev.lastTelemetry?.ph,
-                conductivity: data.lastTelemetry.ec || data.lastTelemetry.conductivity || prev.lastTelemetry?.conductivity || 5.0,
-                weight: data.lastTelemetry.weight ?? prev.lastTelemetry?.weight,
-                activity: data.lastTelemetry.activity ?? prev.lastTelemetry?.activity,
-                shedTemp: data.lastTelemetry.shedTemp ?? prev.lastTelemetry?.shedTemp,
-                humidity: data.lastTelemetry.humidity ?? prev.lastTelemetry?.humidity,
-                battery: data.lastTelemetry.battery ?? prev.lastTelemetry?.battery,
-                rssi: data.rssi ?? prev.lastTelemetry?.rssi,
-                timestamp: new Date().toLocaleTimeString(),
-              },
-            }));
-          }
+          applyTelemetryData(data);
         }
       } catch {
-        // Server not running — silent
+        // Offline / server not reachable
       }
     };
 
     checkServerStatus();
-    const interval = setInterval(checkServerStatus, 3000);
+    pollInterval = setInterval(checkServerStatus, 3500);
+
     return () => {
-      clearInterval(interval);
+      if (sseSource) sseSource.close();
+      if (pollInterval) clearInterval(pollInterval);
       if (autoDismissTimerRef.current) clearTimeout(autoDismissTimerRef.current);
     };
   }, [triggerNotification, esp32State.deviceId]);

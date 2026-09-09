@@ -1,54 +1,55 @@
-# 🐄 Bovine Udder & Clinical Mastitis Image Dataset (MooTracker Vision ML)
+# Bovine Mastitis Image Datasets
 
-This directory contains open-access, peer-reviewed clinical and thermal imaging datasets for machine learning training and validation of **Visual Mastitis & Udder Condition Detection**.
+This folder catalogs all known **image-based** bovine mastitis datasets used in or referenced by MooTracker.
+Unlike the tabular datasets (SCC, EC, milk yield), these contain **RGB photos or thermal IR images** of cow udders.
 
----
+## Usage in MooTracker
 
-## 📂 Dataset Catalog & Sources
+Image datasets are used in **two ways**:
+1. **Visual Scan Screen** — uploaded udder photos are analyzed using computer vision + ML model inference
+2. **Dataset matching** — scan results are compared against labeled clinical cases from these datasets
 
-### 1. 🌡️ Thermal & Visual Udder Imaging Dataset (TIDS - Zenodo)
-- **Source:** Zenodo Open Science Repository ([DOI: 10.5281/zenodo.15619247](https://doi.org/10.5281/zenodo.15619247))
-- **Citation:** *TIDS: A Thermal Imaging Dataset for Subclinical & Clinical Mastitis in Dairy Animals* (FLIR E96 Optical/Thermal Sensor)
-- **Classes:**
-  - `Healthy Udder Baseline` (Normal thermal gradient, symmetric temperature distribution)
-  - `Subclinical Mastitis (SCM)` (Localized quarter hyperthermia, hot spot detection >0.8°C delta)
-  - `Clinical Acute Mastitis` (Severe erythema, acute inflammation, high thermal hotspot, udder asymmetry)
-- **Features Included:**
-  - Full and segmented udder contours
-  - Ground truth somatic cell count (SCC) calibration
-  - Quarter-level segmentation masks (Front-Left, Front-Right, Rear-Left, Rear-Right)
+## Dataset Catalog
 
----
+| ID | Name | Source | Modality | Access | Size |
+|----|------|--------|----------|--------|------|
+| `zenodo_15619247` | TIDS – Thermal Imaging Dataset for Subclinica... | Zenodo | thermal_infrared | restricted_403 | 218 MB |
+| `zenodo_20763985` | Bovine Mastitis Udder Image Dataset (Clinical... | Zenodo | rgb_photo | restricted_403 | Unknown |
+| `zenodo_19391230` | Cow Udder Mastitis Visual Detection Dataset... | Zenodo | rgb_photo | restricted_403 | Unknown |
+| `github_fishmaster93` | FishMaster93/Cow_mastitis – Image Classificat... | GitHub | rgb_photo | public | 0.02 MB |
+| `github_gssi_detection` | gssi/mastitis-detection – ML Pipeline with Im... | GitHub | feature_extracted | public | 1.4 MB |
+| `kaggle_sivaprathish` | Kaggle – Mastitis Disease Detection (sivaprat... | Kaggle | rgb_photo | requires_kaggle_auth | Unknown |
+| `kaggle_amithaditya` | Kaggle – Cow Mastitis from Milk Images (amith... | Kaggle | rgb_photo | requires_kaggle_auth | Unknown |
+| `roboflow_bovine_mastitis` | Roboflow Universe – Bovine Mastitis Udder Det... | Roboflow | rgb_photo_annotated | requires_roboflow_api_key | Unknown |
 
-### 2. 🔍 Teat-End Hyperkeratosis & Lesion Visual Scale (NMC Guidelines)
-- **Standard:** National Mastitis Council (NMC) International Teat Scoring System
-- **Grades:**
-  - **Grade 1 (N - Normal):** Teat-end is smooth with no ring.
-  - **Grade 2 (S - Smooth Ring):** A raised, smooth ring of keratin encircles the orifice.
-  - **Grade 3 (R - Rough Ring):** Raised ring with rough fronds of old keratin.
-  - **Grade 4 (VR - Very Rough / Cracked):** Ring is severely rough with 2-4mm keratin projections and radial cracks/lesions.
+## How to Download Restricted Datasets
 
----
+### Zenodo (requires account)
+1. Create a free account at https://zenodo.org
+2. Visit the dataset URL and click "Download"
+3. Place ZIP files in `datasets/images/<id>/`
 
-### 3. 🔬 Bovine Clinical Mastitis & Teat Condition Image Dataset
-- **Directory:** [`bovine_mastitis_clinical_dataset/`](./bovine_mastitis_clinical_dataset/)
-- **Total Images:** 187 clinical images
-- **Contents:**
-  - `mastitis/` (170 images): Clinical mastitis, hyperkeratosis rings (Grades 1–4), chemical burns, teat edema, papillomas, and petechial hemorrhaging.
-  - `normal_teats/` (10 images): Healthy baseline smooth teat orifices (NMC Grade 1).
-  - `general_samples/` (7 images): Macro photographic reference field samples.
-- **Index:** Indexed in `dataset_catalog.json`.
+### Kaggle (requires API key)
+1. Install Kaggle CLI: `pip install kaggle`
+2. Set up API key from https://www.kaggle.com/settings
+3. Run: `kaggle datasets download <dataset-slug>`
 
----
+### Roboflow (requires API key)
+1. Create account at https://roboflow.com
+2. Get API key from workspace settings
+3. Use Roboflow Python package or download from Universe
 
-### 4. 🔬 B-Mode Udder Ultrasound & Parenchyma Sonograms (Mendeley Data)
-- **Source:** Mendeley Data ([DOI: 10.17632/d8kgk57b9h](https://data.mendeley.com/))
-- **Contents:** 3,072 B-mode ultrasound sonograms of bovine mammary glands with echotexture feature matrices for tissue density and mastitis fibrosis analysis.
+## ML Model Integration
 
----
+The VisualScanScreen uses extracted visual features mapped to the trained ML model:
 
-## 🚀 How This Feeds into the MooTracker Visual AI Engine
-1. **Color & Erythema Extraction:** Detects redness and acute inflammation from optical images.
-2. **Contour & Udder Asymmetry Index:** Calculates volume imbalance between left and right quarters.
-3. **Teat Orifice Classification:** Classifies teat-end roughness (Grade 1 to 4).
-4. **Multimodal Fusion:** Blends photo predictions with IoT sensor data (SCC, Electrical Conductivity, Body Temp) for 96%+ diagnostic confidence.
+| Visual Feature | ML Feature Proxy |
+|---|---|
+| Erythema score (0–100) | Somatic Cell Count proxy |
+| Quadrant asymmetry | Quarter Differential Ratio |
+| Teat roughness % | Udder Thermal Asymmetry proxy |
+| Petechiae/scab count | Past Mastitis Episodes proxy |
+| Tissue mean luminance | Milk Yield proxy |
+| Block std deviation | Bedding Hygiene Score proxy |
+
+The logistic regression weights from `ml_engine.js` drive the final risk probability.

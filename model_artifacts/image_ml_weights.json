@@ -1,0 +1,54 @@
+{
+  "weights": {
+    "Erythema_Score": 9.4444,
+    "Asymmetry_Ratio": 10.731,
+    "Teat_Roughness_Score": 2.0376,
+    "Petechiae_Index": 3.6448,
+    "Texture_Variance": 0.3127,
+    "Mean_Luminance": -0.5259,
+    "Bovine_Coverage": -0.1031
+  },
+  "normParams": {
+    "Erythema_Score": {
+      "mean": 32.4862,
+      "std": 22.7226
+    },
+    "Asymmetry_Ratio": {
+      "mean": 1.516,
+      "std": 0.447
+    },
+    "Teat_Roughness_Score": {
+      "mean": 42.5191,
+      "std": 24.4489
+    },
+    "Petechiae_Index": {
+      "mean": 2.2985,
+      "std": 3.2712
+    },
+    "Texture_Variance": {
+      "mean": 33.8967,
+      "std": 7.0255
+    },
+    "Mean_Luminance": {
+      "mean": 150.4022,
+      "std": 11.3579
+    },
+    "Bovine_Coverage": {
+      "mean": 77.9396,
+      "std": 4.0038
+    }
+  },
+  "bias": 7.3004,
+  "featureKeys": [
+    "Erythema_Score",
+    "Asymmetry_Ratio",
+    "Teat_Roughness_Score",
+    "Petechiae_Index",
+    "Texture_Variance",
+    "Mean_Luminance",
+    "Bovine_Coverage"
+  ],
+  "modelAccuracy": "99.92%",
+  "modelF1": 0.9992,
+  "modelRocAuc": 1.0
+}

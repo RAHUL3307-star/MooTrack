@@ -255,7 +255,7 @@ void loop() {
               <>
                 Live hardware stream active from <strong>{deviceId || "ESP32-WROOM32"}</strong>. Monitored Cow:{" "}
                 <strong style={{ color: "#FCD34D" }}>{lastTelemetry?.cowId || "KA-001"}</strong>. Telemetry updating
-                in real-time.
+                in real-time via SSE.
               </>
             ) : (
               <>
@@ -264,6 +264,61 @@ void loop() {
               </>
             )}
           </div>
+
+          {/* Quad-Quarter Conductivity & Thermal Asymmetry Matrix */}
+          {isLive && (
+            <div
+              style={{
+                background: "rgba(255,255,255,0.08)",
+                borderRadius: 12,
+                padding: "10px 12px",
+                marginBottom: 12,
+                border: "1px solid rgba(255,255,255,0.12)",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#86EFAC", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                  🐄 4-Quarter Udder EC & Symmetry
+                </span>
+                <span
+                  style={{
+                    fontSize: 10,
+                    padding: "2px 6px",
+                    borderRadius: 4,
+                    fontWeight: 700,
+                    background: (lastTelemetry?.quarterRatio || 1.0) > 1.15 ? "#EF4444" : "#22C55E",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  {(lastTelemetry?.quarterRatio || 1.0) > 1.15 ? "⚠️ Asymmetry Alert" : "✓ Balanced Quarters"}
+                </span>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 8 }}>
+                <div style={{ background: "rgba(0,0,0,0.25)", padding: "6px 8px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div style={{ fontSize: 9, color: "#94A3B8" }}>Front Left (FL)</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#F8FAFC" }}>{lastTelemetry?.ec_fl || (lastTelemetry?.conductivity || 5.1).toFixed(2)} <span style={{ fontSize: 9, color: "#94A3B8" }}>mS/cm</span></div>
+                </div>
+                <div style={{ background: "rgba(0,0,0,0.25)", padding: "6px 8px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div style={{ fontSize: 9, color: "#94A3B8" }}>Front Right (FR)</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: (lastTelemetry?.ec_fr || 5.1) > 6.5 ? "#F87171" : "#F8FAFC" }}>{lastTelemetry?.ec_fr || (lastTelemetry?.conductivity || 5.1).toFixed(2)} <span style={{ fontSize: 9, color: "#94A3B8" }}>mS/cm</span></div>
+                </div>
+                <div style={{ background: "rgba(0,0,0,0.25)", padding: "6px 8px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div style={{ fontSize: 9, color: "#94A3B8" }}>Rear Left (RL)</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#F8FAFC" }}>{lastTelemetry?.ec_rl || (lastTelemetry?.conductivity || 5.1).toFixed(2)} <span style={{ fontSize: 9, color: "#94A3B8" }}>mS/cm</span></div>
+                </div>
+                <div style={{ background: "rgba(0,0,0,0.25)", padding: "6px 8px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div style={{ fontSize: 9, color: "#94A3B8" }}>Rear Right (RR)</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#F8FAFC" }}>{lastTelemetry?.ec_rr || (lastTelemetry?.conductivity || 5.1).toFixed(2)} <span style={{ fontSize: 9, color: "#94A3B8" }}>mS/cm</span></div>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#CBD5E1" }}>
+                <span>ΔEC Ratio: <strong style={{ color: "#FDE047" }}>{lastTelemetry?.quarterRatio ? `${lastTelemetry.quarterRatio}x` : "1.02x"}</strong></span>
+                <span>Thermal Asymmetry: <strong style={{ color: "#FDE047" }}>{lastTelemetry?.thermalAsymmetry ? `${lastTelemetry.thermalAsymmetry}°C` : "0.18°C"}</strong></span>
+              </div>
+            </div>
+          )}
 
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
             <button

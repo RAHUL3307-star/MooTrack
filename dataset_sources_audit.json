@@ -1,14 +1,5 @@
 [
   {
-    "name": "Kaggle amithadityacp cow-mastitisfrom-milk",
-    "url": "https://www.kaggle.com/datasets/amithadityacp/cow-mastitisfrom-milk",
-    "status": "page_200",
-    "files": [],
-    "metadata": {
-      "title": "Checking your browser - reCAPTCHA"
-    }
-  },
-  {
     "name": "GitHub FishMaster93 Cow_mastitis",
     "url": "https://github.com/FishMaster93/Cow_mastitis",
     "status": "success",
@@ -179,15 +170,7 @@
     "files": [],
     "metadata": {}
   },
-  {
-    "name": "Kaggle sivaprathishsiva mastitis-disease-detection",
-    "url": "https://www.kaggle.com/datasets/sivaprathishsiva/mastitis-disease-detection",
-    "status": "page_200",
-    "files": [],
-    "metadata": {
-      "title": "Checking your browser - reCAPTCHA"
-    }
-  },
+
   {
     "name": "Zenodo 14908264",
     "url": "https://zenodo.org/records/14908264",

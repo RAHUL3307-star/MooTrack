@@ -1,0 +1,163 @@
+[
+  {
+    "id": "zenodo_15619247",
+    "name": "TIDS – Thermal Imaging Dataset for Subclinical Mastitis",
+    "source": "Zenodo",
+    "url": "https://zenodo.org/records/15619247",
+    "format": "ZIP (thermal IR images, PNG)",
+    "size_mb": 218,
+    "modality": "thermal_infrared",
+    "labels": [
+      "healthy",
+      "subclinical",
+      "clinical"
+    ],
+    "access": "restricted_403",
+    "notes": "218 MB thermal IR udder images. Requires Zenodo account login.",
+    "download_urls": [
+      "https://zenodo.org/records/15619247/files/TIDS%20Dataset.zip?download=1",
+      "https://zenodo.org/api/records/15619247/files/TIDS%20Dataset.zip/content"
+    ],
+    "local_path": null,
+    "downloaded": false
+  },
+  {
+    "id": "zenodo_20763985",
+    "name": "Bovine Mastitis Udder Image Dataset (Clinical Grading)",
+    "source": "Zenodo",
+    "url": "https://zenodo.org/records/20763985",
+    "format": "ZIP (RGB udder photos, annotated)",
+    "size_mb": null,
+    "modality": "rgb_photo",
+    "labels": [
+      "grade1",
+      "grade2",
+      "grade3",
+      "grade4"
+    ],
+    "access": "restricted_403",
+    "notes": "Clinical NMC-grade annotated udder photos.",
+    "download_urls": [
+      "https://zenodo.org/records/20763985/files/mastitis_images.zip?download=1"
+    ],
+    "local_path": null,
+    "downloaded": false
+  },
+  {
+    "id": "zenodo_19391230",
+    "name": "Cow Udder Mastitis Visual Detection Dataset",
+    "source": "Zenodo",
+    "url": "https://zenodo.org/records/19391230",
+    "format": "ZIP",
+    "size_mb": null,
+    "modality": "rgb_photo",
+    "labels": [
+      "healthy",
+      "mastitis"
+    ],
+    "access": "restricted_403",
+    "notes": "RGB udder photos for binary classification.",
+    "download_urls": [
+      "https://zenodo.org/records/19391230/files/dataset.zip?download=1"
+    ],
+    "local_path": null,
+    "downloaded": false
+  },
+  {
+    "id": "github_fishmaster93",
+    "name": "FishMaster93/Cow_mastitis – Image Classification Code",
+    "source": "GitHub",
+    "url": "https://github.com/FishMaster93/Cow_mastitis",
+    "format": "Python scripts (no image data in repo)",
+    "size_mb": 0.02,
+    "modality": "rgb_photo",
+    "labels": [
+      "healthy",
+      "subclinical",
+      "clinical"
+    ],
+    "access": "public",
+    "notes": "CNN classification code for cow mastitis. Companion dataset not included in repo.",
+    "download_urls": [
+      "https://raw.githubusercontent.com/FishMaster93/Cow_mastitis/main/S1.py",
+      "https://raw.githubusercontent.com/FishMaster93/Cow_mastitis/main/S2.py"
+    ],
+    "local_path": "datasets\\images\\github_fishmaster93",
+    "downloaded": true
+  },
+  {
+    "id": "github_gssi_detection",
+    "name": "gssi/mastitis-detection – ML Pipeline with Image Features",
+    "source": "GitHub",
+    "url": "https://github.com/gssi/mastitis-detection",
+    "format": "Parquet (pre-extracted image features + labels)",
+    "size_mb": 1.4,
+    "modality": "feature_extracted",
+    "labels": [
+      "healthy",
+      "subclinical",
+      "clinical"
+    ],
+    "access": "public",
+    "notes": "Pre-extracted image feature vectors (CNN embeddings) stored as parquet.",
+    "download_urls": [],
+    "local_path": null,
+    "downloaded": false
+  },
+  {
+    "id": "kaggle_sivaprathish",
+    "name": "Kaggle – Mastitis Disease Detection (sivaprathishsiva)",
+    "source": "Kaggle",
+    "url": "https://www.kaggle.com/datasets/sivaprathishsiva/mastitis-disease-detection",
+    "format": "ZIP (labeled udder images)",
+    "size_mb": null,
+    "modality": "rgb_photo",
+    "labels": [
+      "healthy",
+      "mastitis"
+    ],
+    "access": "requires_kaggle_auth",
+    "notes": "Labeled bovine udder photos. Requires Kaggle account + API key.",
+    "download_urls": [],
+    "local_path": null,
+    "downloaded": false
+  },
+  {
+    "id": "kaggle_amithaditya",
+    "name": "Kaggle – Cow Mastitis from Milk Images (amithadityacp)",
+    "source": "Kaggle",
+    "url": "https://www.kaggle.com/datasets/amithadityacp/cow-mastitisfrom-milk",
+    "format": "ZIP (images + CSV labels)",
+    "size_mb": null,
+    "modality": "rgb_photo",
+    "labels": [
+      "healthy",
+      "mild",
+      "severe"
+    ],
+    "access": "requires_kaggle_auth",
+    "notes": "Milk appearance images for mastitis grading. Requires Kaggle API key.",
+    "download_urls": [],
+    "local_path": null,
+    "downloaded": false
+  },
+  {
+    "id": "roboflow_bovine_mastitis",
+    "name": "Roboflow Universe – Bovine Mastitis Udder Detection (YOLO)",
+    "source": "Roboflow",
+    "url": "https://universe.roboflow.com/search?q=mastitis+cow",
+    "format": "YOLO annotation (images + labels)",
+    "size_mb": null,
+    "modality": "rgb_photo_annotated",
+    "labels": [
+      "udder",
+      "mastitis_region",
+      "healthy_udder"
+    ],
+    "access": "requires_roboflow_api_key",
+    "notes": "Object detection datasets for mastitis udder region localization.",
+    "download_urls": [],
+    "local_path": null,
+    "downloaded": false
+  }
+]

@@ -27,7 +27,7 @@ ZENODO_IDS = [
     "18013106",
     "5733981",
     "14908264",
-    "15619247",
+    # "15619247" removed – TIDS Thermal Imaging Dataset (image-based, not used in ML)
     "19391230",
     "2660878",
     "20763985",
