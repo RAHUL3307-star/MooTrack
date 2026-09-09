@@ -442,7 +442,7 @@ void loop() {
               <button
                 onClick={() => {
                   if (matchedCow) setSelectedAnimal(matchedCow);
-                  if (onNavigate) onNavigate("visual-scan");
+                  if (onNavigate) onNavigate("visual-ai");
                 }}
                 style={{
                   width: "100%",

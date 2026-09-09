@@ -244,6 +244,7 @@ export function AnimalsScreen({
   onNavigate: (s: Screen) => void;
   lang: string;
 }) {
+  const { isLive, lastTelemetry } = useESP32();
   const { animals, setSelectedAnimal, addAnimal } = useAnimals();
   const [filter, setFilter] = useState<"all" | RiskLevel>("all");
   const [search, setSearch] = useState("");
