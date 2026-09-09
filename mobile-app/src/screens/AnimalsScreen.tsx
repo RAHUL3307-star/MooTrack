@@ -386,11 +386,113 @@ export function AnimalsScreen({
           </div>
         )}
 
+        {/* Live ESP32 Hardware Banner & Active Monitored Cow */}
+        {isLive && lastTelemetry?.cowScanned ? (
+          <div
+            style={{
+              background: "linear-gradient(135deg, #1C2714, #2A5C1F)",
+              border: "1.5px solid #68B946",
+              borderRadius: 14,
+              padding: "14px 16px",
+              marginBottom: 12,
+              color: "#FFFFFF",
+              boxShadow: "0 4px 16px rgba(42,92,31,0.25)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ display: "inline-block", width: 9, height: 9, borderRadius: "50%", background: "#4ADE80", boxShadow: "0 0 10px #4ADE80" }} />
+                <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.06em", color: "#A3E635", textTransform: "uppercase" }}>
+                  LIVE ESP32 SENSOR FEED
+                </span>
+              </div>
+              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.75)", fontFamily: "'JetBrains Mono'" }}>
+                {lastTelemetry.timestamp}
+              </span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 800 }}>
+                  🐄 {lastTelemetry.cowName || lastTelemetry.cowId || "COW 1"}
+                </div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.8)", marginTop: 2 }}>
+                  RFID: {lastTelemetry.rfidTag || "0xE3995556"}
+                </div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: lastTelemetry.riskTier === "HIGH" || lastTelemetry.riskTier === "Elevated" ? "#F87171" : "#86EFAC" }}>
+                  {lastTelemetry.riskTier || "LOW RISK"}
+                </div>
+                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.7)" }}>
+                  Risk Score: {lastTelemetry.riskScore ?? 0}
+                </div>
+              </div>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 6, marginTop: 10, background: "rgba(0,0,0,0.2)", padding: "8px 10px", borderRadius: 10 }}>
+              <div>
+                <div style={{ fontSize: 9, color: "rgba(255,255,255,0.6)" }}>MILK pH</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#FFFFFF" }}>{lastTelemetry.ph != null ? Number(lastTelemetry.ph).toFixed(2) : "—"}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 9, color: "rgba(255,255,255,0.6)" }}>MILK EC</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#FFFFFF" }}>{lastTelemetry.conductivity != null ? Number(lastTelemetry.conductivity).toFixed(2) : "—"} <span style={{ fontSize: 8 }}>mS</span></div>
+              </div>
+              <div>
+                <div style={{ fontSize: 9, color: "rgba(255,255,255,0.6)" }}>BODY TEMP</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#FFFFFF" }}>{lastTelemetry.temp != null ? `${Number(lastTelemetry.temp).toFixed(1)}°C` : "—"}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 9, color: "rgba(255,255,255,0.6)" }}>WEIGHT</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#FFFFFF" }}>{lastTelemetry.weight != null ? `${Number(lastTelemetry.weight).toFixed(1)}kg` : "—"}</div>
+              </div>
+            </div>
+          </div>
+        ) : isLive && (!lastTelemetry || !lastTelemetry.cowScanned) ? (
+          <div
+            style={{
+              background: "linear-gradient(135deg, #1C2714, #2A5C1F)",
+              border: "1.5px dashed #4ADE80",
+              borderRadius: 14,
+              padding: "16px 18px",
+              marginBottom: 12,
+              color: "#FFFFFF",
+              boxShadow: "0 4px 16px rgba(42,92,31,0.2)",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 24 }}>📡</span>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: "#86EFAC" }}>
+                  {lang === "Tamil"
+                    ? "ESP32 இணைக்கப்பட்டது — மாட்டின் RFID அட்டைக்காக காத்திருக்கிறது"
+                    : lang === "Hindi"
+                    ? "ESP32 कनेक्टेड — गाय के RFID कार्ड की प्रतीक्षा है"
+                    : "ESP32 Connected — Waiting for Cow RFID Card"}
+                </div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.8)", marginTop: 2 }}>
+                  {lang === "Tamil"
+                    ? "சீரியல் மானிட்டர்: 'Waiting for Cow RFID card...'. RFID அட்டையை ஸ்கேன் செய்தால் மாடு தானாக பட்டியலில் தோன்றும்."
+                    : lang === "Hindi"
+                    ? "सीरियल मॉनिटर: 'Waiting for Cow RFID card...'. RFID कार्ड स्कैन करते ही गाय स्वतः सूची में जुड़ जाएगी।"
+                    : "Serial monitor: 'Waiting for Cow RFID card...'. Tap card on RC522 scanner to auto-register cow."}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
         {visible.length === 0 ? (
           <div style={{ textAlign: "center", padding: 40, color: "#9BA88C" }}>{t("no_animals", lang)}</div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {visible.map((a) => (
+            {visible.map((a) => {
+              const isMonitoredCow = isLive && lastTelemetry?.cowScanned && (a.id === lastTelemetry.cowId || a.rfidTag === lastTelemetry.rfidTag);
+              const displayPh = isMonitoredCow && lastTelemetry.ph != null ? lastTelemetry.ph : a.ph;
+              const displayEc = isMonitoredCow && lastTelemetry.conductivity != null ? lastTelemetry.conductivity : a.conductivity;
+              const displayTemp = isMonitoredCow && lastTelemetry.temp != null ? lastTelemetry.temp : a.temp;
+              const displayRisk = isMonitoredCow && lastTelemetry.riskTier ? (lastTelemetry.riskTier.toLowerCase() as RiskLevel) : a.risk;
+
+              return (
               <button
                 key={a.id}
                 onClick={() => {
@@ -401,9 +503,9 @@ export function AnimalsScreen({
                   display: "flex",
                   alignItems: "center",
                   gap: 12,
-                  background: a.id === justAdded ? "#F0FAF0" : "#FFFFFF",
-                  border: `1px solid ${a.id === justAdded ? "#B8DBBA" : "#E0DAD0"}`,
-                  borderLeft: `4px solid ${RISK_COLOR[a.risk].dot}`,
+                  background: isMonitoredCow ? "#F2F9EE" : a.id === justAdded ? "#F0FAF0" : "#FFFFFF",
+                  border: `1px solid ${isMonitoredCow ? "#68B946" : a.id === justAdded ? "#B8DBBA" : "#E0DAD0"}`,
+                  borderLeft: `4px solid ${isMonitoredCow ? "#2A5C1F" : RISK_COLOR[a.risk].dot}`,
                   borderRadius: 12,
                   padding: "12px 14px",
                   cursor: "pointer",
@@ -455,25 +557,28 @@ export function AnimalsScreen({
                   </div>
                   <div style={{ display: "flex", gap: 12, fontSize: 11 }}>
                     <span style={{ color: "#6B7A5C" }}>
-                      pH <strong style={{ color: a.ph && (a.ph > 7.0 || a.ph < 6.4) ? "#B83220" : "#1C2714" }}>{a.ph != null ? a.ph.toFixed(2) : "6.7"}</strong>
+                      pH <strong style={{ color: displayPh && (displayPh > 7.0 || displayPh < 6.4) ? "#B83220" : "#1C2714" }}>{displayPh != null ? Number(displayPh).toFixed(2) : "6.7"}</strong>
                     </span>
                     <span style={{ color: "#6B7A5C" }}>
-                      EC <strong style={{ color: a.conductivity > 8 ? "#B83220" : "#1C2714" }}>{a.conductivity}</strong>
+                      EC <strong style={{ color: displayEc > 8 ? "#B83220" : "#1C2714" }}>{displayEc != null ? Number(displayEc).toFixed(1) : "—"}</strong>
                     </span>
                     <span style={{ color: "#6B7A5C" }}>
-                      🌡 <strong style={{ color: a.temp > 39 ? "#B83220" : "#1C2714" }}>{a.temp}°C</strong>
+                      🌡 <strong style={{ color: displayTemp > 39 ? "#B83220" : "#1C2714" }}>{displayTemp != null ? `${Number(displayTemp).toFixed(1)}°C` : "—"}</strong>
                     </span>
                     <span style={{ color: "#6B7A5C" }}>
-                      🥛 <strong style={{ color: "#1C2714" }}>{a.milk}L</strong>
+                      🥛 <strong style={{ color: "#1C2714" }}>{isMonitoredCow && lastTelemetry.weight != null ? `${Number(lastTelemetry.weight).toFixed(1)}kg` : `${a.milk}L`}</strong>
                     </span>
                   </div>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
-                  <RiskBadge level={a.risk} small lang={lang} />
-                  <div style={{ fontSize: 10, color: "#9BA88C" }}>{a.lastSync}</div>
+                  <RiskBadge level={displayRisk} small lang={lang} />
+                  <div style={{ fontSize: 10, color: isMonitoredCow ? "#2A5C1F" : "#9BA88C", fontWeight: isMonitoredCow ? 700 : 400 }}>
+                    {isMonitoredCow ? "Live ESP32" : a.lastSync}
+                  </div>
                 </div>
               </button>
-            ))}
+            );
+          })}
           </div>
         )}
       </div>

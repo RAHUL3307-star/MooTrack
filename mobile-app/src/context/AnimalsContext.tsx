@@ -3,6 +3,8 @@ import type { Animal, RiskLevel } from "../types/index";
 import { ANIMALS } from "../types/index";
 import { fetchAnimals, seedAnimals, updateAnimalRisk } from "../services/animalService";
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
+import { useESP32 } from "./ESP32Context";
+import { computeMilkRisk } from "../types/esp32";
 
 const LOCAL_STORAGE_KEY = "mootracker_custom_animals";
 
@@ -46,13 +48,16 @@ function saveCustomAnimals(custom: Animal[]) {
 }
 
 export function AnimalsProvider({ children }: { children: React.ReactNode }) {
+  const { isLive, lastTelemetry } = useESP32();
   const [baseAnimals, setBaseAnimals] = useState<Animal[]>(ANIMALS);
   const [customAnimals, setCustomAnimals] = useState<Animal[]>(() => loadCustomAnimals());
+  const [liveAnimals, setLiveAnimals] = useState<Animal[]>([]);
   const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Combined list: base (from DB or defaults) + custom (from RFID registration)
-  const animals = [...baseAnimals, ...customAnimals];
+  // When live hardware is connected: ONLY live scanned cows are in herd (0 cows initially until card is tapped)
+  // When offline / disconnected: fallback to base mock cows for demo/prototyping
+  const animals = isLive ? liveAnimals : [...baseAnimals, ...customAnimals];
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -95,15 +100,106 @@ export function AnimalsProvider({ children }: { children: React.ReactNode }) {
     }
   }, [loadData]);
 
+  // Synchronize live scanned cow from ESP32 telemetry
+  useEffect(() => {
+    if (!isLive) {
+      setLiveAnimals([]);
+      return;
+    }
+
+    if (lastTelemetry && (lastTelemetry.cowScanned === true || lastTelemetry.rfid_status === "VERIFIED")) {
+      const cowId = lastTelemetry.cowId || "COW_001";
+      const cowName = lastTelemetry.cowName || (cowId === "COW_001" ? "Cow 1" : cowId);
+      const rfidTag = lastTelemetry.rfidTag || "0xE3995556";
+      const temp = lastTelemetry.temp != null ? Number(lastTelemetry.temp) : 38.6;
+      const ph = lastTelemetry.ph != null ? Number(lastTelemetry.ph) : 6.70;
+      const conductivity = lastTelemetry.conductivity != null ? Number(lastTelemetry.conductivity) : 5.0;
+      const weight = lastTelemetry.weight != null ? Number(lastTelemetry.weight) : 0;
+      const calculatedRisk = computeMilkRisk(lastTelemetry).risk;
+      const riskTier = lastTelemetry.riskTier?.toLowerCase();
+      const risk: RiskLevel =
+        riskTier === "high" || riskTier === "elevated"
+          ? "high"
+          : riskTier === "moderate" || riskTier === "watch"
+          ? "moderate"
+          : calculatedRisk;
+
+      setLiveAnimals((prev) => {
+        const existingIdx = prev.findIndex(
+          (a) => a.id === cowId || (a.rfidTag && a.rfidTag === rfidTag)
+        );
+        if (existingIdx >= 0) {
+          const updated = [...prev];
+          updated[existingIdx] = {
+            ...updated[existingIdx],
+            name: cowName,
+            rfidTag,
+            temp,
+            ph,
+            conductivity,
+            weight,
+            risk,
+            trend: risk === "high" ? "up" : "stable",
+            lastSync: "Just now",
+          };
+          return updated;
+        }
+
+        const newCow: Animal = {
+          id: cowId,
+          name: cowName,
+          breed: "HF Cross",
+          age: "3y 2m",
+          ageYears: 3,
+          ageMonths: 2,
+          rfidTag,
+          lactation: 2,
+          risk,
+          trend: risk === "high" ? "up" : "stable",
+          temp,
+          ph,
+          conductivity,
+          weight,
+          activity: "normal",
+          milk: weight > 0 ? weight : 12.5,
+          lastSync: "Just now",
+          quarter: "All Clear",
+        };
+        return [...prev, newCow];
+      });
+    }
+  }, [isLive, lastTelemetry]);
+
+  // Keep selectedAnimal in sync with current animals
+  useEffect(() => {
+    if (isLive) {
+      if (liveAnimals.length > 0) {
+        setSelectedAnimal((curr) => {
+          if (!curr || !liveAnimals.some((a) => a.id === curr.id)) {
+            return liveAnimals[0];
+          }
+          return liveAnimals.find((a) => a.id === curr.id) || liveAnimals[0];
+        });
+      } else {
+        setSelectedAnimal(null);
+      }
+    } else {
+      setSelectedAnimal((curr) => curr || baseAnimals[0] || null);
+    }
+  }, [isLive, liveAnimals, baseAnimals]);
+
   const updateRisk = useCallback(
     async (animalId: string, risk: RiskLevel, temp: number, ph?: number, conductivity?: number) => {
+      setLiveAnimals((prev) =>
+        prev.map((a) => (a.id === animalId ? { ...a, risk, temp, ph: ph ?? a.ph, conductivity: conductivity ?? a.conductivity, lastSync: "Just now" } : a))
+      );
       setBaseAnimals((prev) =>
         prev.map((a) => (a.id === animalId ? { ...a, risk, temp, ph: ph ?? a.ph, conductivity: conductivity ?? a.conductivity, lastSync: "Just now" } : a))
       );
       setCustomAnimals((prev) =>
         prev.map((a) => (a.id === animalId ? { ...a, risk, temp, ph: ph ?? a.ph, conductivity: conductivity ?? a.conductivity, lastSync: "Just now" } : a))
       );
-      // Supabase update (no SCC column)
+      // Supabase update
       if (isSupabaseConfigured) {
         await updateAnimalRisk(animalId, risk, 0, temp);
       }
@@ -114,7 +210,7 @@ export function AnimalsProvider({ children }: { children: React.ReactNode }) {
   // Add a new cow via RFID scan — name entered by farmer at scan time
   const addAnimal = useCallback(
     (rfidTag: string, name: string, ageYears: number, ageMonths: number, breed: string): Animal => {
-      const totalAnimals = baseAnimals.length + customAnimals.length;
+      const totalAnimals = animals.length;
       const cowNumber = totalAnimals + 1;
       const padded = String(cowNumber).padStart(3, "0");
 
@@ -138,15 +234,19 @@ export function AnimalsProvider({ children }: { children: React.ReactNode }) {
         quarter: "All Clear",
       };
 
-      setCustomAnimals((prev) => {
-        const updated = [...prev, newAnimal];
-        saveCustomAnimals(updated);
-        return updated;
-      });
+      if (isLive) {
+        setLiveAnimals((prev) => [...prev, newAnimal]);
+      } else {
+        setCustomAnimals((prev) => {
+          const updated = [...prev, newAnimal];
+          saveCustomAnimals(updated);
+          return updated;
+        });
+      }
 
       return newAnimal;
     },
-    [baseAnimals.length, customAnimals.length]
+    [animals.length, isLive]
   );
 
   return (

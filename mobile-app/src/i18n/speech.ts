@@ -8,14 +8,36 @@ export function generateLiveSituationSummary(
   lang: string = "English",
   liveTelemetry?: ESP32Telemetry | null
 ): string {
-  // ── Scenario A: Milk Sensor Dipped in Real-Time ─────────────────────────────
-  if (liveTelemetry) {
+  // ── Waiting for Cow RFID Card ───────────────────────────────────────────────
+  if (liveTelemetry && !liveTelemetry.cowScanned) {
+    switch (lang) {
+      case "Tamil":
+        return "ESP32 சாதனம் வெற்றிகரமாக இணைக்கப்பட்டுள்ளது. மாட்டின் RFID அட்டைக்காக காத்திருக்கிறது. மாட்டை பதிவு செய்து நேரடி சென்சார் தரவை பெற, RFID அட்டையை ESP32 ஸ்கேனரில் வையுங்கள்.";
+      case "Hindi":
+        return "ESP32 हार्डवेयर सफलतापूर्वक कनेक्ट हो गया है। गाय के आरएफआईडी कार्ड की प्रतीक्षा है। गाय को पंजीकृत करने और लाइव डेटा प्राप्त करने के लिए कृपया आरएफआईडी कार्ड को स्कैनर पर लगाएं।";
+      case "Kannada":
+        return "ESP32 ಹಾರ್ಡ್‌ವೇರ್ ಯಶಸ್ವಿಯಾಗಿ ಸಂಪರ್ಕಗೊಂಡಿದೆ. ಹಸುವಿನ RFID ಕಾರ್ಡ್‌ಗಾಗಿ ಕಾಯುತ್ತಿದೆ. ಹಸುವನ್ನು ನೋಂದಾಯಿಸಲು ದಯವಿಟ್ಟು RFID ಕಾರ್ಡ್ ಅನ್ನು ಸ್ಕ್ಯಾನರ್‌ಗೆ ಸ್ಪರ್ಶಿಸಿ.";
+      case "Telugu":
+        return "ESP32 హార్డ్‌వేర్ విజయవంతంగా కనెక్ట్ చేయబడింది. ఆవు RFID కార్డు కోసం వేచి చూస్తోంది. ఆవును నమోదు చేయడానికి దయచేసి RFID కార్డును స్కానర్‌పై ఉంచండి.";
+      case "Marathi":
+        return "ESP32 हार्डवेअर यशस्वीरित्या जोडले गेले आहे. गाईच्या RFID कार्डची वाट पाहत आहे. नोंदणी करण्यासाठी कृपया RFID कार्ड स्कॅनरवर लावा.";
+      case "Gujarati":
+        return "ESP32 હાર્ડવેર સફળતાપૂર્વક કનેક્ટ થયું છે. ગાયના RFID કાર્ડની રાહ જોઈ રહ્યું છે. નોંધણી કરવા માટે કૃપા કરીને RFID કાર્ડ સ્કેનર પર રાખો.";
+      case "Punjabi":
+        return "ESP32 ਹਾਰਡਵੇਅਰ ਸਫਲਤਾਪੂਰਵਕ ਕਨੈਕਟ ਹੋ ਗਿਆ ਹੈ। ਗਾਂ ਦੇ RFID ਕਾਰਡ ਦੀ ਉਡੀਕ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ RFID ਕਾਰਡ ਨੂੰ ਸਕੈਨਰ 'ਤੇ ਰੱਖੋ।";
+      default:
+        return "ESP32 hardware is connected and active. Waiting for Cow RFID card. Please tap the cow's RFID card on the ESP32 scanner to register the cow and stream live telemetry.";
+    }
+  }
+
+  // ── Scenario A: Scanned Cow Live Telemetry Dipped in Real-Time ─────────────
+  if (liveTelemetry && liveTelemetry.cowScanned) {
     const targetCow = animals.find(
       (a) =>
         (liveTelemetry.rfidTag && a.rfidTag === liveTelemetry.rfidTag) ||
         a.id === liveTelemetry.cowId
     );
-    const cowName = targetCow ? targetCow.name : (liveTelemetry.cowId || "Tested Cow");
+    const cowName = liveTelemetry.cowName || (targetCow ? targetCow.name : (liveTelemetry.cowId || "Cow 1"));
     const riskResult = computeMilkRisk(liveTelemetry);
     const phVal = liveTelemetry.ph != null ? liveTelemetry.ph.toFixed(2) : "6.70";
     const ecVal = (liveTelemetry.conductivity ?? 5.0).toFixed(1);
@@ -86,9 +108,24 @@ export function generateLiveSituationSummary(
 
   // ── Scenario B: General Herd Voice Summary (Dynamic from Active Cows) ───────
   const total = animals.length;
+  if (total === 0) {
+    switch (lang) {
+      case "Tamil":
+        return "பண்ணையில் மாடுகள் எதுவும் பதிவு செய்யப்படவில்லை. மாட்டை இணைக்க RFID அட்டையை ஸ்கேன் செய்யவும்.";
+      case "Hindi":
+        return "फार्म में कोई पशु दर्ज नहीं है। पशु को जोड़ने के लिए कृपया आरएफआईडी कार्ड स्कैन करें।";
+      case "Kannada":
+        return "ಫಾರ್ಮ್‌ನಲ್ಲಿ ಯಾವುದೇ ಹಸುಗಳು ನೋಂದಣಿಯಾಗಿಲ್ಲ. ಹಸುವನ್ನು ಸೇರಿಸಲು ದಯವಿಟ್ಟು RFID ಕಾರ್ಡ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ.";
+      case "Telugu":
+        return "ఫారమ్‌లో ఎటువంటి ఆవులు నమోదు కాలేదు. ఆవును జోడించడానికి దయచేసి RFID కార్డును స్కాన్ చేయండి.";
+      default:
+        return "No animals in herd yet. Tap an RFID card on the scanner to register a cow.";
+    }
+  }
+
   const high = animals.filter((a) => a.risk === "high");
   const mod = animals.filter((a) => a.risk === "moderate");
-  const totalMilk = Math.round(animals.reduce((s, a) => s + (a.milk || 0), 0)) || 424;
+  const totalMilk = Math.round(animals.reduce((s, a) => s + (a.milk || 0), 0)) || 0;
 
   const highNames = high.map((a) => a.name).join(", ");
   const modNames = mod.map((a) => a.name).join(", ");

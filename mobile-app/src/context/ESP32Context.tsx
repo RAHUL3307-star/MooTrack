@@ -78,12 +78,17 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
 
       if (nextLive && data.lastTelemetry) {
         const raw = data.lastTelemetry;
+        const isScanned = !!((raw.cowScanned === true || raw.rfid_status === "VERIFIED") && raw.rfid_status !== "NOT_VERIFIED");
+
         const tel: ESP32Telemetry = {
-          cowId: raw.cowId || "KA-001",
-          rfidTag: raw.rfidTag,
-          temp: raw.temp || 38.5,
-          ph: raw.ph,
-          conductivity: raw.ec ?? raw.conductivity ?? 5.0,
+          cowScanned: isScanned,
+          rfid_status: raw.rfid_status || (isScanned ? "VERIFIED" : "WAITING_FOR_CARD"),
+          cowId: isScanned ? (raw.cowId || raw.cow_id || "COW_001") : "",
+          cowName: isScanned ? (raw.cowName || raw.cow_name || "Cow 1") : "",
+          rfidTag: isScanned ? (raw.rfidTag || raw.rfid) : undefined,
+          temp: raw.temp ?? raw.temperature ?? raw.body_temperature,
+          ph: raw.ph ?? raw.milk_ph,
+          conductivity: raw.conductivity ?? raw.ec ?? raw.milk_conductivity,
           ec_fl: raw.ec_fl,
           ec_fr: raw.ec_fr,
           ec_rl: raw.ec_rl,
@@ -91,13 +96,13 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
           quarterRatio: raw.quarterRatio,
           thermalAsymmetry: raw.thermalAsymmetry,
           weight: raw.weight,
-          activity: raw.activity,
+          activity: raw.activity ?? raw.activity_score,
           shedTemp: raw.shedTemp,
           humidity: raw.humidity,
           battery: raw.battery,
           rssi: data.rssi || raw.rssi,
-          riskScore: raw.riskScore,
-          riskTier: raw.riskTier,
+          riskScore: raw.riskScore ?? raw.mastitis_risk_score,
+          riskTier: raw.riskTier ?? raw.mastitis_risk,
           timestamp: raw.timestamp || new Date().toLocaleTimeString(),
         };
 
@@ -117,8 +122,8 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
             type: "connected",
             deviceId: data.deviceId || "ESP32-WROOM32",
             source: data.connectionType || "WiFi SSE Stream",
-            cowId: tel.cowId,
-            rfidTag: tel.rfidTag,
+            cowId: isScanned ? tel.cowId : undefined,
+            rfidTag: isScanned ? tel.rfidTag : undefined,
             temp: tel.temp,
             ph: tel.ph,
             conductivity: tel.conductivity,
@@ -165,8 +170,55 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
       // SSE unsupported or blocked
     }
 
-    // Polling fallback
+    // Polling fallback + Direct ESP32 AP (192.168.4.1) Polling
     const checkServerStatus = async () => {
+      // 1. First priority: Check if we are connected directly to ESP32 AP (http://192.168.4.1/data)
+      try {
+        const apRes = await fetch("http://192.168.4.1/data", {
+          signal: AbortSignal.timeout(1800),
+          mode: "cors"
+        });
+        if (apRes.ok) {
+          const rawAp = await apRes.json();
+          const isVerified = (rawAp.rfid_status === "VERIFIED" || rawAp.cowScanned === true) && rawAp.rfid_status !== "NOT_VERIFIED";
+          applyTelemetryData({
+            isLive: true,
+            deviceId: rawAp.deviceId || "ESP32-AP-MOOTRACKER",
+            connectionType: "WiFi AP (192.168.4.1)",
+            rssi: -50,
+            lastTelemetry: {
+              cowScanned: isVerified,
+              rfid_status: isVerified ? "VERIFIED" : "NOT_VERIFIED",
+              cowId: isVerified ? (rawAp.cow_id || "COW_001") : "",
+              cowName: isVerified ? (rawAp.cow_name || "Cow 1") : "",
+              rfidTag: isVerified ? (rawAp.rfidTag || rawAp.rfid || "0xE3995556") : undefined,
+              temp: rawAp.body_temperature ?? rawAp.temperature ?? rawAp.temp,
+              ph: rawAp.milk_ph ?? rawAp.ph,
+              conductivity: rawAp.milk_conductivity ?? rawAp.conductivity ?? rawAp.ec,
+              ec_fl: rawAp.ec_fl ?? rawAp.milk_conductivity ?? rawAp.conductivity,
+              ec_fr: rawAp.ec_fr ?? rawAp.milk_conductivity ?? rawAp.conductivity,
+              ec_rl: rawAp.ec_rl ?? rawAp.milk_conductivity ?? rawAp.conductivity,
+              ec_rr: rawAp.ec_rr ?? rawAp.milk_conductivity ?? rawAp.conductivity,
+              quarterRatio: 1.0,
+              thermalAsymmetry: 0.1,
+              weight: rawAp.weight,
+              activity: rawAp.activity_score ?? rawAp.activity,
+              shedTemp: rawAp.temperature ?? rawAp.shedTemp,
+              humidity: rawAp.humidity,
+              battery: 98,
+              rssi: -50,
+              riskScore: rawAp.mastitis_risk_score ?? rawAp.riskScore,
+              riskTier: rawAp.mastitis_risk ?? rawAp.riskTier ?? "LOW",
+              timestamp: new Date().toLocaleTimeString(),
+            }
+          });
+          return; // Connected directly to ESP32 AP!
+        }
+      } catch (_) {
+        // Not on ESP32 AP or fetch failed, fallback to local backend server
+      }
+
+      // 2. Second priority: Local backend server (/api/esp32/status)
       try {
         const res = await fetch("/api/esp32/status", { signal: AbortSignal.timeout(2000) });
         if (res.ok) {
@@ -179,7 +231,7 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
     };
 
     checkServerStatus();
-    pollInterval = setInterval(checkServerStatus, 3500);
+    pollInterval = setInterval(checkServerStatus, 2000);
 
     return () => {
       if (sseSource) sseSource.close();

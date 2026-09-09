@@ -34,47 +34,28 @@ function broadcastTelemetry(statePayload) {
 }
 
 let esp32State = {
-  connected: true,
-  isLive: true,
-  deviceId: "ESP32-WROOM32-CLINICAL",
+  connected: false,
+  isLive: false,
+  isRealHardware: false,
+  cowScanned: false,
+  deviceId: "ESP32-MOOTRACKER",
   mac: "24:6F:28:B2:7D:9A",
-  ip: "192.168.1.104",
+  ip: "192.168.4.1",
   firmware: "v2.6.0-masti-quad",
   baudRate: 115200,
-  connectionType: "WiFi / Real-Time SSE",
+  connectionType: "WiFi Direct",
   rssi: -56,
-  packetCount: 142,
-  lastPing: Date.now(),
-  lastTelemetry: {
-    cowId: "KA-001",
-    rfidTag: "E200001938090124",
-    temp: 38.65,
-    ph: 6.68,
-    conductivity: 5.12,
-    ec_fl: 5.10,
-    ec_fr: 5.15,
-    ec_rl: 5.08,
-    ec_rr: 5.16,
-    quarterRatio: 1.02,
-    thermalAsymmetry: 0.18,
-    weight: 12.4,
-    activity: 58,
-    shedTemp: 31.8,
-    humidity: 66,
-    battery: 96,
-    voltage: 3.32,
-    riskScore: 18,
-    riskTier: "Low",
-    timestamp: new Date().toLocaleTimeString()
-  }
+  packetCount: 0,
+  lastPing: null,
+  lastTelemetry: null
 };
 
-// Simulation State Engine
+// Simulation State Engine (disabled by default so real ESP32 hardware data is shown)
 let simulationTimer = null;
 let simulationConfig = {
-  enabled: true,
+  enabled: false,
   intervalMs: 3000,
-  scenario: "dynamic_herd", // "dynamic_herd" | "subclinical_spike" | "acute"
+  scenario: "dynamic_herd",
   activeCowIndex: 0
 };
 
@@ -266,10 +247,11 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // 5. ESP32 Disconnect Endpoint
   if (reqPath === '/api/esp32/disconnect' && req.method === 'POST') {
     esp32State.connected = false;
     esp32State.isLive = false;
+    esp32State.cowScanned = false;
+    esp32State.lastTelemetry = null;
     broadcastTelemetry({ ...esp32State, isLive: false, serverTime: Date.now() });
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({ success: true, message: "ESP32 disconnected", state: esp32State }));
@@ -282,18 +264,52 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       try {
         const data = JSON.parse(body || '{}');
+
+        // Automatically disable simulation and clear fake data when real ESP32 connects
+        if (simulationTimer) {
+          clearInterval(simulationTimer);
+          simulationTimer = null;
+        }
+        simulationConfig.enabled = false;
+
         esp32State.connected = true;
         esp32State.isLive = true;
+        esp32State.isRealHardware = true;
         esp32State.lastPing = Date.now();
         esp32State.packetCount += 1;
-        esp32State.connectionType = "WiFi Direct";
+        esp32State.connectionType = "WiFi Direct (Real ESP32)";
         if (data.deviceId) esp32State.deviceId = data.deviceId;
         if (data.rssi) esp32State.rssi = data.rssi;
 
-        const phVal = data.ph !== undefined ? data.ph : data.pH;
-        const ecVal = data.conductivity !== undefined ? data.conductivity : data.ec;
-        const rfid = data.rfidTag || data.rfid;
-        const cowId = data.cowId || rfid || esp32State.lastTelemetry?.cowId || "KA-001";
+        const isScanned = (data.cowScanned === true || data.rfid_status === "VERIFIED") && data.rfid_status !== "NOT_VERIFIED";
+
+        if (!isScanned) {
+          esp32State.connected = true;
+          esp32State.isLive = true;
+          esp32State.isRealHardware = true;
+          esp32State.cowScanned = false;
+          esp32State.lastTelemetry = {
+            cowScanned: false,
+            rfid_status: "WAITING_FOR_CARD",
+            timestamp: new Date().toLocaleTimeString()
+          };
+          broadcastTelemetry({ ...esp32State, isLive: true, serverTime: Date.now() });
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: true, message: "Waiting for RFID card", state: esp32State }));
+        }
+
+        esp32State.connected = true;
+        esp32State.isLive = true;
+        esp32State.isRealHardware = true;
+        esp32State.cowScanned = true;
+
+        const phVal = data.ph !== undefined ? data.ph : (data.pH !== undefined ? data.pH : data.milk_ph);
+        const ecVal = data.conductivity !== undefined ? data.conductivity : (data.ec !== undefined ? data.ec : data.milk_conductivity);
+        const tempVal = data.temp !== undefined ? data.temp : (data.temperature !== undefined ? data.temperature : data.body_temperature);
+        const rfid = data.rfidTag || data.rfid || (data.rfid_status === "VERIFIED" ? "0xE3995556" : undefined);
+        const cowId = data.cowId || data.cow_id || "COW_001";
+        const cowName = data.cow_name || data.cowName || (cowId === "COW_001" ? "Cow 1" : cowId);
+        const activityVal = data.activity !== undefined ? data.activity : data.activity_score;
 
         const ec_fl = data.ec_fl !== undefined ? data.ec_fl : (ecVal || 5.0);
         const ec_fr = data.ec_fr !== undefined ? data.ec_fr : (ecVal || 5.0);
@@ -304,24 +320,27 @@ const server = http.createServer((req, res) => {
         const quarterRatio = +(maxEc / (minEc || 1.0)).toFixed(2);
 
         esp32State.lastTelemetry = {
-          ...esp32State.lastTelemetry,
+          cowScanned: true,
           cowId,
-          rfidTag: rfid || esp32State.lastTelemetry?.rfidTag,
-          temp: data.temp !== undefined ? data.temp : esp32State.lastTelemetry?.temp,
-          ph: phVal !== undefined ? phVal : esp32State.lastTelemetry?.ph,
-          conductivity: ecVal !== undefined ? ecVal : esp32State.lastTelemetry?.conductivity,
+          cowName,
+          rfidTag: rfid,
+          temp: tempVal !== undefined ? tempVal : 38.6,
+          ph: phVal !== undefined ? phVal : 6.7,
+          conductivity: ecVal !== undefined ? ecVal : 5.2,
           ec_fl,
           ec_fr,
           ec_rl,
           ec_rr,
           quarterRatio,
-          thermalAsymmetry: data.thermalAsymmetry !== undefined ? data.thermalAsymmetry : esp32State.lastTelemetry?.thermalAsymmetry,
-          weight: data.weight !== undefined ? data.weight : esp32State.lastTelemetry?.weight,
-          activity: data.activity !== undefined ? data.activity : esp32State.lastTelemetry?.activity,
-          shedTemp: data.shedTemp !== undefined ? data.shedTemp : esp32State.lastTelemetry?.shedTemp,
-          humidity: data.humidity !== undefined ? data.humidity : esp32State.lastTelemetry?.humidity,
-          battery: data.battery !== undefined ? data.battery : esp32State.lastTelemetry?.battery,
-          rssi: data.rssi !== undefined ? data.rssi : esp32State.rssi,
+          thermalAsymmetry: data.thermalAsymmetry !== undefined ? data.thermalAsymmetry : 0.1,
+          weight: data.weight !== undefined ? data.weight : 0,
+          activity: activityVal !== undefined ? activityVal : 50,
+          shedTemp: data.shedTemp !== undefined ? data.shedTemp : 30.0,
+          humidity: data.humidity !== undefined ? data.humidity : 65,
+          battery: data.battery !== undefined ? data.battery : 98,
+          rssi: data.rssi !== undefined ? data.rssi : -50,
+          riskScore: data.riskScore !== undefined ? data.riskScore : (data.mastitis_risk_score !== undefined ? data.mastitis_risk_score : 0),
+          riskTier: data.riskTier || data.mastitis_risk || "LOW",
           timestamp: new Date().toLocaleTimeString()
         };
 

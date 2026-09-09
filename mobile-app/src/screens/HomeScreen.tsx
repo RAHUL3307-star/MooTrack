@@ -105,11 +105,31 @@ export function HomeSituationSummaryCard({
 
       {/* ── Dynamic Live Summary Display ──────────────── */}
       <div style={{ fontSize: 12, lineHeight: 1.55, color: "rgba(255,255,255,0.95)", marginBottom: 12 }}>
-        {isLive && lastTelemetry ? (
+        {isLive && (!lastTelemetry || !lastTelemetry.cowScanned) ? (
+          <div style={{ background: "rgba(0,0,0,0.25)", borderRadius: 10, padding: "10px 12px", marginBottom: 6, border: "1px dashed rgba(134,239,172,0.5)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#86EFAC", fontWeight: 700, fontSize: 12 }}>
+              <span style={{ fontSize: 16 }}>📡</span>
+              <span>
+                {lang === "Tamil"
+                  ? "ESP32 இணைக்கப்பட்டது — மாட்டின் RFID அட்டைக்காக காத்திருக்கிறது..."
+                  : lang === "Hindi"
+                  ? "ESP32 कनेक्टेड — गाय के RFID कार्ड की प्रतीक्षा है..."
+                  : "ESP32 Connected — Waiting for Cow RFID Card..."}
+              </span>
+            </div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.8)", marginTop: 4 }}>
+              {lang === "Tamil"
+                ? "மாட்டை பதிவு செய்து நேரடி பால் தரவை பெற RFID அட்டையை ESP32 ஸ்கேனரில் வையுங்கள்."
+                : lang === "Hindi"
+                ? "गाय को स्वतः दर्ज करने और लाइव डेटा हेतु RFID कार्ड को ESP32 स्कैनर पर लगाएं।"
+                : "Serial monitor: 'Waiting for Cow RFID card...' — Tap RFID card on RC522 scanner to register cow & stream telemetry."}
+            </div>
+          </div>
+        ) : isLive && lastTelemetry && lastTelemetry.cowScanned ? (
           <div style={{ background: "rgba(0,0,0,0.22)", borderRadius: 10, padding: "8px 10px", marginBottom: 6 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
               <span style={{ fontSize: 11, fontWeight: 700, color: "#86EFAC" }}>
-                📡 ESP32 Live: {targetCow?.name || lastTelemetry.cowId}
+                📡 ESP32 Live: {targetCow?.name || lastTelemetry.cowName || lastTelemetry.cowId || "Cow 1"}
               </span>
               <span
                 style={{
@@ -129,12 +149,20 @@ export function HomeSituationSummaryCard({
               </span>
             </div>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.85)" }}>
-              pH: <strong>{lastTelemetry.ph != null ? lastTelemetry.ph.toFixed(2) : "6.7"}</strong> · EC: <strong>{lastTelemetry.conductivity?.toFixed(1) ?? "5.0"} mS/cm</strong> · Temp: <strong>{lastTelemetry.temp}°C</strong>
+              RFID: <strong>{lastTelemetry.rfidTag || "0xE3995556"}</strong> · pH: <strong>{lastTelemetry.ph != null ? lastTelemetry.ph.toFixed(2) : "6.7"}</strong> · EC: <strong>{lastTelemetry.conductivity?.toFixed(1) ?? "5.0"} mS/cm</strong> · Temp: <strong>{lastTelemetry.temp}°C</strong>
             </div>
           </div>
         ) : null}
 
-        {highRisk.length === 0 && modRisk.length === 0 ? (
+        {animals.length === 0 ? (
+          <div style={{ color: "#86EFAC", fontWeight: 600 }}>
+            {lang === "Tamil"
+              ? "📡 பண்ணையில் மாடுகள் எதுவும் பதிவு செய்யப்படவில்லை. RFID அட்டையை ஸ்கேன் செய்யவும்."
+              : lang === "Hindi"
+              ? "📡 फार्म में कोई पशु दर्ज नहीं है। RFID कार्ड स्कैन करके पशु जोड़ें।"
+              : "📡 No cows registered in herd yet. Tap RFID card on scanner to add cow."}
+          </div>
+        ) : highRisk.length === 0 && modRisk.length === 0 ? (
           <div style={{ color: "#86EFAC", fontWeight: 600 }}>
             {lang === "Tamil"
               ? `✅ பண்ணையில் உள்ள அனைத்து ${animals.length} மாடுகளும் நலமுடன் உள்ளன.`
@@ -379,39 +407,122 @@ export function HomeScreen({
           </div>
         </Card>
 
-        {/* Priority Animals */}
+        {/* Priority Animals / Live Monitored Cow */}
         <div style={{ marginBottom: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <SectionLabel>{t("priority_animals", lang)}</SectionLabel>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <SectionLabel>{isLive ? "📡 LIVE ESP32 MONITORED HERD" : t("priority_animals", lang)}</SectionLabel>
+              {isLive && (
+                <span style={{ fontSize: 9, background: "#DCFCE7", color: "#166534", fontWeight: 800, padding: "2px 6px", borderRadius: 8, border: "1px solid #86EFAC" }}>
+                  ● LIVE
+                </span>
+              )}
+            </div>
             <button onClick={() => onNavigate("animals")} style={{ fontSize: 11, color: "#2A5C1F", fontWeight: 700, background: "none", border: "none", cursor: "pointer", padding: "6px 0" }}>
               {t("see_all", lang)}
             </button>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {priorityAnimals.map((a) => (
+            {/* If ESP32 is live and card is scanned, show the active monitored cow card */}
+            {isLive && lastTelemetry?.cowScanned ? (
               <button
-                key={a.id}
-                onClick={() => { setSelectedAnimal(a); onNavigate("animal-profile"); }}
-                style={{ display: "flex", alignItems: "center", gap: 12, background: "#FFFFFF", border: "1px solid #E0DAD0", borderRadius: 14, padding: "12px 14px", cursor: "pointer", textAlign: "left", width: "100%" }}
+                onClick={() => {
+                  const target = animals.find((x) => x.id === lastTelemetry.cowId || x.rfidTag === lastTelemetry.rfidTag) || animals[0];
+                  setSelectedAnimal(target);
+                  onNavigate("animal-profile");
+                }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  background: "linear-gradient(135deg, #F0FDF4, #FFFFFF)",
+                  border: "2px solid #22C55E",
+                  borderRadius: 14,
+                  padding: "12px 14px",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  width: "100%",
+                  boxShadow: "0 4px 12px rgba(34,197,94,0.15)",
+                }}
               >
-                <div style={{ width: 40, height: 40, borderRadius: 12, background: RISK_COLOR[a.risk].bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🐄</div>
+                <div style={{ width: 40, height: 40, borderRadius: 12, background: lastTelemetry.riskTier === "HIGH" || lastTelemetry.riskTier === "Elevated" ? "#FEE2E2" : "#DCFCE7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                  🐄
+                </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                    <span style={{ fontWeight: 700, fontSize: 13, color: "#1C2714" }}>{a.name}</span>
-                    <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 10, color: "#9BA88C" }}>{a.id}</span>
-                    <span style={{ background: "#EEF6E4", color: "#2A5C1F", fontSize: 9, fontWeight: 700, padding: "1px 6px", borderRadius: 12, border: "1px solid #C4DDA0" }}>🎂 {a.age}</span>
+                    <span style={{ fontWeight: 800, fontSize: 13, color: "#1C2714" }}>{lastTelemetry.cowName || "Cow 1 (Active ESP32)"}</span>
+                    <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 9, color: "#166534", background: "#DCFCE7", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>
+                      {lastTelemetry.rfidTag || "0xE3995556"}
+                    </span>
+                    <span style={{ background: "#22C55E", color: "#FFFFFF", fontSize: 8, fontWeight: 800, padding: "1px 5px", borderRadius: 6 }}>
+                      LIVE SENSOR
+                    </span>
                   </div>
-                  <div style={{ fontSize: 11, color: "#6B7A5C" }}>
-                    {a.breed} · Lac {a.lactation}
-                    {a.ph != null ? ` · pH ${a.ph}` : ""} · EC {a.conductivity} mS/cm
+                  <div style={{ fontSize: 11, color: "#166534", fontWeight: 600, marginTop: 2 }}>
+                    pH {lastTelemetry.ph != null ? Number(lastTelemetry.ph).toFixed(2) : "—"} · EC {lastTelemetry.conductivity != null ? Number(lastTelemetry.conductivity).toFixed(1) : "—"} mS/cm · 🌡 {lastTelemetry.temp != null ? `${Number(lastTelemetry.temp).toFixed(1)}°C` : "—"}
                   </div>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-                  <RiskBadge level={a.risk} small lang={lang} />
-                  <TrendArrow dir={a.trend} />
+                  <RiskBadge level={lastTelemetry.riskTier ? (lastTelemetry.riskTier.toLowerCase() as RiskLevel) : "low"} small lang={lang} />
+                  <span style={{ fontSize: 9, color: "#16A34A", fontWeight: 700 }}>Live Feed</span>
                 </div>
               </button>
-            ))}
+            ) : isLive && (!lastTelemetry || !lastTelemetry.cowScanned) ? (
+              <div
+                style={{
+                  background: "linear-gradient(135deg, #1C2714, #2A5C1F)",
+                  border: "1.5px dashed #4ADE80",
+                  borderRadius: 14,
+                  padding: "18px 16px",
+                  textAlign: "center",
+                  color: "#FFFFFF",
+                  boxShadow: "0 4px 16px rgba(42,92,31,0.2)",
+                }}
+              >
+                <div style={{ fontSize: 28, marginBottom: 6 }}>📡</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "#86EFAC" }}>
+                  {lang === "Tamil"
+                    ? "ESP32 இணைக்கப்பட்டது — மாட்டின் RFID அட்டைக்காக காத்திருக்கிறது"
+                    : lang === "Hindi"
+                    ? "ESP32 कनेक्टेड — गाय के RFID कार्ड की प्रतीक्षा है"
+                    : "ESP32 Connected — Waiting for Cow RFID Card"}
+                </div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.8)", marginTop: 4, lineHeight: 1.4 }}>
+                  {lang === "Tamil"
+                    ? "சீரியல் மானிட்டர்: 'Waiting for Cow RFID card...'\nRFID அட்டையை ESP32 ஸ்கேனரில் வைத்தால் மாடு தானாக சேர்க்கப்படும்."
+                    : lang === "Hindi"
+                    ? "सीरियल मॉनिटर: 'Waiting for Cow RFID card...'\nगाय को स्वतः जोड़ने के लिए RFID कार्ड स्कैनर पर लगाएं।"
+                    : "Serial monitor: 'Waiting for Cow RFID card...'\nTap your RFID card on the RC522 scanner to auto-register cow & stream live telemetry."}
+                </div>
+              </div>
+            ) : null}
+
+            {/* Other animals list */}
+            {(!isLive ? priorityAnimals : priorityAnimals.filter((a) => a.id !== lastTelemetry?.cowId && a.rfidTag !== lastTelemetry?.rfidTag))
+              .map((a) => (
+                <button
+                  key={a.id}
+                  onClick={() => { setSelectedAnimal(a); onNavigate("animal-profile"); }}
+                  style={{ display: "flex", alignItems: "center", gap: 12, background: "#FFFFFF", border: "1px solid #E0DAD0", borderRadius: 14, padding: "12px 14px", cursor: "pointer", textAlign: "left", width: "100%" }}
+                >
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: RISK_COLOR[a.risk].bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🐄</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                      <span style={{ fontWeight: 700, fontSize: 13, color: "#1C2714" }}>{a.name}</span>
+                      <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 10, color: "#9BA88C" }}>{a.id}</span>
+                      <span style={{ background: "#EEF6E4", color: "#2A5C1F", fontSize: 9, fontWeight: 700, padding: "1px 6px", borderRadius: 12, border: "1px solid #C4DDA0" }}>🎂 {a.age}</span>
+                    </div>
+                    <div style={{ fontSize: 11, color: "#6B7A5C" }}>
+                      {a.breed} · Lac {a.lactation}
+                      {a.ph != null ? ` · pH ${a.ph}` : ""} · EC {a.conductivity} mS/cm
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+                    <RiskBadge level={a.risk} small lang={lang} />
+                    <TrendArrow dir={a.trend} />
+                  </div>
+                </button>
+              ))}
           </div>
         </div>
 

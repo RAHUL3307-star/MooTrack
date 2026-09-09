@@ -10,6 +10,9 @@
 
 export interface ESP32Telemetry {
   // Identity
+  cowScanned?: boolean;   // true if an RFID card has been scanned on ESP32
+  cowName?: string;       // Resolved cow name
+  rfid_status?: string;   // "VERIFIED" | "WAITING_FOR_CARD"
   rfidTag?: string;       // RC522 RFID tag UID (cow identification)
   cowId: string;          // Resolved cow ID from RFID registry
 
