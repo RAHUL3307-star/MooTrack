@@ -179,6 +179,22 @@ export function AnimalProfileScreen({
               ))}
             </div>
             <Card>
+              <SectionLabel>{lang === "Tamil" ? "சோமாடிக் செல் எண்ணிக்கை (SCC)" : lang === "Hindi" ? "सोमैटिक सेल काउंट (SCC)" : "Somatic Cell Count (SCC)"}</SectionLabel>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div>
+                  <div style={{ fontFamily: "'Fraunces', serif", fontSize: 24, fontWeight: 700, color: (a.scc || 185000) > 500000 ? "#B83220" : (a.scc || 185000) > 200000 ? "#C47A10" : "#2A5C1F" }}>
+                    {((a.scc || 185000) / 1000).toFixed(0)}k <span style={{ fontSize: 13, fontWeight: 500, fontFamily: "sans-serif" }}>cells/mL</span>
+                  </div>
+                  <div style={{ fontSize: 11, color: "#6B7A5C", marginTop: 2 }}>
+                    SCS Score: <strong>{(a.scs || 3.2).toFixed(1)}</strong> · <span style={{ color: (a.scc || 185000) > 500000 ? "#B83220" : (a.scc || 185000) > 200000 ? "#C47A10" : "#2A5C1F", fontWeight: 700 }}>
+                      {(a.scc || 185000) > 500000 ? "🚨 Acute Inflammation (>500k)" : (a.scc || 185000) > 200000 ? "⚠️ Subclinical Infection (200k–500k)" : "✅ Normal Healthy (<200k)"}
+                    </span>
+                  </div>
+                </div>
+                <div style={{ fontSize: 28 }}>🔬</div>
+              </div>
+            </Card>
+            <Card>
               <SectionLabel>{t("scc_trend", lang)}</SectionLabel>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div>

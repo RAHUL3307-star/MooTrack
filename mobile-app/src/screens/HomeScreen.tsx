@@ -149,7 +149,7 @@ export function HomeSituationSummaryCard({
               </span>
             </div>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.85)" }}>
-              RFID: <strong>{lastTelemetry.rfidTag || "0xE3995556"}</strong> · pH: <strong>{lastTelemetry.ph != null ? lastTelemetry.ph.toFixed(2) : "6.7"}</strong> · EC: <strong>{lastTelemetry.conductivity?.toFixed(1) ?? "5.0"} mS/cm</strong> · Temp: <strong>{lastTelemetry.temp}°C</strong>
+              RFID: <strong>{lastTelemetry.rfidTag || "0xE3995556"}</strong> · SCC: <strong>{(((lastTelemetry.scc || (liveRisk?.risk === "high" ? 1850000 : liveRisk?.risk === "moderate" ? 420000 : 75000)) / 1000).toFixed(0))}k/mL</strong> · pH: <strong>{lastTelemetry.ph != null ? lastTelemetry.ph.toFixed(2) : "6.7"}</strong> · EC: <strong>{lastTelemetry.conductivity?.toFixed(1) ?? "5.0"} mS/cm</strong> · Temp: <strong>{lastTelemetry.temp}°C</strong>
             </div>
           </div>
         ) : null}
@@ -459,7 +459,7 @@ export function HomeScreen({
                     </span>
                   </div>
                   <div style={{ fontSize: 11, color: "#166534", fontWeight: 600, marginTop: 2 }}>
-                    pH {lastTelemetry.ph != null ? Number(lastTelemetry.ph).toFixed(2) : "—"} · EC {lastTelemetry.conductivity != null ? Number(lastTelemetry.conductivity).toFixed(1) : "—"} mS/cm · 🌡 {lastTelemetry.temp != null ? `${Number(lastTelemetry.temp).toFixed(1)}°C` : "—"}
+                    SCC {(((lastTelemetry.scc || (lastTelemetry.conductivity > 8 ? 1850000 : lastTelemetry.conductivity > 6 ? 420000 : 75000)) / 1000).toFixed(0))}k/mL · pH {lastTelemetry.ph != null ? Number(lastTelemetry.ph).toFixed(2) : "—"} · EC {lastTelemetry.conductivity != null ? Number(lastTelemetry.conductivity).toFixed(1) : "—"} mS/cm · 🌡 {lastTelemetry.temp != null ? `${Number(lastTelemetry.temp).toFixed(1)}°C` : "—"}
                   </div>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
@@ -514,6 +514,7 @@ export function HomeScreen({
                     </div>
                     <div style={{ fontSize: 11, color: "#6B7A5C" }}>
                       {a.breed} · Lac {a.lactation}
+                      {a.scc != null ? ` · SCC ${((a.scc) / 1000).toFixed(0)}k` : ""}
                       {a.ph != null ? ` · pH ${a.ph}` : ""} · EC {a.conductivity} mS/cm
                     </div>
                   </div>

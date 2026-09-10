@@ -114,8 +114,10 @@ export function AnimalsProvider({ children }: { children: React.ReactNode }) {
       const temp = lastTelemetry.temp != null ? Number(lastTelemetry.temp) : 38.6;
       const ph = lastTelemetry.ph != null ? Number(lastTelemetry.ph) : 6.70;
       const conductivity = lastTelemetry.conductivity != null ? Number(lastTelemetry.conductivity) : 5.0;
-      const weight = lastTelemetry.weight != null ? Number(lastTelemetry.weight) : 0;
-      const calculatedRisk = computeMilkRisk(lastTelemetry).risk;
+      const calculatedRiskSummary = computeMilkRisk(lastTelemetry);
+      const calculatedRisk = calculatedRiskSummary.risk;
+      const scc = lastTelemetry.scc != null ? Number(lastTelemetry.scc) : (calculatedRisk === "high" ? 1850000 : calculatedRisk === "moderate" ? 420000 : 85000);
+      const scs = lastTelemetry.scs != null ? Number(lastTelemetry.scs) : (calculatedRisk === "high" ? 7.1 : calculatedRisk === "moderate" ? 5.1 : 2.9);
       const riskTier = lastTelemetry.riskTier?.toLowerCase();
       const risk: RiskLevel =
         riskTier === "high" || riskTier === "elevated"
@@ -137,6 +139,8 @@ export function AnimalsProvider({ children }: { children: React.ReactNode }) {
             temp,
             ph,
             conductivity,
+            scc,
+            scs,
             weight,
             risk,
             trend: risk === "high" ? "up" : "stable",
@@ -159,6 +163,8 @@ export function AnimalsProvider({ children }: { children: React.ReactNode }) {
           temp,
           ph,
           conductivity,
+          scc,
+          scs,
           weight,
           activity: "normal",
           milk: weight > 0 ? weight : 12.5,

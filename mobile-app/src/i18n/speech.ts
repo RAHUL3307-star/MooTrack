@@ -42,66 +42,70 @@ export function generateLiveSituationSummary(
     const phVal = liveTelemetry.ph != null ? liveTelemetry.ph.toFixed(2) : "6.70";
     const ecVal = (liveTelemetry.conductivity ?? 5.0).toFixed(1);
     const tempVal = (liveTelemetry.temp ?? 38.5).toFixed(1);
+    const sccNum = liveTelemetry.scc ?? (targetCow?.scc || (riskResult.risk === "high" ? 1850000 : riskResult.risk === "moderate" ? 420000 : 75000));
+    const sccFormatted = sccNum >= 1000000 ? `${(sccNum / 1000000).toFixed(1)} million` : `${(sccNum / 1000).toFixed(0)} thousand`;
+    const sccRegional = `${(sccNum / 1000).toFixed(0)} हजार`;
+    const sccTamil = `${(sccNum / 1000).toFixed(0)} ஆயிரம்`;
 
     if (riskResult.risk === "high") {
       // Already Affected (Clinical Mastitis)
       switch (lang) {
         case "Tamil":
-          return `${cowName} மாட்டின் நேரடி பால் சென்சார் பகுப்பாய்வு: தீவிர மடிநோய் எச்சரிக்கை! பாலின் pH ${phVal}, மின்கடத்துதிறன் ${ecVal} mS/cm, வெப்பநிலை ${tempVal}°C. நேரடி அளவீடுகளின்படி இம்மாடு ஏற்கனவே மடிநோயால் தீவிரமாக பாதிக்கப்பட்டுள்ளது. உடனடி நடவடிக்கை: ${cowName} மாட்டை உடனடியாக தனிமைப்படுத்தி, மருத்துவர் சர்மாவை தொடர்பு கொண்டு தீவிர சிகிச்சை தொடங்குங்கள்.`;
+          return `${cowName} மாட்டின் நேரடி பால் சென்சார் பகுப்பாய்வு: தீவிர மடிநோய் எச்சரிக்கை! சோமாடிக் செல் எண்ணிக்கை (SCC) ${sccTamil} செல்கள்/மி.லி என ஆபத்தான உச்சத்தில் உள்ளது, பாலின் pH ${phVal}, மின்கடத்துதிறன் ${ecVal} mS/cm, வெப்பநிலை ${tempVal}°C. நேரடி அளவீடுகளின்படி இம்மாடு ஏற்கனவே மடிநோயால் தீவிரமாக பாதிக்கப்பட்டுள்ளது. உடனடி நடவடிக்கை: ${cowName} மாட்டை உடனடியாக தனிமைப்படுத்தி, மருத்துவர் சர்மாவை தொடர்பு கொண்டு தீவிர சிகிச்சை தொடங்குங்கள்.`;
         case "Hindi":
-          return `${cowName} के दूध सेंसर जांच का लाइव विश्लेषण: थनैला का गंभीर खतरा! दूध का pH ${phVal}, चालकता ${ecVal} mS/cm और तापमान ${tempVal}°C है। लाइव आंकड़ों के अनुसार यह गाय पहले से ही थनैला रोग से गंभीर रूप से प्रभावित है। तुरंत कार्रवाई करें: ${cowName} को अन्य पशुओं से अलग बाड़े में रखें और पशु चिकित्सक डॉ. शर्मा को बुलाएं।`;
+          return `${cowName} के दूध सेंसर जांच का लाइव विश्लेषण: थनैला का गंभीर खतरा! सोमैटिक सेल काउंट (SCC) ${sccRegional} सेल्स/मिलीलीटर के गंभीर स्तर पर है, दूध का pH ${phVal}, चालकता ${ecVal} mS/cm और तापमान ${tempVal}°C है। यह बढ़ा हुआ सेल काउंट पुष्टि करता है कि गाय पहले से ही थनैला रोग से गंभीर रूप से प्रभावित है। तुरंत कार्रवाई करें: ${cowName} को अन्य पशुओं से अलग बाड़े में रखें और पशु चिकित्सक डॉ. शर्मा को बुलाएं।`;
         case "Kannada":
-          return `${cowName} ಹಸುವಿನ ನೇರ ಹಾಲು ಸೆನ್ಸರ್ ಪರೀಕ್ಷಾ ವರದಿ: ತೀವ್ರ ಕೆಚ್ಚಲುಬಾವು ಎಚ್ಚರಿಕೆ! ಹಾಲಿನ pH ${phVal}, ವಾಹಕತೆ ${ecVal} mS/cm ಮತ್ತು ತಾಪಮಾನ ${tempVal}°C ಆಗಿದೆ. ಈ ಹಸು ಈಗಾಗಲೇ ಕೆಚ್ಚಲುಬಾವಿನಿಂದ ತೀವ್ರವಾಗಿ ಬಾಧಿತವಾಗಿದೆ. ತಕ್ಷಣ ${cowName} ಹಸುವನ್ನು ಪ್ರತ್ಯೇಕಿಸಿ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
+          return `${cowName} ಹಸುವಿನ ನೇರ ಹಾಲು ಸೆನ್ಸರ್ ಪರೀಕ್ಷಾ ವರದಿ: ತೀವ್ರ ಕೆಚ್ಚಲುಬಾವು ಎಚ್ಚರಿಕೆ! ಸೊಮ್ಯಾಟಿಕ್ ಕೋಶಗಳ ಸಂಖ್ಯೆ (SCC) ${sccRegional} ಕೋಶ/ಮಿಲಿ ಲೀಟರ್ ಆಗಿದೆ, ಹಾಲಿನ pH ${phVal}, ವಾಹಕತೆ ${ecVal} mS/cm ಮತ್ತು ತಾಪಮಾನ ${tempVal}°C ಆಗಿದೆ. ಈ ಹಸು ಈಗಾಗಲೇ ಕೆಚ್ಚಲುಬಾವಿನಿಂದ ತೀವ್ರವಾಗಿ ಬಾಧಿತವಾಗಿದೆ. ತಕ್ಷಣ ${cowName} ಹಸುವನ್ನು ಪ್ರತ್ಯೇಕಿಸಿ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
         case "Telugu":
-          return `${cowName} ఆవు ప్రత్యక్ష పాల సెన్సార్ విశ్లేషణ: తీవ్ర పొదుగువాపు హెచ్చరిక! పాల pH ${phVal}, వాహకత ${ecVal} mS/cm మరియు ఉష్ಣోగ్రత ${tempVal}°C. సెన్సార్ రీడింగ్‌ల ప్రకారం ఈ ఆవు ఇప్పటికే తీవ్ర వ్యాధితో బాధపడుతోంది. వెంటనే ${cowName} ను వేరు చేసి డాక్టర్ శర్మకు సమాచారం ఇవ్వండి.`;
+          return `${cowName} ఆవు ప్రత్యక్ష పాల సెన్సార్ విశ్లేషణ: తీవ్ర పొదుగువాపు హెచ్చరిక! సోమాటిక్ సెల్ కౌంట్ (SCC) ${sccRegional} కణాలు/మిల్లీలీటర్‌గా ఉంది, పాల pH ${phVal}, వాహకత ${ecVal} mS/cm మరియు ఉష్ణోగ్రత ${tempVal}°C. సెన్సార్ రీడింగ్‌ల ప్రకారం ఈ ఆవు ఇప్పటికే తీవ్ర వ్యాధితో బాధపడుతోంది. వెంటనే ${cowName} ను వేరు చేసి డాక్టర్ శర్మకు సమాచారం ఇవ్వండి.`;
         case "Marathi":
-          return `${cowName} चे थेट दूध सेन्सर विश्लेषण: मस्टायटिसचा तीव्र धोका! दुधाचा pH ${phVal}, चालकता ${ecVal} mS/cm आणि तापमान ${tempVal}°C आहे. गाईला आधीच गंभीर स्तनदाह झालेला आहे. तात्काळ ${cowName} ला वेगळे करा व पशुवैद्यकांना बोलवा.`;
+          return `${cowName} चे थेट दूध सेन्सर विश्लेषण: मस्टायटिसचा तीव्र धोका! सोमॅटिक सेल काउंट (SCC) ${sccRegional} सेल्स/मिलीलीटर आहे, दुधाचा pH ${phVal}, चालकता ${ecVal} mS/cm आणि तापमान ${tempVal}°C आहे. गाईला आधीच गंभीर स्तनदाह झालेला आहे. तात्काळ ${cowName} ला वेगळे करा व पशुवैद्यकांना बोलवा.`;
         case "Gujarati":
-          return `${cowName} નું લાઈવ દૂધ સેન્સર વિશ્લેષણ: ગંભીર મસ્ટાઇટિસ ચેતવણી! દૂધનું pH ${phVal}, વાહકતા ${ecVal} mS/cm અને તાપમાન ${tempVal}°C છે. આ ગાય પહેલેથી જ રોગથી ગંભીર રીતે પ્રભાવિત છે. તાત્કાલિક ${cowName} ને અલગ કરો અને ડૉક્ટરને બોલાવો.`;
+          return `${cowName} નું લાઈવ દૂધ સેન્સર વિશ્લેષણ: ગંભીર મસ્ટાઇટિસ ચેતવણી! સોમેટિક સેલ કાઉન્ટ (SCC) ${sccRegional} સેલ/મિલી છે, દૂધનું pH ${phVal}, વાહકતા ${ecVal} mS/cm અને તાપમાન ${tempVal}°C છે. આ ગાય પહેલેથી જ રોગથી ગંભીર રીતે પ્રભાવિત છે. તાત્કાલિક ${cowName} ને અલગ કરો અને ડૉક્ટરને બોલાવો.`;
         case "Punjabi":
-          return `${cowName} ਦਾ ਲਾਈਵ ਦੁੱਧ ਸੈਂਸਰ ਵਿਸ਼ਲੇਸ਼ਣ: ਗੰਭੀਰ ਥਣੇਲਾ ਰੋਗ ਚੇਤਾਵਨੀ! ਦੁੱਧ ਦਾ pH ${phVal}, ਚਾਲਕਤਾ ${ecVal} mS/cm ਅਤੇ ਤਾਪਮਾਨ ${tempVal}°C ਹੈ। ਗਾਂ ਪਹਿਲਾਂ ਹੀ ਗੰਭੀਰ ਰੂਪ ਵਿੱਚ ਪ੍ਰਭਾਵਿਤ ਹੈ। ਤੁਰੰਤ ${cowName} ਨੂੰ ਵੱਖ ਕਰੋ।`;
+          return `${cowName} ਦਾ ਲਾਈਵ ਦੁੱਧ ਸੈਂਸਰ ਵਿਸ਼ਲੇਸ਼ਣ: ਗੰਭੀਰ ਥਣੇਲਾ ਰੋਗ ਚੇਤਾਵਨੀ! ਸੋਮੈਟਿਕ ਸੈੱਲ ਕਾਊਂਟ (SCC) ${sccRegional} ਸੈੱਲ/ਮਿਲੀਲੀਟਰ ਹੈ, ਦੁੱਧ ਦਾ pH ${phVal}, ਚਾਲਕਤਾ ${ecVal} mS/cm ਅਤੇ ਤਾਪਮਾਨ ${tempVal}°C ਹੈ। ਗਾਂ ਪਹਿਲਾਂ ਹੀ ਗੰਭੀਰ ਰੂਪ ਵਿੱਚ ਪ੍ਰਭਾਵਿਤ ਹੈ। ਤੁਰੰਤ ${cowName} ਨੂੰ ਵੱਖ ਕਰੋ।`;
         default:
-          return `Live milk sensor analysis for ${cowName}: High Mastitis Alert! Milk pH is ${phVal}, Electrical Conductivity is ${ecVal} mS/cm, and temperature is ${tempVal}°C. The sensor readings confirm this cow is ALREADY AFFECTED by clinical mastitis. Immediate action: isolate ${cowName} immediately in quarantine and notify veterinarian Dr. Sharma for clinical antibiotic protocol.`;
+          return `Live milk sensor analysis for ${cowName}: High Mastitis Alert! Somatic Cell Count is critically elevated at ${sccFormatted} cells/mL, Milk pH is ${phVal}, Electrical Conductivity is ${ecVal} mS/cm, and temperature is ${tempVal}°C. The high leukocyte somatic cell count confirms this cow is ALREADY AFFECTED by clinical mastitis. Immediate action: isolate ${cowName} immediately in quarantine and notify veterinarian Dr. Sharma for clinical antibiotic protocol.`;
       }
     } else if (riskResult.risk === "moderate") {
       // Chance of Getting Affected (Intermediate Warning Stage: 7 to 14 days)
       switch (lang) {
         case "Tamil":
-          return `${cowName} மாட்டின் நேரடி பால் சென்சார் பகுப்பாய்வு: இடைநிலை எச்சரிக்கை நிலை (70% முதல் 80% ஆபத்து). பாலின் pH ${phVal}, மின்கடத்துதிறன் ${ecVal} mS/cm, வெப்பநிலை ${tempVal}°C. ${cowName} மாட்டிற்கு அடுத்த 7 முதல் 14 நாட்களில் மடிநோய் தாக்கும் அதிக வாய்ப்புள்ளது என்று சென்சார்கள் எச்சரிக்கின்றன. உடனடி நடவடிக்கை: பால் கறந்த உடன் அயோடின் கிருமிநாசினி தடுப்பு பூச்சு இட்டு நோய் வராமல் தடுத்திடுங்கள்.`;
+          return `${cowName} மாட்டின் நேரடி பால் சென்சார் பகுப்பாய்வு: இடைநிலை எச்சரிக்கை நிலை (70% முதல் 80% ஆபத்து). சோமாடிக் செல் எண்ணிக்கை (SCC) ${sccTamil} செல்கள்/மி.லி என உயர்ந்துள்ளது, பாலின் pH ${phVal}, மின்கடத்துதிறன் ${ecVal} mS/cm, வெப்பநிலை ${tempVal}°C. ${cowName} மாட்டிற்கு அடுத்த 7 முதல் 14 நாட்களில் மடிநோய் தாக்கும் அதிக வாய்ப்புள்ளது என்று சென்சார்கள் எச்சரிக்கின்றன. உடனடி நடவடிக்கை: பால் கறந்த உடன் அயோடின் கிருமிநாசினி தடுப்பு பூச்சு இட்டு நோய் வராமல் தடுத்திடுங்கள்.`;
         case "Hindi":
-          return `${cowName} के दूध सेंसर जांच का लाइव विश्लेषण: मध्यवर्ती चेतावनी चरण (70% से 80% जोखिम)। दूध का pH ${phVal}, चालकता ${ecVal} mS/cm और तापमान ${tempVal}°C है। लाइव आंकड़े चेतावनी देते हैं कि ${cowName} में अगले 7 से 14 दिनों में थनैला रोग होने की पूरी आशंका है। तुरंत कार्रवाई करें: दूध निकालने के बाद थनों में तुरंत आयोडीन घोल का लेप लगाएं ताकि बीमारी को पहले ही रोका जा सके।`;
+          return `${cowName} के दूध सेंसर जांच का लाइव विश्लेषण: मध्यवर्ती चेतावनी चरण (70% से 80% जोखिम)। सोमैटिक सेल काउंट (SCC) ${sccRegional} सेल्स/मिलीलीटर तक बढ़ चुका है, दूध का pH ${phVal}, चालकता ${ecVal} mS/cm और तापमान ${tempVal}°C है। लाइव आंकड़े चेतावनी देते हैं कि ${cowName} में अगले 7 से 14 दिनों में थनैला रोग होने की पूरी आशंका है। तुरंत कार्रवाई करें: दूध निकालने के बाद थनों में तुरंत आयोडीन घोल का लेप लगाएं ताकि बीमारी को पहले ही रोका जा सके।`;
         case "Kannada":
-          return `${cowName} ಹಸುವಿನ ನೇರ ಹಾಲು ಸೆನ್ಸರ್ ಪರೀಕ್ಷಾ ವರದಿ: ಮಧ್ಯಂತರ ಎಚ್ಚರಿಕೆ ಹಂತ (70% ರಿಂದ 80% ಅಪಾಯ). ಹಾಲಿನ pH ${phVal}, ವಾಹಕತೆ ${ecVal} mS/cm ಮತ್ತು ತಾಪಮಾನ ${tempVal}°C ಆಗಿದೆ. ಮುಂದಿನ 7 ರಿಂದ 14 ದಿನಗಳಲ್ಲಿ ರೋಗ ಬರುವ ಹೆಚ್ಚಿನ ಸಾಧ್ಯತೆಯಿದೆ. ತಕ್ಷಣ ಅಯೋಡಿನ್ ದ್ರಾವಣದಿಂದ ಮುನ್ನೆಚ್ಚರಿಕೆ ಚಿಕಿತ್ಸೆ ನೀಡಿ ರೋಗ ಬರದಂತೆ ತಡೆಯಿರಿ.`;
+          return `${cowName} ಹಸುವಿನ ನೇರ ಹಾಲು ಸೆನ್ಸರ್ ಪರೀಕ್ಷಾ ವರದಿ: ಮಧ್ಯಂತರ ಎಚ್ಚರಿಕೆ ಹಂತ (70% ರಿಂದ 80% ಅಪಾಯ). ಸೊಮ್ಯಾಟಿಕ್ ಕೋಶಗಳ ಸಂಖ್ಯೆ ${sccRegional} ಆಗಿದೆ, ಹಾಲಿನ pH ${phVal}, ವಾಹಕತೆ ${ecVal} mS/cm ಮತ್ತು ತಾಪಮಾನ ${tempVal}°C ಆಗಿದೆ. ಮುಂದಿನ 7 ರಿಂದ 14 ದಿನಗಳಲ್ಲಿ ರೋಗ ಬರುವ ಹೆಚ್ಚಿನ ಸಾಧ್ಯತೆಯಿದೆ. ತಕ್ಷಣ ಅಯೋಡಿನ್ ದ್ರಾವಣದಿಂದ ಮುನ್ನೆಚ್ಚರಿಕೆ ಚಿಕಿತ್ಸೆ ನೀಡಿ ರೋಗ ಬರದಂತೆ ತಡೆಯಿರಿ.`;
         case "Telugu":
-          return `${cowName} ఆవు ప్రత్యక్ష పాల సెన్సార్ విశ్లేషణ: మధ్యస్థ హెచ్చరిక దశ (70% నుండి 80% ప్రమాదం). పాల pH ${phVal}, వాహకత ${ecVal} mS/cm మరియు ఉష్ಣోగ్రత ${tempVal}°C. రాబోయే 7 నుండి 14 రోజులలో ఈ ఆవుకు వ్యాధి సోకే అవకాశం ఎక్కువగా ఉంది. వెంటనే అయోడిన్ ద్రావణంతో ముందస్తు సంరక్షణ చర్యలు చేపట్టండి.`;
+          return `${cowName} ఆవు ప్రత్యక్ష పాల సెన్సార్ విశ్లేషణ: మధ్యస్థ హెచ్చరిక దశ (70% నుండి 80% ప్రమాదం). సోమాటిక్ సెల్స్ ${sccRegional} కు చేరాయి, పాల pH ${phVal}, వాహకత ${ecVal} mS/cm మరియు ఉష్ణోగ్రత ${tempVal}°C. రాబోయే 7 నుండి 14 రోజులలో ఈ ఆవుకు వ్యాధి సోకే అవకాశం ఎక్కువగా ఉంది. వెంటనే అయోడిన్ ద్రావణంతో ముందస్తు సంరక్షణ చర్యలు చేపట్టండి.`;
         case "Marathi":
-          return `${cowName} चे थेट दूध सेन्सर विश्लेषण: मध्यम इशारा टप्पा (70% ते 80% धोका). दुधाचा pH ${phVal}, चालकता ${ecVal} mS/cm आणि तापमान ${tempVal}°C आहे. पुढील 7 ते 14 दिवसांत स्तनदाह होण्याची दाट शक्यता आहे. तात्काळ आयोडीन मलम लावून प्रतिबंध करा.`;
+          return `${cowName} चे थेट दूध सेन्सर विश्लेषण: मध्यम इशारा टप्पा (70% ते 80% धोका). सोमॅटिक सेल काउंट ${sccRegional} आहे, दुधाचा pH ${phVal}, चालकता ${ecVal} mS/cm आणि तापमान ${tempVal}°C आहे. पुढील 7 ते 14 दिवसांत स्तनदाह होण्याची दाट शक्यता आहे. तात्काळ आयोडीन मलम लावून प्रतिबंध करा.`;
         case "Gujarati":
-          return `${cowName} નું લાઈવ દૂધ સેન્સર વિશ્લેષણ: મધ્યવર્તી ચેતવણી તબક્કો (70% થી 80% જોખમ). દૂધનું pH ${phVal}, વાહકતા ${ecVal} mS/cm અને તાપમાન ${tempVal}°C છે. આગામੀ 7 થી 14 દિવસમાં રોગ થવાની પૂરી શક્યતા છે. તાત્કાલિક આયોડિન સોલ્યુશનથી રક્ષણ આપો.`;
+          return `${cowName} નું લાઈવ દૂધ સેન્સર વિશ્લેષણ: મધ્યવર્તી ચેતવણી તબક્કો (70% થી 80% જોખમ). સોમેટિક સેલ કાઉન્ટ ${sccRegional} છે, દૂધનું pH ${phVal}, વાહકતા ${ecVal} mS/cm અને તાપમાન ${tempVal}°C છે. આગામી 7 થી 14 દિવસમાં રોગ થવાની પૂરી શક્યતા છે. તાત્કાલિક આયોડિન સોલ્યુશનથી રક્ષણ આપો.`;
         case "Punjabi":
-          return `${cowName} ਦਾ ਲਾਈਵ ਦੁੱਧ ਸੈਂਸਰ ਵਿਸ਼ਲੇਸ਼ਣ: ਦਰਮਿਆਨੇ ਖ਼ਤਰੇ ਦੀ ਚੇਤਾਵਨੀ (70% ਤੋਂ 80% ਖ਼ਤਰਾ)। ਦੁੱਧ ਦਾ pH ${phVal}, ਚਾਲਕਤਾ ${ecVal} mS/cm ਅਤੇ ਤਾਪਮਾਨ ${tempVal}°C ਹੈ। ਅਗਲੇ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਬਿਮਾਰੀ ਹੋਣ ਦੀ ਪੂਰੀ ਸੰਭਾਵਨਾ ਹੈ। ਤੁਰੰਤ ਬਚਾਅ ਇਲਾਜ ਸ਼ੁਰੂ ਕਰੋ।`;
+          return `${cowName} ਦਾ ਲਾਈਵ ਦੁੱਧ ਸੈਂਸਰ ਵਿਸ਼ਲੇਸ਼ਣ: ਦਰਮਿਆਨੇ ਖ਼ਤਰੇ ਦੀ ਚੇਤਾਵਨੀ (70% ਤੋਂ 80% ਖ਼ਤਰਾ)। ਸੋਮੈਟਿਕ ਸੈੱਲ ਕਾਊਂਟ ${sccRegional} ਹੈ, ਦੁੱਧ ਦਾ pH ${phVal}, ਚਾਲਕਤਾ ${ecVal} mS/cm ਅਤੇ ਤਾਪਮਾਨ ${tempVal}°C ਹੈ। ਅਗਲੇ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਬਿਮਾਰੀ ਹੋਣ ਦੀ ਪੂਰੀ ਸੰਭਾਵਨਾ ਹੈ। ਤੁਰੰਤ ਬਚਾਅ ਇਲਾਜ ਸ਼ੁਰੂ ਕਰੋ।`;
         default:
-          return `Live milk sensor analysis for ${cowName}: Subclinical Warning (70% to 80% intermediate stage). Milk pH is ${phVal}, Electrical Conductivity is ${ecVal} mS/cm, and temperature is ${tempVal}°C. The sensor readings indicate this cow has a HIGH CHANCE OF GETTING AFFECTED by clinical mastitis in the next 7 to 14 days. Immediate action: apply post-milking iodine teat barrier dip and monitor milk daily to prevent disease onset.`;
+          return `Live milk sensor analysis for ${cowName}: Subclinical Warning (70% to 80% intermediate stage). Somatic Cell Count has risen to ${sccFormatted} cells/mL, Milk pH is ${phVal}, Electrical Conductivity is ${ecVal} mS/cm, and temperature is ${tempVal}°C. The sensor readings indicate this cow has a HIGH CHANCE OF GETTING AFFECTED by clinical mastitis in the next 7 to 14 days. Immediate action: apply post-milking iodine teat barrier dip and monitor milk daily to prevent disease onset.`;
       }
     } else {
       // Normal & Healthy Milk
       switch (lang) {
         case "Tamil":
-          return `${cowName} மாட்டின் நேரடி பால் சென்சார் பகுப்பாய்வு: பால் முற்றிலும் ஆரோக்கியமாகவும் இயல்பாகவும் உள்ளது! பாலின் pH ${phVal}, மின்கடத்துதிறன் ${ecVal} mS/cm, வெப்பநிலை ${tempVal}°C. மடிநோய் அறிகுறிகள் எதுவும் இல்லை. வழக்கமான சுத்தமான பால் கறக்கும் முறைகளைத் தொடருங்கள்.`;
+          return `${cowName} மாட்டின் நேரடி பால் சென்சார் பகுப்பாய்வு: பால் முற்றிலும் ஆரோக்கியமாகவும் இயல்பாகவும் உள்ளது! சோமாடிக் செல் எண்ணிக்கை (SCC) ${sccTamil} செல்கள்/மி.லி என பாதுகாப்பான வரம்பில் உள்ளது. பாலின் pH ${phVal}, மின்கடத்துதிறன் ${ecVal} mS/cm, வெப்பநிலை ${tempVal}°C. மடிநோய் அறிகுறிகள் எதுவும் இல்லை. வழக்கமான சுத்தமான பால் கறக்கும் முறைகளைத் தொடருங்கள்.`;
         case "Hindi":
-          return `${cowName} के दूध सेंसर जांच का लाइव विश्लेषण: दूध पूरी तरह स्वस्थ और सामान्य है! दूध का pH ${phVal}, चालकता ${ecVal} mS/cm और तापमान ${tempVal}°C है। थनैला का कोई लक्षण नहीं है। स्वच्छता और नियमित देखभाल बनाए रखें।`;
+          return `${cowName} के दूध सेंसर जांच का लाइव विश्लेषण: दूध पूरी तरह स्वस्थ और सामान्य है! सोमैटिक सेल काउंट (SCC) ${sccRegional} सेल्स/मिलीलीटर के सुरक्षित दायरे में है, दूध का pH ${phVal}, चालकता ${ecVal} mS/cm और तापमान ${tempVal}°C है। थनैला का कोई लक्षण नहीं है। स्वच्छता और नियमित देखभाल बनाए रखें।`;
         case "Kannada":
-          return `${cowName} ಹಸುವಿನ ನೇರ ಹಾಲು ಸೆನ್ಸರ್ ಪರೀಕ್ಷಾ ವರದಿ: ಹಾಲು ಆರೋಗ್ಯಕರ ಮತ್ತು ಸಹಜವಾಗಿದೆ! pH ${phVal}, ವಾಹಕತೆ ${ecVal} mS/cm ಮತ್ತು ತಾಪಮಾನ ${tempVal}°C ಆಗಿದೆ. ಯಾವುದೇ ರೋಗದ ಲಕ್ಷಣಗಳಿಲ್ಲ.`;
+          return `${cowName} ಹಸುವಿನ ನೇರ ಹಾಲು ಸೆನ್ಸರ್ ಪರೀಕ್ಷಾ ವರದಿ: ಹಾಲು ಆರೋಗ್ಯಕರ ಮತ್ತು ಸಹಜವಾಗಿದೆ! ಸೊಮ್ಯಾಟಿಕ್ ಕೋಶಗಳ ಸಂಖ್ಯೆ ${sccRegional} ಸಹಜವಾಗಿದೆ, pH ${phVal}, ವಾಹಕತೆ ${ecVal} mS/cm ಮತ್ತು ತಾಪಮಾನ ${tempVal}°C ಆಗಿದೆ. ಯಾವುದೇ ರೋಗದ ಲಕ್ಷಣಗಳಿಲ್ಲ.`;
         case "Telugu":
-          return `${cowName} ఆవు ప్రత్యక్ష పాల సెన్సార్ విశ్లేషణ: పాలు సంపూర్ణ ఆరోగ్యంగా ఉన్నాయి! పాల pH ${phVal}, వాహకత ${ecVal} mS/cm, ఉష్ಣోగ్రత ${tempVal}°C. ఎటువంటి వ్యాధి ముప్పు లేదు.`;
+          return `${cowName} ఆవు ప్రత్యక్ష పాల సెన్సార్ విశ్లేషణ: పాలు సంపూర్ణ ఆరోగ్యంగా ఉన్నాయి! సోమాటిక్ సెల్స్ ${sccRegional} సాధారణంగా ఉన్నాయి, పాల pH ${phVal}, వాహకత ${ecVal} mS/cm, ఉష్ణోగ్రత ${tempVal}°C. ఎటువంటి వ్యాధి ముప్పు లేదు.`;
         case "Marathi":
-          return `${cowName} चे थेट दूध सेन्सर विश्लेषण: दूध पूर्णपणे निरोगी आणि सामान्य आहे! दुधाचा pH ${phVal}, चालकता ${ecVal} mS/cm आणि तापमान ${tempVal}°C आहे. कोणताही धोका नाही.`;
+          return `${cowName} चे थेट दूध सेन्सर विश्लेषण: दूध पूर्णपणे निरोगी आणि सामान्य आहे! सोमॅटिक सेल काउंट ${sccRegional} सुरक्षित आहे, दुधाचा pH ${phVal}, चालकता ${ecVal} mS/cm आणि तापमान ${tempVal}°C आहे. कोणताही धोका नाही.`;
         case "Gujarati":
-          return `${cowName} નું લાઈવ દૂધ સેન્સર વિશ્લેષણ: દૂધ સંપૂર્ણપણે સ્વસ્થ અને સામાન્ય છે! pH ${phVal}, વાહકતા ${ecVal} mS/cm અને તાપમાન ${tempVal}°C છે. કોઈ રોગનું જોખમ નથી.`;
+          return `${cowName} નું લાઈવ દૂધ સેન્સર વિશ્લેષણ: દૂધ સંપૂર્ણપણે સ્વસ્થ અને સામાન્ય છે! સોમેટિક સેલ કાઉન્ટ ${sccRegional} સામાન્ય છે, pH ${phVal}, વાહકતા ${ecVal} mS/cm અને તાપમાન ${tempVal}°C છે. કોઈ રોગનું જોખમ નથી.`;
         case "Punjabi":
           return `${cowName} ਦਾ ਲਾਈਵ ਦੁੱਧ ਸੈਂਸਰ ਵਿਸ਼ਲੇਸ਼ਣ: ਦੁੱਧ ਬਿਲਕੁਲ ਤੰਦਰੁਸਤ ਅਤੇ ਆਮ ਹੈ! ਕੋਈ ਖ਼ਤਰਾ ਨਹੀਂ ਹੈ।`;
         default:
-          return `Live milk sensor analysis for ${cowName}: Milk is healthy and normal. Milk pH is ${phVal}, Electrical Conductivity is ${ecVal} mS/cm, and temperature is ${tempVal}°C. No indication of mastitis infection. Continue standard milking hygiene.`;
+          return `Live milk sensor analysis for ${cowName}: Milk is healthy and normal. Somatic Cell Count is low at ${sccFormatted} cells/mL, Milk pH is ${phVal}, Electrical Conductivity is ${ecVal} mS/cm, and temperature is ${tempVal}°C. No indication of mastitis infection. Continue standard milking hygiene.`;
       }
     }
   }
@@ -133,15 +137,15 @@ export function generateLiveSituationSummary(
   switch (lang) {
     case "Tamil":
       if (high.length > 0 || mod.length > 0) {
-        return `வணக்கம் விவசாயி அவர்களே! இது உங்கள் பண்ணையின் நேரடி நிலவரச் சுருக்கம். உங்கள் பண்ணையில் உள்ள மொத்தம் ${total} மாடுகளில், ${high.length > 0 ? `${highNames} ஆகியவை தீவிர மடிநோய் ஆபத்தில் உள்ளன.` : "எந்த மாடும் தீவிர ஆபத்தில் இல்லை."} மிக முக்கியமாக, 70 முதல் 80 சதவீத இடைநிலை ஆபத்து கட்டத்தில் உள்ள ${mod.length > 0 ? modNames : "கண்காணிப்பில் உள்ள"} மாடுகளுக்கு அடுத்த 7 முதல் 14 நாட்களில் மடிநோய் தாக்கும் அதிக வாய்ப்புள்ளது என்று அமைப்பு எச்சரிக்கிறது. இன்றைய மொத்த பால் உற்பத்தி ${totalMilk} லிட்டர். உடனடி நடவடிக்கையாக: இடைநிலை மாடுகளுக்கு உடனே அயோடின் கிருமிநாசினி தடுப்பு சிகிச்சையைத் தொடங்குங்கள், தீவிர பாதிப்புள்ள மாடுகளை உடனே தனிமைப்படுத்துங்கள்.`;
+        return `வணக்கம் விவசாயி அவர்களே! இது உங்கள் பண்ணையின் நேரடி நிலவரச் சுருக்கம். உங்கள் பண்ணையில் உள்ள மொத்தம் ${total} மாடுகளில், ${high.length > 0 ? `${highNames} ஆகியவை தீவிர மடிநோய் மற்றும் உயர் சோமாடிக் செல் ஆபத்தில் உள்ளன.` : "எந்த மாடும் தீவிர ஆபத்தில் இல்லை."} மிக முக்கியமாக, 70 முதல் 80 சதவீத இடைநிலை ஆபத்து கட்டத்தில் உள்ள ${mod.length > 0 ? modNames : "கண்காணிப்பில் உள்ள"} மாடுகளுக்கு அடுத்த 7 முதல் 14 நாட்களில் மடிநோய் தாக்கும் அதிக வாய்ப்புள்ளது என்று அமைப்பு எச்சரிக்கிறது. இன்றைய மொத்த பால் உற்பத்தி ${totalMilk} லிட்டர். உடனடி நடவடிக்கையாக: இடைநிலை மாடுகளுக்கு உடனே அயோடின் கிருமிநாசினி தடுப்பு சிகிச்சையைத் தொடங்குங்கள், தீவிர பாதிப்புள்ள மாடுகளை உடனே தனிமைப்படுத்துங்கள்.`;
       }
-      return `வணக்கம் விவசாயி அவர்களே! நற்செய்தி: உங்கள் பண்ணையில் உள்ள ${total} மாடுகளும் முழுமையாக ஆரோக்கியமாக உள்ளன. மடிநோய் ஆபத்து எதுவும் இல்லை. இன்றைய மொத்த பால் உற்பத்தி ${totalMilk} லிட்டர். சுத்தமான பால் கறக்கும் முறைகளைத் தொடருங்கள்.`;
+      return `வணக்கம் விவசாயி அவர்களே! நற்செய்தி: உங்கள் பண்ணையில் உள்ள ${total} மாடுகளும் முழுமையாக ஆரோக்கியமாக உள்ளன. சோமாடிக் செல் எண்ணிக்கை இயல்பாக உள்ளது. இன்றைய மொத்த பால் உற்பத்தி ${totalMilk} லிட்டர். சுத்தமான பால் கறக்கும் முறைகளைத் தொடருங்கள்.`;
 
     case "Hindi":
       if (high.length > 0 || mod.length > 0) {
-        return `नमस्ते किसान भाई! यह आपकी डेयरी फार्म का लाइव सारांश है। आपके फार्म के ${total} पशुओं में से ${high.length > 0 ? `${highNames} को गंभीर थनैला रोग का खतरा है।` : "कोई भी गाय गंभीर बीमार नहीं है।"} विशेष रूप से ध्यान दें: 70 से 80 प्रतिशत जोखिम वाले मध्यवर्ती चरण के पशुओं, जैसे ${mod.length > 0 ? modNames : "निगरानी वाले पशु"}, में अगले 7 से 14 दिनों में थनैला रोग होने की पूरी आशंका है। आज का कुल दूध उत्पादन ${totalMilk} लीटर है। तुरंत करने योग्य काम: मध्यवर्ती गायों के थनों में तुरंत आयोडीन घोल का लेप लगाकर बचाव करें और गंभीर गायों को अलग बाड़े में रखें।`;
+        return `नमस्ते किसान भाई! यह आपकी डेयरी फार्म का लाइव सारांश है। आपके फार्म के ${total} पशुओं में से ${high.length > 0 ? `${highNames} को गंभीर थनैला रोग और उच्च सेल काउंट का खतरा है।` : "कोई भी गाय गंभीर बीमार नहीं है।"} विशेष रूप से ध्यान दें: 70 से 80 प्रतिशत जोखिम वाले मध्यवर्ती चरण के पशुओं, जैसे ${mod.length > 0 ? modNames : "निगरानी वाले पशु"}, में अगले 7 से 14 दिनों में थनैला रोग होने की पूरी आशंका है। आज का कुल दूध उत्पादन ${totalMilk} लीटर है। तुरंत करने योग्य काम: मध्यवर्ती गायों के थनों में तुरंत आयोडीन घोल का लेप लगाकर बचाव करें और गंभीर गायों को अलग बाड़े में रखें।`;
       }
-      return `नमस्ते किसान भाई! खुशखबरी: आपके फार्म की सभी ${total} गायें पूरी तरह स्वस्थ हैं और थनैला का कोई खतरा नहीं है। आज का कुल दूध उत्पादन ${totalMilk} लीटर है। नियमित स्वच्छता बनाए रखें।`;
+      return `नमस्ते किसान भाई! खुशखबरी: आपके फार्म की सभी ${total} गायें पूरी तरह स्वस्थ हैं, सोमैटिक सेल काउंट सामान्य है और थनैला का कोई खतरा नहीं है। आज का कुल दूध उत्पादन ${totalMilk} लीटर है। नियमित स्वच्छता बनाए रखें।`;
 
     case "Kannada":
       if (high.length > 0 || mod.length > 0) {
@@ -175,9 +179,9 @@ export function generateLiveSituationSummary(
 
     default:
       if (high.length > 0 || mod.length > 0) {
-        return `Hello farmer! Here is your live dairy situation summary. Out of ${total} cows in your herd, ${high.length > 0 ? `${highNames} are at critical mastitis risk.` : "no cows have acute clinical disease."} Crucially, cows in the intermediate stage with 70 to 80 percent risk, including ${mod.length > 0 ? modNames : "cows under active observation"}, have high chances of getting attacked by the disease in 7 to 14 days without preventive intervention. Today's total milk yield is ${totalMilk} litres. Immediate action: start preventive iodine teat dipping for intermediate-stage cows, and isolate critical cows right away.`;
+        return `Hello farmer! Here is your live dairy situation summary. Out of ${total} cows in your herd, ${high.length > 0 ? `${highNames} are at critical mastitis risk with elevated Somatic Cell Counts.` : "no cows have acute clinical disease."} Crucially, cows in the intermediate stage with 70 to 80 percent risk, including ${mod.length > 0 ? modNames : "cows under active observation"}, have high chances of getting attacked by the disease in 7 to 14 days without preventive intervention. Today's total milk yield is ${totalMilk} litres. Immediate action: start preventive iodine teat dipping for intermediate-stage cows, and isolate critical cows right away.`;
       }
-      return `Hello farmer! Great news: all ${total} cows in your herd are completely healthy and free from mastitis. Today's total milk yield is ${totalMilk} litres. Keep up the clean milking practices!`;
+      return `Hello farmer! Great news: all ${total} cows in your herd are completely healthy with normal somatic cell counts and free from mastitis. Today's total milk yield is ${totalMilk} litres. Keep up the clean milking practices!`;
   }
 }
 
@@ -200,7 +204,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Punjabi":
         return "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ ਕਿਸਾਨ ਵੀਰੋ! ਇਹ ਤੁਹਾਡੇ ਡੇਅਰੀ ਫਾਰਮ ਦਾ ਮੁੱਖ ਸਾਰ ਹੈ। ਤੁਹਾਡੇ ਫਾਰਮ ਵਿੱਚ Cow 1 ਅਤੇ Cow 8 ਗੰਭੀਰ ਖ਼ਤਰੇ ਵਿੱਚ ਹਨ। ਸਭ ਤੋਂ ਜ਼ਰੂਰੀ ਗੱਲ ਇਹ ਹੈ ਕਿ 70 ਤੋਂ 80 ਪ੍ਰਤੀਸ਼ਤ ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਾਲੀਆਂ ਗਾਵਾਂ ਜਿਵੇਂ ਕਿ Cow 2 ਅਤੇ Cow 3 ਵਿੱਚ ਅਗਲੇ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਥਣੇਲਾ ਰੋਗ ਲੱਗਣ ਦੀ ਪੂਰੀ ਸੰਭਾਵਨਾ ਹੈ। ਅੱਜ ਦਾ ਕੁੱਲ ਦੁੱਧ 424 ਲੀਟਰ ਹੈ। ਤੁਰੰਤ ਇਹਨਾਂ ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਾਲੀਆਂ ਗਾਵਾਂ ਦਾ ਬਚਾਅ ਇਲਾਜ ਸ਼ੁਰੂ ਕਰੋ ਅਤੇ ਡਾਕਟਰ ਨੂੰ ਸੂਚਿਤ ਕਰੋ।";
       default:
-        return "Hello farmer! Here is your daily dairy situation summary. Cow 1 and Cow 8 are at critical mastitis risk. More importantly, cows in the intermediate stage with 70 to 80 percent risk, such as Cow 2 and Cow 3, have high chances of getting attacked by the disease in 7 to 14 days without preventive care. Today's total milk yield is 424 litres, and IoT sensors are actively streaming. Immediate action: start preventive iodine teat dipping for intermediate-stage cows, and isolate Cow 1 and Cow 8 right away.";
+        return "Hello farmer! Here is your daily dairy situation summary. Cow 1 and Cow 8 are at critical mastitis risk with high somatic cell counts. More importantly, cows in the intermediate stage with 70 to 80 percent risk, such as Cow 2 and Cow 3, have high chances of getting attacked by the disease in 7 to 14 days without preventive care. Today's total milk yield is 424 litres, and IoT sensors are actively streaming. Immediate action: start preventive iodine teat dipping for intermediate-stage cows, and isolate Cow 1 and Cow 8 right away.";
     }
   },
   animals: (lang: string) => {
@@ -220,15 +224,15 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Punjabi":
         return "ਪਸ਼ੂ ਸੂਚੀ ਸਾਰ। Cow 1 ਅਤੇ Cow 8 ਗੰਭੀਰ ਖ਼ਤਰੇ ਵਿੱਚ ਹਨ। Cow 2 ਅਤੇ Cow 3 70 ਤੋਂ 80 ਪ੍ਰਤੀਸ਼ਤ ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਿੱਚ ਹਨ ਅਤੇ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਬਿਮਾਰੀ ਹੋਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ।";
       default:
-        return "Cattle list summary. Cow 1 and Cow 8 have critical mastitis risk above 90%. Cow 2 and Cow 3 are in the intermediate stage with 70 to 80 percent risk, and our AI models predict a high chance of clinical disease appearing in 7 to 14 days without preventive care. Cow 5 and Cow 7 are completely healthy. Tap any animal's card to view its detailed health records.";
+        return "Cattle list summary. Cow 1 and Cow 8 have critical mastitis risk above 90% with elevated somatic cell counts. Cow 2 and Cow 3 are in the intermediate stage with 70 to 80 percent risk, and our AI models predict a high chance of clinical disease appearing in 7 to 14 days without preventive care. Cow 5 and Cow 7 are completely healthy. Tap any animal's card to view its detailed health records.";
     }
   },
   "animal-profile": (lang: string) => {
     switch (lang) {
       case "Tamil":
-        return "மாட்டின் உடல்நிலை சுருக்கம். Cow 1 மாட்டின் மின்கடத்துதிறன் 12.4 mS/cm மற்றும் வெப்பநிலை 39.4 டிகிரி என அதிகமாக உள்ளது. அதேபோல் 70 முதல் 80 சதவீத இடைநிலை ஆபத்தில் உள்ள மாடுகளுக்கு அடுத்த 7 முதல் 14 நாட்களில் நோய் தாக்கும் வாய்ப்புள்ளது. உடனே மடி காம்புகளை அயோடின் திரவத்தால் சுத்தம் செய்யவும், மருத்துவரை வரவழைக்க வாட்ஸ்அப் பட்டனைத் தொடுங்கள்.";
+        return "மாட்டின் உடல்நிலை சுருக்கம். Cow 1 மாட்டின் மின்கடத்துதிறன் 12.4 mS/cm மற்றும் சோமாடிக் செல் எண்ணிக்கை 1.8 மில்லியன் என அதிகமாக உள்ளது. அதேபோல் 70 முதல் 80 சதவீத இடைநிலை ஆபத்தில் உள்ள மாடுகளுக்கு அடுத்த 7 முதல் 14 நாட்களில் நோய் தாக்கும் வாய்ப்புள்ளது. உடனே மடி காம்புகளை அயோடின் திரவத்தால் சுத்தம் செய்யவும், மருத்துவரை வரவழைக்க வாட்ஸ்அப் பட்டனைத் தொடுங்கள்.";
       case "Hindi":
-        return "पशु स्वास्थ्य रिपोर्ट का सारांश। Cow 1 में दूध चालकता 12.4 mS/cm और तापमान 39.4 डिग्री है। वहीं 70 से 80 प्रतिशत मध्यवर्ती जोखिम वाले पशुओं में अगले 7 से 14 दिनों में बीमारी उभरने की पूरी आशंका है। तुरंत थनों की जांच कर दवा का लेप लगाएं और डॉक्टर को बुलाने के लिए व्हाट्सएप बटन दबाएं।";
+        return "पशु स्वास्थ्य रिपोर्ट का सारांश। Cow 1 में दूध चालकता 12.4 mS/cm और सोमैटिक सेल काउंट 18 लाख सेल्स प्रति मिलीलीटर है। वहीं 70 से 80 प्रतिशत मध्यवर्ती जोखिम वाले पशुओं में अगले 7 से 14 दिनों में बीमारी उभरने की पूरी आशंका है। तुरंत थनों की जांच कर दवा का लेप लगाएं और डॉक्टर को बुलाने के लिए व्हाट्सएप बटन दबाएं।";
       case "Kannada":
         return "ಹಸುವಿನ ಆರೋಗ್ಯ ಸಾರಾಂಶ. Cow 1 ಹಸುವಿನ ಹಾಲಿನ ವಾಹಕತೆ 12.4 mS/cm ಮತ್ತು ತಾಪಮಾನ 39.4 ಡಿಗ್ರಿ ಆಗಿದೆ. 70 ರಿಂದ 80 ಪ್ರತಿಶತ ಮಧ್ಯಂತರ ಹಂತದಲ್ಲಿರುವ ಹಸುಗಳಿಗೆ ಮುಂದಿನ 7 ರಿಂದ 14 ದಿನಗಳಲ್ಲಿ ರೋಗ ಬರುವ ಸಾಧ್ಯತೆಯಿದೆ. ತಕ್ಷಣ ಪಶುವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.";
       case "Telugu":
@@ -240,7 +244,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Punjabi":
         return "ਸਿਹਤ ਰਿਪੋਰਟ ਸਾਰ। Cow 1 ਨੂੰ ਗੰਭੀਰ ਖ਼ਤਰਾ ਹੈ। ਇਸ ਤੋਂ ਇਲਾਵਾ 70 ਤੋਂ 80% ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਾਲੀਆਂ ਗਾਵਾਂ ਵਿੱਚ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਬਿਮਾਰੀ ਹੋਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ।";
       default:
-        return "Health summary for Cow 1. Cow 1 has an 88% high risk of clinical mastitis with elevated 39.4°C temperature and 12.4 mS/cm milk electrical conductivity. Crucially, intermediate stage cows at 70% to 80% risk, like Cow 2 and Cow 3, show early warning signs and have a high chance of clinical infection in 7 to 14 days without preventive intervention. Inspect and disinfect udder teats immediately.";
+        return "Health summary for Cow 1. Cow 1 has high risk with an estimated Somatic Cell Count of 1.85 million cells/mL, elevated 39.4°C temperature, and 12.4 mS/cm milk electrical conductivity. Crucially, intermediate stage cows at 70% to 80% risk, like Cow 2 and Cow 3, show early warning signs and have a high chance of clinical infection in 7 to 14 days without preventive intervention. Inspect and disinfect udder teats immediately.";
     }
   },
   "ai-risk": (lang: string) => {
@@ -260,7 +264,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Punjabi":
         return "AI ਜੋਖਮ ਵਿਸ਼ਲੇਸ਼ਣ ਸਾਰ। 70 ਤੋਂ 80 ਪ੍ਰਤੀਸ਼ਤ ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਾਲੀਆਂ ਗਾਵਾਂ ਵਿੱਚ ਅਗਲੇ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਰੋਗ ਲੱਗਣ ਦੀ ਪੂਰੀ ਸੰਭਾਵਨਾ ਹੈ। ਸਮੇਂ ਸਿਰ ਇਲਾਜ ਸ਼ੁਰੂ ਕਰੋ।";
       default:
-        return "AI Risk Assessment summary. Our smart AI has detected critical mastitis flags for Cow 1. Crucially, cows entering the 70% to 80% intermediate stage, such as Cow 2 and Cow 3, face high chances of contracting clinical mastitis in 7 to 14 days. Early intervention during this 7 to 14 day window prevents acute inflammation.";
+        return "AI Risk Assessment summary. Our smart AI has detected critical mastitis and high somatic cell counts for Cow 1. Crucially, cows entering the 70% to 80% intermediate stage, such as Cow 2 and Cow 3, face high chances of contracting clinical mastitis in 7 to 14 days. Early intervention during this 7 to 14 day window prevents acute inflammation.";
     }
   },
   alerts: (lang: string) => {
@@ -280,7 +284,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Punjabi":
         return "ਐਮਰਜੈਂਸੀ ਚੇਤਾਵਨੀ ਸਾਰ। 70 ਤੋਂ 80% ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਾਲੀਆਂ ਗਾਵਾਂ ਵਿੱਚ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਬਿਮਾਰੀ ਹੋਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ। ਡਾਕਟਰ ਨੂੰ ਸੂਚਿਤ ਕਰੋ।";
       default:
-        return "Emergency alerts summary. Cow 1 and Cow 8 are at critical risk and must be isolated immediately. Furthermore, cows in the 70% to 80% intermediate stage like Cow 2 and Cow 3 have high chance of getting clinical mastitis in 7 to 14 days, and need pre-milking iodine teat sanitization right now. Tap the WhatsApp button to alert your veterinarian.";
+        return "Emergency alerts summary. Cow 1 and Cow 8 are at critical risk with elevated somatic cell counts and must be isolated immediately. Furthermore, cows in the 70% to 80% intermediate stage like Cow 2 and Cow 3 have high chance of getting clinical mastitis in 7 to 14 days, and need pre-milking iodine teat sanitization right now. Tap the WhatsApp button to alert your veterinarian.";
     }
   },
   recommendations: (lang: string) => {
@@ -320,15 +324,15 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
   sensors: (lang: string) => {
     switch (lang) {
       case "Tamil":
-        return "சென்சார் கருவிகள் சுருக்கம். உங்கள் 48 சென்சார்களில் 42 கருவிகள் முழுமையாக இயங்குகின்றன. 6 கருவிகளில் பேட்டரி குறைவாக உள்ளது. கொட்டகையில் ஈரப்பதம் 84 சதவீதம் அதிகமாக உள்ளதால், காற்றோட்டத்தை அதிகப்படுத்துங்கள். ஆஃப்லைனில் உள்ள சென்சார் 12-ஐ சரிபார்க்கவும்.";
+        return "சென்சார் கருவிகள் சுருக்கம். உங்கள் 48 சென்சார்களில் 42 கருவிகள் முழுமையாக இயங்குகின்றன. சோமாடிக் செல் எண்ணிக்கை மற்றும் பால் கடத்துதிறன் அளவீடுகள் துல்லியமாக கண்காணிக்கப்படுகின்றன.";
       case "Hindi":
-        return "सेंसर स्थिति सारांश। आपके 48 में से 42 स्मार्ट सेंसर लाइव काम कर रहे हैं। 6 सेंसर में बैटरी कम है। शेड में 84% ज्यादा नमी है, इसलिए खिड़कियां व पंखे चालू करें। ऑफलाइन सेंसर नंबर 12 को चेक करें।";
+        return "सेंसर स्थिति सारांश। आपके 48 में से 42 स्मार्ट सेंसर लाइव काम कर रहे हैं। सोमैटिक सेल काउंट, तापमान और दूध चालकता की सटीक लाइव ट्रैकिंग चालू है।";
       case "Kannada":
         return "ಸೆನ್ಸರ್ ಸಾಧನಗಳ ಸಾರಾಂಶ. 48 ಸೆನ್ಸರ್‌ಗಳಲ್ಲಿ 42 ಸರಿಯಾಗಿ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತಿವೆ. 6 ಸಾಧನಗಳಲ್ಲಿ ಬ್ಯಾಟರಿ ಕಡಿಮೆಯಿದೆ. ಶೆಡ್‌ನಲ್ಲಿ ಗಾಳಿಯಾಡುವಂತೆ ಮಾಡಿ.";
       case "Telugu":
         return "సెన్సార్ల స్థితి సారాంశం. 48 సెన్సార్లలో 42 సమర్థవంతంగా పనిచేస్తున్నాయి. 6 పరికరాలలో బ్యాటరీ తక్కువగా ఉంది. షెడ్‌లో గాలి వెలుతురు పెంచండి.";
       default:
-        return "IoT Sensors summary. 42 out of 48 smart devices are active. 6 devices have low battery, and shed humidity is high at 84%. Increase ventilation in the shed and inspect offline sensor number 12.";
+        return "IoT Sensors summary. 42 out of 48 smart devices are active. Somatic cell count, milk conductivity, and temperature are actively tracked in real-time.";
     }
   },
   gis: (lang: string) => {
@@ -356,7 +360,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Telugu":
         return "చికిత్స నివేదిక సారాంశం. Cow 1 కు సిఎంటి పరీక్ష చేసి ల్యాబ్‌కు పంపారు. Cow 8 ను వేరు చేశారు. Cow 3 ఆవు 52 శాతం మెరుగుదలతో కోలుకుంది.";
       default:
-        return "Interventions summary. Cow 1 has completed CMT testing with lab results pending. Cow 8 is safely isolated. Great news: Cow 3 has achieved full recovery with improved milk conductivity and normalized temperature.";
+        return "Interventions summary. Cow 1 has completed CMT testing with lab results pending. Cow 8 is safely isolated. Great news: Cow 3 has achieved full recovery with normalized somatic cell count and conductivity.";
     }
   },
   profile: (lang: string) => {
@@ -386,9 +390,9 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
   "ml-lab": (lang: string) => {
     switch (lang) {
       case "Tamil":
-        return "செயற்கை நுண்ணறிவு கணிப்பு மற்றும் சிகிச்சை ஆய்வகம். Cow 1 மாட்டிற்கு மடிநோய் ஆபத்து 96 சதவீதம் என கணிக்கப்பட்டுள்ளது. பாலின் மின்கடத்துதிறன் 12.4 mS/cm மற்றும் pH 6.1 என ஆபத்தான அளவில் பதிவாகியுள்ளது. மிக முக்கியமாக, 70 முதல் 80 சதவீத இடைநிலை கட்டத்தில் உள்ள Cow 2 மற்றும் Cow 3 மாடுகளுக்கு அடுத்த 7 முதல் 14 நாட்களில் மடிநோய் தாக்கும் வாய்ப்புள்ளது என்று ஆய்வகம் எச்சரிக்கிறது. நீங்கள் செய்ய வேண்டியது: இடைநிலை மாடுகளுக்கு அயோடின் தடுப்பு பூச்சு போடுங்கள், Cow 1 மாட்டை தனிமைப்படுத்தி டாக்டர் சர்மாவை உடனே அழையுங்கள்.";
+        return "செயற்கை நுண்ணறிவு கணிப்பு மற்றும் சிகிச்சை ஆய்வகம். Cow 1 மாட்டிற்கு மடிநோய் ஆபத்து 96 சதவீதம் என கணிக்கப்பட்டுள்ளது. சோமாடிக் செல் எண்ணிக்கை 1.85 மில்லியன், பாலின் மின்கடத்துதிறன் 12.4 mS/cm மற்றும் pH 6.1 என ஆபத்தான அளவில் பதிவாகியுள்ளது. நீங்கள் செய்ய வேண்டியது: இடைநிலை மாடுகளுக்கு அயோடின் தடுப்பு பூச்சு போடுங்கள், Cow 1 மாட்டை தனிமைப்படுத்தி டாக்டர் சர்மாவை உடனே அழையுங்கள்.";
       case "Hindi":
-        return "एआई भविष्यवाणी और उपचार लैब। Cow 1 में थनैला का जोखिम 96% है। दूध की चालकता 12.4 mS/cm और pH 6.1 दर्ज हुई है, जो गंभीर संक्रमण दर्शाती है। सबसे खास बात: 70 से 80 प्रतिशत के मध्यवर्ती चरण वाली गायों, जैसे Cow 2 और Cow 3 में, अगले 7 से 14 दिनों में थनैला रोग होने की पूरी आशंका है। तुरंत मध्यवर्ती गायों के थनों में आयोडीन घोल लगाएं, Cow 1 को अलग बाड़े में रखें और व्हाट्सएप से डॉक्टर शर्मा को तुरंत बुलाएं।";
+        return "एआई भविष्यवाणी और उपचार लैब। Cow 1 में थनैला का जोखिम 96% है। सोमैटिक सेल काउंट 18.5 लाख सेल्स/मि.ली, दूध की चालकता 12.4 mS/cm और pH 6.1 दर्ज हुई है। तुरंत मध्यवर्ती गायों के थनों में आयोडीन घोल लगाएं, Cow 1 को अलग बाड़े में रखें और व्हाट्सएप से डॉक्टर शर्मा को तुरंत बुलाएं।";
       case "Kannada":
         return "AI ಕೆಚ್ಚಲುಬಾವು ಮುನ್ಸೂಚನೆ ಮತ್ತು ಚಿಕಿತ್ಸೆ ಲ್ಯಾಬ್. Cow 1 ಹಸುವಿಗೆ 96% ಗಂಭೀರ ಅಪಾಯವಿದೆ. ಹಾಲಿನ ವಾಹಕತೆ 12.4 mS/cm ಮತ್ತು pH 6.1 ಆಗಿದೆ. ಮುಖ್ಯವಾಗಿ 70 ರಿಂದ 80 ಪ್ರತಿಶತ ಮಧ್ಯಂತರ ಹಂತದಲ್ಲಿರುವ ಹಸುಗಳಿಗೆ ಮುಂದಿನ 7 ರಿಂದ 14 ದಿನಗಳಲ್ಲಿ ರೋಗ ಬರುವ ಸಾಧ್ಯತೆಯಿದೆ. ತಕ್ಷಣ ಹಸುವನ್ನು ಪ್ರತ್ಯೇಕಿಸಿ, ಅಯೋಡಿನ್ ದ್ರಾವಣದಿಂದ ತೊಳೆದು ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.";
       case "Telugu":
@@ -400,7 +404,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Punjabi":
         return "AI ਭਵਿੱਖਬਾਣੀ ਅਤੇ ਇਲਾਜ ਲੈਬ। 70 ਤੋਂ 80 ਪ੍ਰਤੀਸ਼ਤ ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਾਲੀਆਂ ਗਾਵਾਂ ਵਿੱਚ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਬਿਮਾਰੀ ਹੋਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ। ਤੁਰੰਤ ਬਚਾਅ ਇਲਾਜ ਸ਼ੁਰੂ ਕਰੋ।";
       default:
-        return "AI Predictive Modeling and Treatment Lab. High mastitis risk of 96% is forecasted for Cow 1 with elevated milk conductivity of 12.4 mS/cm, abnormal pH of 6.1, and 40.4°C temperature. Crucially, intermediate stage cows at 70% to 80% risk, including Cow 2 and Cow 3, have high chances of getting attacked by the disease in 7 to 14 days without intervention. Immediately apply iodine teat barrier, isolate critical cows, and alert your veterinarian Dr. Sharma.";
+        return "AI Predictive Modeling and Treatment Lab. High mastitis risk of 96% is forecasted for Cow 1 with Somatic Cell Count of 1.85 million cells/mL, elevated milk conductivity of 12.4 mS/cm, abnormal pH of 6.1, and 40.4°C temperature. Immediately apply iodine teat barrier, isolate critical cows, and alert your veterinarian Dr. Sharma.";
     }
   },
   "visual-ai": (lang: string) => {

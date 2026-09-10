@@ -178,8 +178,9 @@ float milkPH = NAN;
 String phStatus = "UNAVAILABLE";
 
 float animalWeight = NAN;
-
 float milkTemperature = NAN;
+long somaticCellCount = 75000;
+float somaticCellScore = 2.9;
 float activityScore = NAN;
 float ruminationMinutes = NAN;
 float feedingMinutes = NAN;
@@ -437,6 +438,40 @@ float readWeight()
 }
 
 // ============================================================
+// SOMATIC CELL COUNT (SCC) & SCORE (SCS) ESTIMATION
+// ============================================================
+
+long computeSCC(float ec, float pH, float milkTemp)
+{
+  if (isnan(ec) || ec <= 0) return 75000;
+
+  float scs = 3.0;
+  if (ec > 5.0) {
+    scs += 1.8 * (ec - 5.0);
+  }
+  if (!isnan(pH) && pH > 6.65) {
+    scs += 2.2 * (pH - 6.65);
+  }
+  if (!isnan(milkTemp) && milkTemp > 38.5) {
+    scs += 1.2 * (milkTemp - 38.5);
+  }
+
+  if (scs < 1.5) scs = 1.5;
+  if (scs > 9.5) scs = 9.5;
+
+  long scc = (long)(100000.0 * pow(2.0, scs - 3.0));
+  if (scc < 25000) scc = 25000;
+  if (scc > 5000000) scc = 5000000;
+  return scc;
+}
+
+float computeSCS(long scc)
+{
+  if (scc <= 12500) return 1.5;
+  return 3.0 + (log((float)scc / 100000.0) / log(2.0));
+}
+
+// ============================================================
 // RISK SCORING
 // ============================================================
 
@@ -449,12 +484,25 @@ String predictMastitisRisk(
   float rumination,
   float feeding,
   float milkYield,
+  long scc,
   int &score
 )
 {
   score = 0;
 
   int availableFeatures = 0;
+
+  // Somatic Cell Count (SCC)
+  if (scc > 500000)
+  {
+    availableFeatures++;
+    score += 2;
+  }
+  else if (scc > 200000)
+  {
+    availableFeatures++;
+    score += 1;
+  }
 
   // Conductivity
   if (!isnan(conductivity))
@@ -555,10 +603,10 @@ String predictMastitisRisk(
   if (availableFeatures == 0)
     return "LOW";
 
-  if (score >= 4)
+  if (score >= 4 || scc > 500000)
     return "HIGH";
 
-  if (score >= 2)
+  if (score >= 2 || scc > 200000)
     return "MODERATE";
 
   return "LOW";
@@ -742,6 +790,16 @@ String buildJSON()
           phStatus +
           "\"";
 
+  // Somatic Cell Count
+  json += ",\"somatic_cell_count\":" +
+          String(somaticCellCount);
+
+  json += ",\"scc\":" +
+          String(somaticCellCount);
+
+  json += ",\"somatic_cell_score\":" +
+          jsonNumber(somaticCellScore, 2);
+
   // Other features
   json += ",\"activity_score\":" +
           jsonNumber(activityScore, 2);
@@ -854,6 +912,13 @@ bool readSensors()
   animalWeight =
     readWeight();
 
+  // Somatic Cell Count & Score calculation
+  somaticCellCount =
+    computeSCC(milkConductivity, milkPH, milkTemperature);
+
+  somaticCellScore =
+    computeSCS(somaticCellCount);
+
   // Risk prediction
   mastitisRisk =
     predictMastitisRisk(
@@ -865,6 +930,7 @@ bool readSensors()
       ruminationMinutes,
       feedingMinutes,
       milkYieldLiters,
+      somaticCellCount,
       riskScore
     );
 

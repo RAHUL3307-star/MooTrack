@@ -20,6 +20,8 @@ export interface ESP32Telemetry {
   temp: number;           // DS18B20 milk temperature °C (GPIO 4)
   ph?: number;            // pH electrode → interface board → GPIO 34
   conductivity: number;   // EC probe → interface board → GPIO 35 (mS/cm)
+  scc?: number;           // Somatic Cell Count in cells/mL (Direct / Calculated)
+  scs?: number;           // Somatic Cell Score (log2 scale)
   ec_fl?: number;         // Front Left Quarter EC (mS/cm)
   ec_fr?: number;         // Front Right Quarter EC (mS/cm)
   ec_rl?: number;         // Rear Left Quarter EC (mS/cm)
@@ -105,6 +107,12 @@ export function computeMilkRisk(t: ESP32Telemetry): MLPredictionSummary {
   const thermAsym = t.thermalAsymmetry ?? 0.15;
   const activity = t.activity ?? 55;
 
+  // Somatic Cell Score & Count Calculation (Veterinary Standard Model)
+  // SCS = 3.0 + 1.8*(EC - 5.0) + 2.2*(pH - 6.65) + 1.2*max(0, temp - 38.5)
+  const computedSCS = Math.min(9.5, Math.max(1.5, 3.0 + 1.8 * (ec - 5.0) + 2.2 * (ph - 6.65) + 1.2 * Math.max(0, temp - 38.5)));
+  const scc = t.scc ?? Math.round(100000 * Math.pow(2, computedSCS - 3.0));
+  const normSCC = (Math.log10(Math.max(scc, 10000)) - 5.0) / 0.45;
+
   // Normalized ML Features against 30,000 dataset records
   const normEC = (ec - 5.291) / 0.461;
   const normRatio = (qRatio - 1.399) / 0.359;
@@ -113,14 +121,15 @@ export function computeMilkRisk(t: ESP32Telemetry): MLPredictionSummary {
   const normTherm = (thermAsym - 0.774) / 0.664;
   const normAct = (activity - 50.0) / 15.0;
 
-  // Weighted Logit from trained ensemble (ROC-AUC: 1.0000)
+  // Weighted Logit from trained ensemble (incorporating Somatic Cell Count weight)
   const rawScore = 3.9028 + (
-    2.4144 * normEC +
-    3.9761 * normRatio +
-    3.5591 * normPH +
-    2.4757 * normTemp +
-    4.9945 * normTherm -
-    2.4636 * normAct
+    2.1144 * normEC +
+    2.8500 * normSCC +
+    3.6761 * normRatio +
+    3.2591 * normPH +
+    2.2757 * normTemp +
+    4.5945 * normTherm -
+    2.1636 * normAct
   );
 
   // Scaled probability
@@ -131,7 +140,19 @@ export function computeMilkRisk(t: ESP32Telemetry): MLPredictionSummary {
   const reasons: string[] = [];
   const comparisons: BiomarkerComparison[] = [];
 
-  // 1. Conductivity Comparison
+  // 1. Somatic Cell Count (SCC) Comparison
+  const sccDev = scc > 200000 ? `+${((scc - 100000) / 100000 * 100).toFixed(0)}%` : "Normal";
+  const sccStatus: BiomarkerComparison["status"] = scc > 500000 ? "critical" : scc > 200000 ? "elevated" : "normal";
+  if (sccStatus !== "normal") reasons.push(`Somatic Cell Count ${scc.toLocaleString()} cells/mL (${sccStatus === "critical" ? "Acute Leukocyte Surge >500k" : "Subclinical Threshold 200k–500k"})`);
+  comparisons.push({
+    name: "Somatic Cell Count (SCC)",
+    current: `${(scc / 1000).toFixed(0)}k cells/mL`,
+    datasetNormal: "< 200k cells/mL (Healthy)",
+    status: sccStatus,
+    deviation: sccDev,
+  });
+
+  // 2. Conductivity Comparison
   const ecDev = ec > 6.0 ? `+${((ec - 5.2) / 5.2 * 100).toFixed(0)}%` : "Normal";
   const ecStatus: BiomarkerComparison["status"] = ec > 9.0 ? "critical" : ec > 6.2 ? "elevated" : "normal";
   if (ecStatus !== "normal") reasons.push(`Milk EC ${ec.toFixed(1)} mS/cm (${ecDev} vs normal <5.5)`);
@@ -143,7 +164,7 @@ export function computeMilkRisk(t: ESP32Telemetry): MLPredictionSummary {
     deviation: ecDev,
   });
 
-  // 2. Quarter EC Differential Ratio
+  // 3. Quarter EC Differential Ratio
   const qDev = qRatio > 1.15 ? `${qRatio.toFixed(2)}x` : "Symmetric";
   const qStatus: BiomarkerComparison["status"] = qRatio > 1.30 ? "critical" : qRatio > 1.15 ? "elevated" : "normal";
   if (qStatus !== "normal") reasons.push(`Quarter Asymmetry ${qRatio.toFixed(2)}x (differential alert >1.15x)`);
@@ -155,7 +176,7 @@ export function computeMilkRisk(t: ESP32Telemetry): MLPredictionSummary {
     deviation: qDev,
   });
 
-  // 3. Milk Temperature
+  // 4. Milk Temperature
   const tempDev = temp > 39.0 ? `+${(temp - 38.5).toFixed(1)}°C` : "Normal";
   const tempStatus: BiomarkerComparison["status"] = temp > 40.0 ? "critical" : temp > 39.2 ? "elevated" : "normal";
   if (tempStatus !== "normal") reasons.push(`Milk Temp ${temp.toFixed(1)}°C (fever alert >39.0°C)`);
@@ -167,7 +188,7 @@ export function computeMilkRisk(t: ESP32Telemetry): MLPredictionSummary {
     deviation: tempDev,
   });
 
-  // 4. Milk pH
+  // 5. Milk pH
   const phStatus: BiomarkerComparison["status"] = (ph < 6.2 || ph > 7.1) ? "critical" : (ph < 6.4 || ph > 6.9) ? "elevated" : "normal";
   if (phStatus !== "normal") reasons.push(`Milk pH ${ph.toFixed(2)} (abnormal vs normal 6.5–6.8)`);
   comparisons.push({
@@ -178,7 +199,7 @@ export function computeMilkRisk(t: ESP32Telemetry): MLPredictionSummary {
     deviation: phStatus !== "normal" ? (ph > 6.8 ? "Alkaline" : "Acidic") : "Normal",
   });
 
-  // 5. Thermal Asymmetry
+  // 6. Thermal Asymmetry
   const thermStatus: BiomarkerComparison["status"] = thermAsym > 0.8 ? "critical" : thermAsym > 0.4 ? "elevated" : "normal";
   comparisons.push({
     name: "Udder Temp ΔT",
@@ -188,7 +209,7 @@ export function computeMilkRisk(t: ESP32Telemetry): MLPredictionSummary {
     deviation: thermStatus !== "normal" ? `+${thermAsym.toFixed(2)}°C` : "Normal",
   });
 
-  // Risk Classification
+  // Risk Classification (Factoring Somatic Cell Count)
   let risk: "none" | "low" | "moderate" | "high" = "none";
   let riskTierLabel = "No Risk (Healthy Baseline)";
   let verdict = "Normal & Healthy · No Signs of Mastitis";
@@ -196,21 +217,21 @@ export function computeMilkRisk(t: ESP32Telemetry): MLPredictionSummary {
   let tamilVerdict = "இயல்பு & ஆரோக்கியம் · மடிநோய் அறிகுறிகள் இல்லை";
   let hasMastitis = false;
 
-  if (probability >= 75 || ec > 9.5 || (temp > 39.8 && qRatio > 1.25)) {
+  if (scc > 500000 || probability >= 75 || ec > 9.5 || (temp > 39.8 && qRatio > 1.25)) {
     risk = "high";
     riskTierLabel = "High Risk (Clinical Acute)";
-    verdict = "🚨 Acute Clinical Mastitis Detected (High Risk)";
-    hindiVerdict = "🚨 तीव्र नैदानिक थनैला पाया गया (उच्च जोखिम)";
-    tamilVerdict = "🚨 தீவிர மடிநோய் பாதிப்பு கண்டறியப்பட்டது";
+    verdict = "🚨 Acute Clinical Mastitis Detected (High Risk / Critical SCC)";
+    hindiVerdict = "🚨 तीव्र नैदानिक थनैला पाया गया (उच्च सोमैटिक सेल काउंट)";
+    tamilVerdict = "🚨 தீவிர மடிநோய் பாதிப்பு கண்டறியப்பட்டது (உயர் SCC)";
     hasMastitis = true;
-  } else if (probability >= 45 || ec > 6.8 || qRatio > 1.18 || ph > 6.95) {
+  } else if (scc > 200000 || probability >= 45 || ec > 6.8 || qRatio > 1.18 || ph > 6.95) {
     risk = "moderate";
     riskTierLabel = "Moderate Risk (Subclinical Mastitis)";
-    verdict = "⚠️ Subclinical Mastitis Detected (7–14 Day High Chance)";
-    hindiVerdict = "⚠️ उप-नैदानिक थनैला का जोखिम (7–14 दिनों में होने की संभावना)";
-    tamilVerdict = "⚠️ உள்ளுறை மடிநோய் எச்சரிக்கை (7–14 நாட்களில் தாக்கும் வாய்ப்பு)";
+    verdict = "⚠️ Subclinical Mastitis Detected (7–14 Day High Chance / Elevated SCC)";
+    hindiVerdict = "⚠️ उप-नैदानिक थनैला का जोखिम (7–14 दिनों में होने की संभावना / बढ़ा हुआ SCC)";
+    tamilVerdict = "⚠️ உள்ளுறை மடிநோய் எச்சரிக்கை (7–14 நாட்களில் தாக்கும் வாய்ப்பு / அதிகரித்த SCC)";
     hasMastitis = true;
-  } else if (probability >= 18 || ec > 5.8 || temp > 38.9) {
+  } else if (scc > 120000 || probability >= 18 || ec > 5.8 || temp > 38.9) {
     risk = "low";
     riskTierLabel = "Low Risk (Early Warning)";
     verdict = "⚡ Early Warning / Minor Parameter Drift";

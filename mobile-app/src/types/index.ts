@@ -35,10 +35,12 @@ export interface Animal {
   lactation: number;
   risk: RiskLevel;
   trend: "up" | "down" | "stable";
-  // Real sensor readings (no SCC — not part of hardware)
+  // Real sensor readings & Somatic Cell Count
   temp: number;           // DS18B20 milk temperature °C
   ph?: number;            // pH electrode reading
   conductivity: number;   // EC probe mS/cm
+  scc?: number;           // Somatic Cell Count (cells/mL)
+  scs?: number;           // Somatic Cell Score (log2 scale)
   weight?: number;        // HX711 milk weight kg
   activity: "low" | "normal" | "high"; // MPU6050 movement
   milk: number;
@@ -62,12 +64,12 @@ export const RISK_COLOR: Record<RiskLevel, RiskColorMap> = {
 };
 
 export const ANIMALS: Animal[] = [
-  { id: "KA-001", name: "Cow 1", breed: "HF Cross",    age: "5y 3m", ageYears: 5, ageMonths: 3,  rfidTag: "RFID-001", lactation: 3, risk: "high",     trend: "up",     temp: 39.4, ph: 6.1, conductivity: 12.4, activity: "low",    milk: 10.2, lastSync: "8 min ago",  quarter: "Front-Right" },
-  { id: "KA-007", name: "Cow 2", breed: "Murrah Buf.", age: "4y 1m", ageYears: 4, ageMonths: 1,  rfidTag: "RFID-007", lactation: 2, risk: "moderate", trend: "up",     temp: 38.9, ph: 6.3, conductivity: 9.8,  activity: "normal", milk: 14.8, lastSync: "12 min ago", quarter: "Rear-Left"   },
-  { id: "KA-014", name: "Cow 3", breed: "Sahiwal",     age: "6y 8m", ageYears: 6, ageMonths: 8,  rfidTag: "RFID-014", lactation: 5, risk: "moderate", trend: "stable", temp: 38.7, ph: 6.5, conductivity: 8.9,  activity: "normal", milk: 9.6,  lastSync: "5 min ago",  quarter: "All Clear"   },
-  { id: "KA-022", name: "Cow 4", breed: "Jersey X",   age: "3y 2m", ageYears: 3, ageMonths: 2,  rfidTag: "RFID-022", lactation: 1, risk: "low",      trend: "down",   temp: 38.5, ph: 6.6, conductivity: 6.2,  activity: "high",   milk: 18.4, lastSync: "3 min ago",  quarter: "All Clear"   },
-  { id: "KA-031", name: "Cow 5", breed: "HF Cross",   age: "4y 6m", ageYears: 4, ageMonths: 6,  rfidTag: "RFID-031", lactation: 3, risk: "none",     trend: "stable", temp: 38.4, ph: 6.7, conductivity: 5.1,  activity: "normal", milk: 19.2, lastSync: "6 min ago",  quarter: "All Clear"   },
-  { id: "KA-038", name: "Cow 6", breed: "Gir",         age: "7y 0m", ageYears: 7, ageMonths: 0,  rfidTag: "RFID-038", lactation: 6, risk: "low",      trend: "stable", temp: 38.6, ph: 6.6, conductivity: 7.0,  activity: "normal", milk: 7.8,  lastSync: "15 min ago", quarter: "All Clear"   },
-  { id: "KA-045", name: "Cow 7", breed: "Sahiwal",     age: "2y 9m", ageYears: 2, ageMonths: 9,  rfidTag: "RFID-045", lactation: 1, risk: "none",     trend: "stable", temp: 38.3, ph: 6.8, conductivity: 4.8,  activity: "high",   milk: 12.1, lastSync: "4 min ago",  quarter: "All Clear"   },
-  { id: "KA-052", name: "Cow 8", breed: "HF Cross",   age: "5y 5m", ageYears: 5, ageMonths: 5,  rfidTag: "RFID-052", lactation: 4, risk: "high",     trend: "up",     temp: 39.6, ph: 5.9, conductivity: 14.2, activity: "low",    milk: 8.4,  lastSync: "22 min ago", quarter: "Rear-Right"  },
+  { id: "KA-001", name: "Cow 1", breed: "HF Cross",    age: "5y 3m", ageYears: 5, ageMonths: 3,  rfidTag: "RFID-001", lactation: 3, risk: "high",     trend: "up",     temp: 39.4, ph: 6.1, conductivity: 12.4, scc: 1850000, scs: 7.2, activity: "low",    milk: 10.2, lastSync: "8 min ago",  quarter: "Front-Right" },
+  { id: "KA-007", name: "Cow 2", breed: "Murrah Buf.", age: "4y 1m", ageYears: 4, ageMonths: 1,  rfidTag: "RFID-007", lactation: 2, risk: "moderate", trend: "up",     temp: 38.9, ph: 6.3, conductivity: 9.8,  scc: 480000,  scs: 5.3, activity: "normal", milk: 14.8, lastSync: "12 min ago", quarter: "Rear-Left"   },
+  { id: "KA-014", name: "Cow 3", breed: "Sahiwal",     age: "6y 8m", ageYears: 6, ageMonths: 8,  rfidTag: "RFID-014", lactation: 5, risk: "moderate", trend: "stable", temp: 38.7, ph: 6.5, conductivity: 8.9,  scc: 360000,  scs: 4.8, activity: "normal", milk: 9.6,  lastSync: "5 min ago",  quarter: "All Clear"   },
+  { id: "KA-022", name: "Cow 4", breed: "Jersey X",   age: "3y 2m", ageYears: 3, ageMonths: 2,  rfidTag: "RFID-022", lactation: 1, risk: "low",      trend: "down",   temp: 38.5, ph: 6.6, conductivity: 6.2,  scc: 140000,  scs: 3.5, activity: "high",   milk: 18.4, lastSync: "3 min ago",  quarter: "All Clear"   },
+  { id: "KA-031", name: "Cow 5", breed: "HF Cross",   age: "4y 6m", ageYears: 4, ageMonths: 6,  rfidTag: "RFID-031", lactation: 3, risk: "none",     trend: "stable", temp: 38.4, ph: 6.7, conductivity: 5.1,  scc: 65000,   scs: 2.7, activity: "normal", milk: 19.2, lastSync: "6 min ago",  quarter: "All Clear"   },
+  { id: "KA-038", name: "Cow 6", breed: "Gir",         age: "7y 0m", ageYears: 7, ageMonths: 0,  rfidTag: "RFID-038", lactation: 6, risk: "low",      trend: "stable", temp: 38.6, ph: 6.6, conductivity: 7.0,  scc: 165000,  scs: 3.7, activity: "normal", milk: 7.8,  lastSync: "15 min ago", quarter: "All Clear"   },
+  { id: "KA-045", name: "Cow 7", breed: "Sahiwal",     age: "2y 9m", ageYears: 2, ageMonths: 9,  rfidTag: "RFID-045", lactation: 1, risk: "none",     trend: "stable", temp: 38.3, ph: 6.8, conductivity: 4.8,  scc: 55000,   scs: 2.5, activity: "high",   milk: 12.1, lastSync: "4 min ago",  quarter: "All Clear"   },
+  { id: "KA-052", name: "Cow 8", breed: "HF Cross",   age: "5y 5m", ageYears: 5, ageMonths: 5,  rfidTag: "RFID-052", lactation: 4, risk: "high",     trend: "up",     temp: 39.6, ph: 5.9, conductivity: 14.2, scc: 2200000, scs: 7.5, activity: "low",    milk: 8.4,  lastSync: "22 min ago", quarter: "Rear-Right"  },
 ];

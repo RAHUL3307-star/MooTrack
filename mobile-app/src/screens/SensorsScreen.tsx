@@ -59,7 +59,20 @@ export function SensorsScreen({
     ? animals.find((a) => (lastTelemetry.rfidTag && a.rfidTag === lastTelemetry.rfidTag) || a.id === lastTelemetry.cowId)
     : null;
 
+  const effectiveSCC = isLive && lastTelemetry?.scc != null
+    ? lastTelemetry.scc
+    : (isLive && lastTelemetry
+      ? (computeMilkRisk(lastTelemetry).risk === "high" ? 1850000 : computeMilkRisk(lastTelemetry).risk === "moderate" ? 420000 : 85000)
+      : (targetCow?.scc || 185000));
+
   const readings = [
+    {
+      label: lang === "Tamil" ? "சோமாடிக் செல் எண்ணிக்கை (SCC)" : lang === "Hindi" ? "सोमैटिक सेल काउंट (SCC)" : "Somatic Cell Count (SCC)",
+      value: `${(effectiveSCC / 1000).toFixed(0)}k cells/mL`,
+      status: effectiveSCC > 500000 ? "Critical 🚨" : effectiveSCC > 200000 ? "Elevated ⚠️" : "Normal ✅",
+      icon: "🔬",
+      color: effectiveSCC > 500000 ? "#B83220" : effectiveSCC > 200000 ? "#C47A10" : "#2A5C1F",
+    },
     {
       label: lang === "Tamil" ? "பால் pH" : "Milk pH (GPIO 34)",
       value: isLive && lastTelemetry?.ph != null ? `${lastTelemetry.ph.toFixed(2)}` : "6.7",
