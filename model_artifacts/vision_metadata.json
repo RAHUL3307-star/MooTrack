@@ -1,0 +1,15 @@
+{
+  "architecture": "MobileNetV3-Small (Transfer Learning)",
+  "num_classes": 4,
+  "classes": [
+    "Score 1: No Risk (Healthy Teat Orifice)",
+    "Score 2: Low Risk (Smooth Hyperkeratosis Ring)",
+    "Score 3: Moderate Risk (Rough Ring - 7-14d Early Warning)",
+    "Score 4: High Risk (Severe Ulcerative/Cracked Orifice)"
+  ],
+  "test_accuracy": 0.2053,
+  "f1_macro": 0.1759,
+  "train_samples": 1149,
+  "test_samples": 380,
+  "device": "mps"
+}

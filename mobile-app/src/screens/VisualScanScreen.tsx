@@ -6,6 +6,8 @@ import { useAnimals } from "../context/AnimalsContext";
 import { useESP32 } from "../context/ESP32Context";
 import { computeMilkRisk } from "../types/esp32";
 import { validateImageWithMobileNet } from "../services/imageValidationService";
+import { predictFromImage } from "../services/mlApiService";
+import type { ImagePredictionResult } from "../services/mlApiService";
 
 // ─── Dedicated Trained ML Model for Image/Photo Analysis ──────────────────────
 // Trained on 30,000 multi-modal visual biomarker records with 99.92% test accuracy & 1.0000 ROC-AUC
@@ -767,6 +769,8 @@ export function VisualScanScreen({
   const [scanResult, setScanResult] = useState<VisualScanResult | null>(null);
   const [validationError, setValidationError] = useState<SubjectValidation | null>(null);
   const [savedSuccess, setSavedSuccess] = useState<boolean>(false);
+  // FastAPI server image prediction result (null when server offline)
+  const [fastApiImageResult, setFastApiImageResult] = useState<ImagePredictionResult | null>(null);
 
   // Trigger analysis for preset
   const runPresetAnalysis = (presetId?: string) => {
@@ -823,6 +827,7 @@ export function VisualScanScreen({
     if (uploadedImage) {
       setValidationError(null);
       setScanResult(null);
+      setFastApiImageResult(null);
       setIsScanning(true);
       setScanStep(
         lang === "Hindi"
@@ -832,7 +837,20 @@ export function VisualScanScreen({
           : "🔍 Analyzing Udder Image with Clinical Computer Vision..."
       );
 
-      const { validation, result } = await analyzeUdderImageWithDataset(uploadedImage, lang);
+      // Try fetching the image blob from the data URL for FastAPI upload
+      let fileBlob: Blob | null = null;
+      try {
+        const res = await fetch(uploadedImage);
+        fileBlob = await res.blob();
+      } catch { /* ignore */ }
+
+      const [{ validation, result }, serverResult] = await Promise.all([
+        analyzeUdderImageWithDataset(uploadedImage, lang),
+        fileBlob ? predictFromImage(fileBlob, "rerun.jpg").catch(() => null) : Promise.resolve(null),
+      ]);
+
+      if (serverResult) setFastApiImageResult(serverResult);
+
       setTimeout(() => {
         setIsScanning(false);
         if (!validation.isValid) {
@@ -840,6 +858,13 @@ export function VisualScanScreen({
           setScanResult(null);
         } else if (result) {
           setValidationError(null);
+          if (serverResult?.isValidBovineTeat) {
+            result.visualRisk = Math.round(
+              Math.max(result.visualRisk, serverResult.mastatisProbabilityPct)
+            );
+            if (serverResult.visualTier === 3 && result.riskLevel !== "high") result.riskLevel = "high";
+            else if (serverResult.visualTier === 2 && result.riskLevel === "none") result.riskLevel = "moderate";
+          }
           setScanResult(result);
         }
       }, 1000);
@@ -857,6 +882,7 @@ export function VisualScanScreen({
         const url = ev.target?.result as string;
         setUploadedImage(url);
         setScanResult(null);
+        setFastApiImageResult(null);
         setValidationError(null);
         setIsScanning(true);
         setScanStep(
@@ -867,8 +893,14 @@ export function VisualScanScreen({
             : "🔍 AI Subject Validation: Verifying bovine udder & rejecting non-cow images..."
         );
 
-        const { validation, result } = await analyzeUdderImageWithDataset(url, lang);
-        
+        // Run canvas analysis + FastAPI server call in parallel
+        const [{ validation, result }, serverResult] = await Promise.all([
+          analyzeUdderImageWithDataset(url, lang),
+          predictFromImage(file, file.name).catch(() => null),
+        ]);
+
+        if (serverResult) setFastApiImageResult(serverResult);
+
         setTimeout(() => {
           setIsScanning(false);
           if (!validation.isValid) {
@@ -876,6 +908,14 @@ export function VisualScanScreen({
             setScanResult(null);
           } else if (result) {
             setValidationError(null);
+            // If the FastAPI server returned a result, upgrade the risk tier
+            if (serverResult?.isValidBovineTeat) {
+              result.visualRisk = Math.round(
+                Math.max(result.visualRisk, serverResult.mastatisProbabilityPct)
+              );
+              if (serverResult.visualTier === 3 && result.riskLevel !== "high") result.riskLevel = "high";
+              else if (serverResult.visualTier === 2 && result.riskLevel === "none") result.riskLevel = "moderate";
+            }
             setScanResult(result);
           }
         }, 1200);

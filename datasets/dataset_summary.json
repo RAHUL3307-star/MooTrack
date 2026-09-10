@@ -1,0 +1,19 @@
+{
+  "cohort_definition": "Unified Dairy Cows (Zero breed classifications, zero regional/state segregation)",
+  "total_records": 40000,
+  "n_herds": 500,
+  "species": "Cow",
+  "risk_distribution": {
+    "No Risk": 18400,
+    "Low Risk": 11200,
+    "Moderate Risk": 7200,
+    "High Risk": 3200
+  },
+  "metrics_summary": {
+    "avg_scc": 303018.16516775,
+    "avg_rumination": 439.08954500000004,
+    "avg_ec_diff_pct": 13.89877,
+    "avg_thi": 80.0900775,
+    "avg_milk_yield_l": 15.25715975
+  }
+}

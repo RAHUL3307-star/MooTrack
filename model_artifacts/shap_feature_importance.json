@@ -1,0 +1,275 @@
+{
+  "overall_test_accuracy": 1.0,
+  "test_classification_report": {
+    "No Risk": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 1839.0
+    },
+    "Low Risk": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 1122.0
+    },
+    "Moderate Risk": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 715.0
+    },
+    "High Risk": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 324.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 4000.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 4000.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      1839,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      1122,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      715,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      324
+    ]
+  ],
+  "brier_calibration_scores": {
+    "No Risk": 0.0,
+    "Low Risk": 0.0,
+    "Moderate Risk": 0.0,
+    "High Risk": 0.0
+  },
+  "roc_curves": {
+    "No Risk": {
+      "auc": 1.0,
+      "fpr": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "tpr": [
+        0.0,
+        0.9995,
+        1.0,
+        1.0
+      ]
+    },
+    "Low Risk": {
+      "auc": 1.0,
+      "fpr": [
+        0.0,
+        0.0,
+        0.0003,
+        1.0
+      ],
+      "tpr": [
+        0.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "Moderate Risk": {
+      "auc": 1.0,
+      "fpr": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "tpr": [
+        0.0,
+        1.0,
+        1.0
+      ]
+    },
+    "High Risk": {
+      "auc": 1.0,
+      "fpr": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "tpr": [
+        0.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  "top_features": [
+    {
+      "feature": "interleukin_signaling_cascade_score",
+      "importance_gain_pct": 8.089,
+      "splits": 100
+    },
+    {
+      "feature": "localized_swelling_volume_cm3",
+      "importance_gain_pct": 5.736,
+      "splits": 100
+    },
+    {
+      "feature": "yield_drop_pct",
+      "importance_gain_pct": 5.18,
+      "splits": 100
+    },
+    {
+      "feature": "enzymatic_damage_score",
+      "importance_gain_pct": 4.989,
+      "splits": 100
+    },
+    {
+      "feature": "frr_deviation_detected_days_prior",
+      "importance_gain_pct": 4.807,
+      "splits": 100
+    },
+    {
+      "feature": "milk_granulocyte_signature_score",
+      "importance_gain_pct": 4.555,
+      "splits": 100
+    },
+    {
+      "feature": "macrophage_activation_ratio",
+      "importance_gain_pct": 4.086,
+      "splits": 100
+    },
+    {
+      "feature": "laser_density_somatic_ratio",
+      "importance_gain_pct": 3.012,
+      "splits": 100
+    },
+    {
+      "feature": "ldh_activity_u_l",
+      "importance_gain_pct": 2.903,
+      "splits": 100
+    },
+    {
+      "feature": "ec_std_quarters",
+      "importance_gain_pct": 2.802,
+      "splits": 100
+    },
+    {
+      "feature": "prepartum_metabolic_dysfunction_score",
+      "importance_gain_pct": 2.773,
+      "splits": 100
+    },
+    {
+      "feature": "mycoplasma_bovis_cfu_ml",
+      "importance_gain_pct": 2.715,
+      "splits": 100
+    },
+    {
+      "feature": "optical_absorbance_650nm",
+      "importance_gain_pct": 2.712,
+      "splits": 100
+    },
+    {
+      "feature": "anorexia_symptom_score",
+      "importance_gain_pct": 2.557,
+      "splits": 100
+    },
+    {
+      "feature": "nagase_activity_nmol_min_ml",
+      "importance_gain_pct": 2.545,
+      "splits": 100
+    },
+    {
+      "feature": "tbeso_bp_subclinical_risk_index",
+      "importance_gain_pct": 2.43,
+      "splits": 100
+    },
+    {
+      "feature": "ionic_barrier_index",
+      "importance_gain_pct": 2.405,
+      "splits": 100
+    },
+    {
+      "feature": "ec_asymmetry_ratio",
+      "importance_gain_pct": 2.321,
+      "splits": 100
+    },
+    {
+      "feature": "max_quarter_ec_diff_pct",
+      "importance_gain_pct": 2.313,
+      "splits": 100
+    },
+    {
+      "feature": "thermal_ec_synergy_index",
+      "importance_gain_pct": 2.028,
+      "splits": 100
+    }
+  ],
+  "modality_importance_breakdown": {
+    "In-Line Milk Sensors, Enzymes & Electrolytes (EC, pH, SCC, Na/K, LDH)": 37.68,
+    "Precision Wearable Telemetry (Rumination, Core Temp, Flex)": 2.35,
+    "Housing, Bedding Hygiene & Milking Protocols": 0.0,
+    "Environmental Microclimate (THI Heat Stress)": 0.0,
+    "Lactation, Parity & Historical Immunity": 59.95
+  },
+  "prescriptive_decision_rules": [
+    {
+      "condition": "max_quarter_ec_diff_pct > 15% AND somatic_cell_count > 200,000 cells/mL",
+      "clinical_interpretation": "Localized subclinical intramammary infection with increased vascular permeability and sodium/chloride leakage into the milk cistern.",
+      "lead_time_window": "7-14 Days Before Clinical Symptoms",
+      "recommended_interventions": [
+        "Perform quarter-level California Mastitis Test (CMT) verification during evening milking.",
+        "Apply topical herbal mastitis formulation (Mastilep / polyherbal gel with Turmeric & Aloe vera) twice daily.",
+        "Enforce mandatory post-milking teat dipping (0.5% povidone-iodine / lactic acid barrier).",
+        "Adjust milking order: milk this cow last to prevent transmission via milker hands or cluster liners.",
+        "Avoid indiscriminate broad-spectrum antibiotics to preserve antimicrobial efficacy (AMR stewardship)."
+      ]
+    },
+    {
+      "condition": "rumination_drop_ratio_7d > 12% AND core_body_temp_c > 38.8\u00b0C",
+      "clinical_interpretation": "Systemic inflammatory response and early pyrexia reducing rumen motility prior to noticeable udder inflammation.",
+      "lead_time_window": "5-10 Days Before Clinical Signs",
+      "recommended_interventions": [
+        "Administer supportive oral electrolytes and rumen buffer (sodium bicarbonate + yeast culture).",
+        "Isolate animal in well-ventilated dry shaded shed with fresh clean bedding.",
+        "Verify rectal temperature morning and evening."
+      ]
+    },
+    {
+      "condition": "thi_index > 78 AND bedding_moisture_pct > 40%",
+      "clinical_interpretation": "Environmental heat load suppressing immune competence combined with wet bedding facilitating coliform multiplication.",
+      "lead_time_window": "Herd-Level Preventive Action",
+      "recommended_interventions": [
+        "Activate shed misters/fans 45 minutes prior to milking letdown.",
+        "Replace wet bedding with dry sand or agricultural lime.",
+        "Increase water trough cleaning frequency to twice daily."
+      ]
+    }
+  ]
+}

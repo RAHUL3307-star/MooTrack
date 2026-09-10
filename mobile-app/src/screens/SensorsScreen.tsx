@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { StatusBar, BackHeader, Card, SectionLabel, ReadAloudFAB, RiskBadge } from "../components/ui";
 import { useESP32 } from "../context/ESP32Context";
 import { useAnimals } from "../context/AnimalsContext";
 import { computeMilkRisk } from "../types/esp32";
+import type { MLPredictionSummary } from "../types/esp32";
 import type { Screen } from "../types/index";
 import { t } from "../i18n/index";
+import { predictFromTelemetry, getMLServerStatus } from "../services/mlApiService";
+import type { MLServerStatus } from "../services/mlApiService";
 
 export function SensorsScreen({
   onBack,
@@ -20,8 +23,38 @@ export function SensorsScreen({
   const [showSketch, setShowSketch] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Run trained ML model on live ESP32 telemetry (30,000 dataset baseline)
-  const mlSummary = isLive && lastTelemetry ? computeMilkRisk(lastTelemetry) : null;
+  // ── Enhanced ML prediction (FastAPI → on-device fallback) ────────────────
+  const [mlSummary, setMlSummary] = useState<MLPredictionSummary | null>(null);
+  const [mlSource, setMlSource] = useState<"fastapi" | "ondevice">("ondevice");
+  const [leadTimeDays, setLeadTimeDays] = useState<number | null>(null);
+  const [clinicalAdvisory, setClinicalAdvisory] = useState<string[]>([]);
+  const [serverStatus, setServerStatus] = useState<MLServerStatus | null>(null);
+  const lastTelemetryRef = useRef<string>("");
+
+  // Check server status once on mount
+  useEffect(() => {
+    getMLServerStatus().then(setServerStatus);
+  }, []);
+
+  // Run prediction whenever live telemetry changes
+  useEffect(() => {
+    if (!isLive || !lastTelemetry) {
+      setMlSummary(null);
+      return;
+    }
+    // Debounce: only re-run if telemetry actually changed
+    const key = `${lastTelemetry.conductivity}-${lastTelemetry.temp}-${lastTelemetry.ph}`;
+    if (key === lastTelemetryRef.current) return;
+    lastTelemetryRef.current = key;
+
+    predictFromTelemetry(lastTelemetry).then(({ summary, source, leadTimeDays: ld, clinicalAdvisory: ca }) => {
+      setMlSummary(summary);
+      setMlSource(source);
+      setLeadTimeDays(ld);
+      setClinicalAdvisory(ca);
+    });
+  }, [isLive, lastTelemetry]);
+
   const matchedCow = isLive && lastTelemetry
     ? animals.find((a) => (lastTelemetry.rfidTag && a.rfidTag === lastTelemetry.rfidTag) || a.id === lastTelemetry.cowId)
     : null;
@@ -391,7 +424,7 @@ void loop() {
               {/* Probability bar */}
               <div style={{ marginBottom: 10 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#CBD5E1", marginBottom: 3 }}>
-                  <span>Trained Dataset ML Probability:</span>
+                  <span>{mlSource === "fastapi" ? "Indian Farms Ensemble Probability:" : "Trained Dataset ML Probability:"}</span>
                   <strong style={{ color: "#FFFFFF", fontFamily: "'JetBrains Mono'" }}>{mlSummary.probability}%</strong>
                 </div>
                 <div style={{ height: 6, background: "rgba(255,255,255,0.15)", borderRadius: 4, overflow: "hidden" }}>
@@ -407,10 +440,42 @@ void loop() {
                 </div>
               </div>
 
+              {/* Model source + lead-time forecast row */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, gap: 6 }}>
+                <span
+                  style={{
+                    fontSize: 9,
+                    padding: "2px 7px",
+                    borderRadius: 20,
+                    fontWeight: 700,
+                    background: mlSource === "fastapi" ? "rgba(34,197,94,0.2)" : "rgba(99,102,241,0.2)",
+                    color: mlSource === "fastapi" ? "#86EFAC" : "#A5B4FC",
+                    border: `1px solid ${mlSource === "fastapi" ? "rgba(34,197,94,0.35)" : "rgba(99,102,241,0.35)"}`,
+                  }}
+                >
+                  {mlSource === "fastapi" ? "🟢 Indian Farms Model (FastAPI)" : "🔵 On-Device JS Model"}
+                </span>
+                {leadTimeDays !== null && (
+                  <span
+                    style={{
+                      fontSize: 9.5,
+                      fontWeight: 800,
+                      background: "rgba(245,158,11,0.2)",
+                      color: "#FDE68A",
+                      border: "1px solid rgba(245,158,11,0.4)",
+                      borderRadius: 20,
+                      padding: "2px 8px",
+                    }}
+                  >
+                    ⏱️ Onset in ~{leadTimeDays}d
+                  </span>
+                )}
+              </div>
+
               {/* Real-Time Sensor vs ML Dataset Norms Comparison Matrix */}
               <div style={{ background: "rgba(0,0,0,0.3)", borderRadius: 8, padding: 8, marginBottom: 10 }}>
                 <div style={{ fontSize: 9.5, fontWeight: 700, color: "#94A3B8", textTransform: "uppercase", marginBottom: 6 }}>
-                  📊 Real-Time vs 30k Veterinary Dataset Baseline:
+                  📊 Real-Time vs {mlSource === "fastapi" ? "Indian Farm Dataset" : "30k Veterinary Dataset"} Baseline:
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   {mlSummary.comparisons.map((c) => (

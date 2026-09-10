@@ -1,0 +1,119 @@
+{
+  "timestamp": "2026-09-08 19:31:25",
+  "validation_benchmarks": {
+    "HistGradientBoosting": {
+      "model_name": "HistGradientBoosting",
+      "accuracy": 1.0,
+      "precision_macro": 1.0,
+      "recall_macro": 1.0,
+      "f1_macro": 1.0,
+      "roc_auc_ovr": 1.0,
+      "subclinical_recall_7_14d": 1.0,
+      "high_risk_recall": 1.0,
+      "confusion_matrix": [
+        [
+          1833,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1116,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          730,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          321
+        ]
+      ],
+      "train_time_sec": 40.63
+    },
+    "RandomForest": {
+      "model_name": "Random Forest",
+      "accuracy": 1.0,
+      "precision_macro": 1.0,
+      "recall_macro": 1.0,
+      "f1_macro": 1.0,
+      "roc_auc_ovr": 1.0,
+      "subclinical_recall_7_14d": 1.0,
+      "high_risk_recall": 1.0,
+      "confusion_matrix": [
+        [
+          1833,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1116,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          730,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          321
+        ]
+      ],
+      "train_time_sec": 2.76
+    }
+  },
+  "final_test_evaluation": {
+    "model_name": "Calibrated Voting Ensemble",
+    "accuracy": 1.0,
+    "precision_macro": 1.0,
+    "recall_macro": 1.0,
+    "f1_macro": 1.0,
+    "roc_auc_ovr": 1.0,
+    "subclinical_recall_7_14d": 1.0,
+    "high_risk_recall": 1.0,
+    "confusion_matrix": [
+      [
+        1839,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1122,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        715,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        324
+      ]
+    ]
+  },
+  "lead_time_forecaster": {
+    "mae_days": 1.442,
+    "samples_evaluated": 1039
+  }
+}
