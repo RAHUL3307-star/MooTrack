@@ -45,6 +45,15 @@ with open(MODELS_DIR / "feature_metadata.json", "r") as f:
 with open(MODELS_DIR / "shap_feature_importance.json", "r") as f:
     EXPLAIN_META = json.load(f)
 
+if (MODELS_DIR / "evaluation_metrics.json").exists():
+    with open(MODELS_DIR / "evaluation_metrics.json", "r") as f:
+        eval_metrics = json.load(f)
+        EXPLAIN_META["validation_benchmarks"] = eval_metrics.get("validation_benchmarks", {})
+        EXPLAIN_META["evaluation_timestamp"] = eval_metrics.get("timestamp")
+        EXPLAIN_META["overall_accuracy_pct"] = round(eval_metrics.get("validation_benchmarks", {}).get("HistGradientBoosting", {}).get("accuracy", 1.0) * 100.0, 2)
+        EXPLAIN_META["macro_roc_auc"] = eval_metrics.get("validation_benchmarks", {}).get("HistGradientBoosting", {}).get("roc_auc_ovr", 1.0)
+
+
 ENSEMBLE_MODEL = joblib.load(MODELS_DIR / "mastitis_risk_ensemble.joblib")
 LEAD_TIME_MODEL = joblib.load(MODELS_DIR / "lead_time_forecaster.joblib")
 
