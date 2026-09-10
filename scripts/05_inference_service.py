@@ -124,8 +124,12 @@ class CowTelemetryInput(BaseModel):
     ec_sensor_ms_cm: float = Field(default=6.85, ge=3.5, le=12.0)
     milk_ph_sensor: float = Field(default=6.88, ge=6.2, le=7.8)
     udder_temp_sensor_c: float = Field(default=39.2, ge=36.0, le=42.5)
-    rumination_minutes_day: float = Field(default=385.0, ge=100.0, le=650.0)
-    ambient_thi_index: float = Field(default=79.5, ge=50.0, le=100.0)
+    rumination_minutes_day: Optional[float] = Field(default=None, description="Rumination minutes per day")
+    rumination_min_day: Optional[float] = Field(default=None, description="Alias for rumination minutes per day")
+    ambient_thi_index: Optional[float] = Field(default=None, description="Temperature-Humidity Index")
+    ambient_temp_c: Optional[float] = Field(default=None, description="Ambient temperature in C")
+    humidity_pct: Optional[float] = Field(default=None, description="Ambient humidity percentage")
+    activity_steps_day: Optional[float] = Field(default=None, description="Daily activity steps")
 
 def validate_bovine_teat_domain(pil_img: Image.Image) -> tuple[bool, str]:
     """
@@ -278,9 +282,14 @@ def compute_engineered_features(input_data: CowTelemetryInput) -> pd.DataFrame:
         scc = 75000
     scs = float(np.log2(max(scc, 1000) / 100.0) + 3.0)
     
-    thi = d["ambient_thi_index"]
+    thi = d.get("ambient_thi_index")
+    if thi is None:
+        amb_t = d.get("ambient_temp_c", 30.0) or 30.0
+        amb_h = d.get("humidity_pct", 65.0) or 65.0
+        thi = (0.8 * amb_t) + ((amb_h / 100.0) * (amb_t - 14.4)) + 46.4
+    
     thermal_delta = max(0.0, d["udder_temp_sensor_c"] - 38.6)
-    rumination = d["rumination_minutes_day"]
+    rumination = d.get("rumination_minutes_day") or d.get("rumination_min_day") or 385.0
     rum_per_l = rumination / max(act_yield, 1.0)
     
     record = {
@@ -534,6 +543,15 @@ def predict_mastitis_risk(telemetry: CowTelemetryInput):
             
         interventions = formulate_prescriptive_interventions(predicted_class_idx, lead_time_forecast)
         
+        # Compute continuous SCC from sensors (same formula as ESP32 / JS client)
+        ec_v = telemetry.ec_sensor_ms_cm
+        ph_v = telemetry.milk_ph_sensor
+        tmp_v = telemetry.udder_temp_sensor_c
+        _scs = 3.0 + max(0.0, 1.8 * (ec_v - 5.0)) + max(0.0, 2.2 * (ph_v - 6.65)) + max(0.0, 1.2 * (tmp_v - 38.5))
+        _scs = min(9.5, max(1.5, _scs))
+        computed_scc = int(max(25000, min(5_000_000, round(100_000 * (2.0 ** (_scs - 3.0))))))
+        computed_scs = round(_scs, 2)
+
         return {
             "animal_id": telemetry.animal_id,
             "patient_type": "Dairy Cow",
@@ -542,8 +560,8 @@ def predict_mastitis_risk(telemetry: CowTelemetryInput):
             "mastitis_probability_pct": mastitis_prob_pct,
             "lead_time_days_forecast": lead_time_forecast,
             "early_warning_active": (predicted_class_idx == 2),
-            "somatic_cell_count_estimate": 1850000 if predicted_class_idx == 3 else (412000 if predicted_class_idx == 2 else (165000 if predicted_class_idx == 1 else 75000)),
-            "somatic_cell_score_estimate": 7.15 if predicted_class_idx == 3 else (5.04 if predicted_class_idx == 2 else (3.72 if predicted_class_idx == 1 else 2.95)),
+            "somatic_cell_count_estimate": computed_scc,
+            "somatic_cell_score_estimate": computed_scs,
             "class_probabilities": {
                 FEATURE_META["classes"][i]: round(float(probas[i]), 4) for i in range(len(FEATURE_META["classes"]))
             },

@@ -95,19 +95,30 @@ function stepSimulation() {
   esp32State.lastPing = Date.now();
   esp32State.packetCount += 1;
 
+  const avgConductivity = +( (ec_fl + ec_fr + ec_rl + ec_rr) / 4 ).toFixed(2);
+  let simScs = 3.0;
+  if (avgConductivity > 5.0) simScs += 1.8 * (avgConductivity - 5.0);
+  if (cow.basePh > 6.65) simScs += 2.2 * (cow.basePh - 6.65);
+  if (cow.baseTemp > 38.5) simScs += 1.2 * (cow.baseTemp - 38.5);
+  simScs = Math.max(1.5, Math.min(9.5, simScs));
+  const simScc = Math.round(Math.max(25000, Math.min(5000000, 100000 * Math.pow(2, simScs - 3))));
+
   esp32State.lastTelemetry = {
     cowId: cow.cowId,
     rfidTag: cow.rfidTag,
     cowName: cow.name,
     temp: +(cow.baseTemp + jitter(0.15)).toFixed(2),
     ph: +(cow.basePh + jitter(0.04)).toFixed(2),
-    conductivity: +( (ec_fl + ec_fr + ec_rl + ec_rr) / 4 ).toFixed(2),
+    conductivity: avgConductivity,
     ec_fl,
     ec_fr,
     ec_rl,
     ec_rr,
     quarterRatio,
     thermalAsymmetry,
+    scc: simScc,
+    somatic_cell_count: simScc,
+    somaticCellScore: +(simScs).toFixed(2),
     weight: +(Math.max(0, cow.baseWeight + jitter(0.3))).toFixed(1),
     activity: Math.round(Math.max(10, Math.min(95, cow.baseAct + jitter(6)))),
     shedTemp: +(31.5 + jitter(0.8)).toFixed(1),
@@ -319,6 +330,20 @@ const server = http.createServer((req, res) => {
         const minEc = Math.min(ec_fl, ec_fr, ec_rl, ec_rr);
         const quarterRatio = +(maxEc / (minEc || 1.0)).toFixed(2);
 
+        const sccRaw = data.somatic_cell_count !== undefined ? data.somatic_cell_count : (data.scc !== undefined ? data.scc : undefined);
+        let sccVal = sccRaw !== undefined ? Number(sccRaw) : undefined;
+        let scsVal = data.somatic_cell_score !== undefined ? Number(data.somatic_cell_score) : (data.scs !== undefined ? Number(data.scs) : undefined);
+
+        if (sccVal === undefined && ecVal !== undefined) {
+          let calcScs = 3.0;
+          if (ecVal > 5.0) calcScs += 1.8 * (ecVal - 5.0);
+          if (phVal !== undefined && phVal > 6.65) calcScs += 2.2 * (phVal - 6.65);
+          if (tempVal !== undefined && tempVal > 38.5) calcScs += 1.2 * (tempVal - 38.5);
+          calcScs = Math.max(1.5, Math.min(9.5, calcScs));
+          sccVal = Math.round(Math.max(25000, Math.min(5000000, 100000 * Math.pow(2, calcScs - 3))));
+          if (scsVal === undefined) scsVal = +(calcScs).toFixed(2);
+        }
+
         esp32State.lastTelemetry = {
           cowScanned: true,
           cowId,
@@ -333,6 +358,9 @@ const server = http.createServer((req, res) => {
           ec_rr,
           quarterRatio,
           thermalAsymmetry: data.thermalAsymmetry !== undefined ? data.thermalAsymmetry : 0.1,
+          scc: sccVal || 75000,
+          somatic_cell_count: sccVal || 75000,
+          somaticCellScore: scsVal || 2.9,
           weight: data.weight !== undefined ? data.weight : 0,
           activity: activityVal !== undefined ? activityVal : 50,
           shedTemp: data.shedTemp !== undefined ? data.shedTemp : 30.0,
