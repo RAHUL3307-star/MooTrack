@@ -3,25 +3,17 @@ import { ANIMALS } from "../types/index";
 import type { Animal, RiskLevel } from "../types/index";
 
 // Bump this version whenever ANIMALS data changes — forces a reseed
-const DATA_VERSION = "v4-cow-numbered-fixed";
+const DATA_VERSION = "v5-multi-herd-scc";
 
 const OLD_NAME_MAP: Record<string, string> = {
-  "Ganga": "Cow 1",
-  "Kaveri": "Cow 2",
-  "Saraswati": "Cow 3",
-  "Narmada": "Cow 4",
-  "Yamuna": "Cow 5",
-  "Godavari": "Cow 6",
+  "Ganga": "Cow 1 (Gauri)",
+  "Kaveri": "Cow 2 (Kamdhenu)",
+  "Saraswati": "Cow 3 (Lakshmi)",
+  "Narmada": "Cow 4 (Nandini)",
+  "Yamuna": "Cow 5 (Shanti)",
+  "Godavari": "Cow 6 (Kalyani)",
   "Chambal": "Cow 7",
   "Betwa": "Cow 8",
-  "KA-001": "Cow 1",
-  "KA-007": "Cow 2",
-  "KA-014": "Cow 3",
-  "KA-022": "Cow 4",
-  "KA-031": "Cow 5",
-  "KA-038": "Cow 6",
-  "KA-045": "Cow 7",
-  "KA-052": "Cow 8",
 };
 
 export function normalizeCowName(id: string, name?: string): string {
@@ -54,7 +46,8 @@ export async function fetchAnimals(): Promise<Animal[]> {
     return data.map((row) => ({
       id: row.id,
       name: normalizeCowName(row.id, row.name),
-      species: (row as any).species || (row.id.startsWith("GT") ? "Goat" : row.id.startsWith("BF") ? "Buffalo" : "Cow"),
+      species: (row.species as "Cow" | "Goat" | "Buffalo") || (row.id.startsWith("GT") ? "Goat" : row.id.startsWith("BF") ? "Buffalo" : "Cow"),
+      herdId: row.herd_id ?? undefined,
       breed: row.breed,
       age: row.age,
       ageYears: row.age_years ?? undefined,
@@ -63,12 +56,18 @@ export async function fetchAnimals(): Promise<Animal[]> {
       lactation: row.lactation,
       risk: row.risk_level as RiskLevel,
       trend: row.trend,
-      ph: (row as any).ph ?? 6.6,
-      conductivity: (row as any).conductivity ?? 5.2,
-      weight: (row as any).weight ?? 12.0,
+      ph: row.ph ?? 6.6,
+      conductivity: row.conductivity ?? 5.2,
+      scc: row.scc ?? undefined,
+      scs: row.scs ?? undefined,
+      weight: row.weight ?? 12.0,
       temp: row.temperature,
       activity: row.activity,
       milk: row.milk_yield,
+      rumination: row.rumination ?? undefined,
+      feeding: row.feeding ?? undefined,
+      ambientTemp: row.ambient_temp ?? undefined,
+      humidity: row.humidity ?? undefined,
       lastSync: row.last_sync,
       quarter: row.quarter,
     }));
@@ -104,7 +103,7 @@ export async function updateAnimalRisk(
   return true;
 }
 
-// ─── Seed Initial Animals (Cow 1–8) ──────────────────────────────────────────
+// ─── Seed Initial Animals (Cow / Goat / Buffalo Multi-Herd) ──────────────────
 export async function seedAnimals(): Promise<void> {
   if (!isSupabaseConfigured || !supabase) return;
 
@@ -112,7 +111,7 @@ export async function seedAnimals(): Promise<void> {
 
   // If already seeded with an older version, wipe and re-seed to ensure clean names
   if (storedVersion !== DATA_VERSION) {
-    console.info(`[animalService] Upgrading data to ${DATA_VERSION}: resetting names to Cow 1–8...`);
+    console.info(`[animalService] Upgrading data to ${DATA_VERSION}: resetting names and herds...`);
 
     for (const a of ANIMALS) {
       await supabase
@@ -120,6 +119,8 @@ export async function seedAnimals(): Promise<void> {
         .upsert({
           id: a.id,
           name: a.name,
+          species: a.species ?? "Cow",
+          herd_id: a.herdId ?? null,
           breed: a.breed,
           age: a.age,
           age_years: a.ageYears ?? null,
@@ -130,17 +131,23 @@ export async function seedAnimals(): Promise<void> {
           trend: a.trend,
           ph: a.ph ?? 6.6,
           conductivity: a.conductivity ?? 5.2,
+          scc: a.scc ?? null,
+          scs: a.scs ?? null,
           weight: a.weight ?? 12.0,
           temperature: a.temp,
           activity: a.activity,
           milk_yield: a.milk,
+          rumination: a.rumination ?? null,
+          feeding: a.feeding ?? null,
+          ambient_temp: a.ambientTemp ?? null,
+          humidity: a.humidity ?? null,
           last_sync: a.lastSync,
           quarter: a.quarter,
         }, { onConflict: "id" });
     }
 
     localStorage.setItem("mootracker_data_version", DATA_VERSION);
-    console.info("[animalService] Animal names updated to Cow 1–8 in Supabase.");
+    console.info("[animalService] Animal records updated in Supabase.");
     return;
   }
 
@@ -151,6 +158,8 @@ export async function seedAnimals(): Promise<void> {
   const rows = ANIMALS.map((a) => ({
     id: a.id,
     name: a.name,
+    species: a.species ?? "Cow",
+    herd_id: a.herdId ?? null,
     breed: a.breed,
     age: a.age,
     age_years: a.ageYears ?? null,
@@ -161,10 +170,16 @@ export async function seedAnimals(): Promise<void> {
     trend: a.trend,
     ph: a.ph ?? 6.6,
     conductivity: a.conductivity ?? 5.2,
+    scc: a.scc ?? null,
+    scs: a.scs ?? null,
     weight: a.weight ?? 12.0,
     temperature: a.temp,
     activity: a.activity,
     milk_yield: a.milk,
+    rumination: a.rumination ?? null,
+    feeding: a.feeding ?? null,
+    ambient_temp: a.ambientTemp ?? null,
+    humidity: a.humidity ?? null,
     last_sync: a.lastSync,
     quarter: a.quarter,
   }));

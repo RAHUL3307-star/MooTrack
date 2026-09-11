@@ -335,7 +335,7 @@ export function AnalyticsScreen({
                       </td>
 
                       <td style={{ padding: "10px 6px", verticalAlign: "middle" }}>
-                        <div style={{ fontWeight: 700, color: "#2B3A1E" }}>{herd.animalCount} Animals</div>
+                        <div style={{ fontWeight: 700, color: "#2B3A1E" }}>{assessment.totalAnimals} Animals</div>
                         <div style={{ fontSize: 9.5, color: "#6B7A5C" }}>
                           {cows > 0 && `🐄 ${cows}c `}
                           {goats > 0 && `🐐 ${goats}g `}

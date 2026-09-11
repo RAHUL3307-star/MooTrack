@@ -13,10 +13,22 @@ export async function logTelemetry(
     temperature: telemetry.temp,
     ph: telemetry.ph ?? null,
     conductivity: telemetry.conductivity ?? 0,
+    scc: telemetry.scc ?? null,
+    scs: telemetry.scs ?? null,
+    ec_fl: telemetry.ec_fl ?? null,
+    ec_fr: telemetry.ec_fr ?? null,
+    ec_rl: telemetry.ec_rl ?? null,
+    ec_rr: telemetry.ec_rr ?? null,
+    quarter_ratio: telemetry.quarterRatio ?? null,
+    thermal_asymmetry: telemetry.thermalAsymmetry ?? null,
     weight: telemetry.weight ?? null,
+    activity: telemetry.activity ?? null,
+    shed_temp: telemetry.shedTemp ?? null,
     humidity: telemetry.humidity ?? null,
     battery: telemetry.battery ?? null,
     rssi: telemetry.rssi ?? null,
+    risk_score: telemetry.riskScore ?? null,
+    risk_tier: telemetry.riskTier ?? null,
   });
 
   if (error) {

@@ -13,6 +13,8 @@ export interface Database {
         Row: {
           id: string;
           name: string;
+          species?: "Cow" | "Goat" | "Buffalo";
+          herd_id?: string | null;
           breed: string;
           age: string;
           age_years: number | null;
@@ -24,10 +26,16 @@ export interface Database {
 
           ph?: number | null;
           conductivity?: number | null;
+          scc?: number | null;
+          scs?: number | null;
           weight?: number | null;
           temperature: number;
           activity: "low" | "normal" | "high";
           milk_yield: number;
+          rumination?: number | null;
+          feeding?: number | null;
+          ambient_temp?: number | null;
+          humidity?: number | null;
           quarter: string;
           last_sync: string;
           created_at?: string;
@@ -36,6 +44,8 @@ export interface Database {
         Insert: {
           id: string;
           name: string;
+          species?: "Cow" | "Goat" | "Buffalo";
+          herd_id?: string | null;
           breed: string;
           age: string;
           age_years?: number | null;
@@ -47,10 +57,16 @@ export interface Database {
 
           ph?: number | null;
           conductivity?: number | null;
+          scc?: number | null;
+          scs?: number | null;
           weight?: number | null;
           temperature: number;
           activity: "low" | "normal" | "high";
           milk_yield: number;
+          rumination?: number | null;
+          feeding?: number | null;
+          ambient_temp?: number | null;
+          humidity?: number | null;
           quarter: string;
           last_sync: string;
           created_at?: string;
@@ -59,6 +75,8 @@ export interface Database {
         Update: {
           id?: string;
           name?: string;
+          species?: "Cow" | "Goat" | "Buffalo";
+          herd_id?: string | null;
           breed?: string;
           age?: string;
           age_years?: number | null;
@@ -70,10 +88,16 @@ export interface Database {
 
           ph?: number | null;
           conductivity?: number | null;
+          scc?: number | null;
+          scs?: number | null;
           weight?: number | null;
           temperature?: number;
           activity?: "low" | "normal" | "high";
           milk_yield?: number;
+          rumination?: number | null;
+          feeding?: number | null;
+          ambient_temp?: number | null;
+          humidity?: number | null;
           quarter?: string;
           last_sync?: string;
           created_at?: string;
@@ -89,11 +113,22 @@ export interface Database {
           temperature: number;
           conductivity: number;
           ph?: number | null;
+          scc?: number | null;
+          scs?: number | null;
+          ec_fl?: number | null;
+          ec_fr?: number | null;
+          ec_rl?: number | null;
+          ec_rr?: number | null;
+          quarter_ratio?: number | null;
+          thermal_asymmetry?: number | null;
           weight?: number | null;
-
+          activity?: number | null;
+          shed_temp?: number | null;
           humidity: number | null;
           battery: number | null;
           rssi: number | null;
+          risk_score?: number | null;
+          risk_tier?: string | null;
           created_at: string;
         };
         Insert: {
@@ -103,11 +138,22 @@ export interface Database {
           temperature: number;
           conductivity: number;
           ph?: number | null;
+          scc?: number | null;
+          scs?: number | null;
+          ec_fl?: number | null;
+          ec_fr?: number | null;
+          ec_rl?: number | null;
+          ec_rr?: number | null;
+          quarter_ratio?: number | null;
+          thermal_asymmetry?: number | null;
           weight?: number | null;
-
+          activity?: number | null;
+          shed_temp?: number | null;
           humidity?: number | null;
           battery?: number | null;
           rssi?: number | null;
+          risk_score?: number | null;
+          risk_tier?: string | null;
           created_at?: string;
         };
         Update: {
@@ -117,11 +163,22 @@ export interface Database {
           temperature?: number;
           conductivity?: number;
           ph?: number | null;
+          scc?: number | null;
+          scs?: number | null;
+          ec_fl?: number | null;
+          ec_fr?: number | null;
+          ec_rl?: number | null;
+          ec_rr?: number | null;
+          quarter_ratio?: number | null;
+          thermal_asymmetry?: number | null;
           weight?: number | null;
-
+          activity?: number | null;
+          shed_temp?: number | null;
           humidity?: number | null;
           battery?: number | null;
           rssi?: number | null;
+          risk_score?: number | null;
+          risk_tier?: string | null;
           created_at?: string;
         };
         Relationships: [];
