@@ -17,6 +17,7 @@ import { t, LANG_FLAGS, generateLiveSituationSummary } from "../i18n/index";
 import { SCREEN_SPEECH } from "../i18n/speech";
 import { useReadAloud } from "../i18n/useReadAloud";
 import { useAnimals } from "../context/AnimalsContext";
+import { useHerd } from "../context/HerdContext";
 import { useESP32 } from "../context/ESP32Context";
 import { useUser } from "../context/UserContext";
 import { computeMilkRisk } from "../types/esp32";
@@ -246,6 +247,260 @@ export function HomeSituationSummaryCard({
 }
 
 
+import { calculateHerdRisk, filterAnimalsByHerd } from "../services/herdService";
+
+export function HerdRiskConditionCard({
+  lang,
+  onNavigate,
+}: {
+  lang: string;
+  onNavigate: (s: Screen) => void;
+}) {
+  const { animals } = useAnimals();
+  const { herds, selectedHerdId, setSelectedHerdId } = useHerd();
+  const filteredAnimals = filterAnimalsByHerd(animals, selectedHerdId);
+  const herd = calculateHerdRisk(filteredAnimals);
+
+  const statusBg =
+    herd.status === "HIGH"
+      ? "linear-gradient(135deg, #7F1D1D 0%, #450A0A 100%)"
+      : herd.status === "MODERATE"
+      ? "linear-gradient(135deg, #78350F 0%, #451A03 100%)"
+      : "linear-gradient(135deg, #14532D 0%, #052E16 100%)";
+
+  const statusBorder =
+    herd.status === "HIGH" ? "#EF4444" : herd.status === "MODERATE" ? "#F59E0B" : "#22C55E";
+
+  const statusLabel =
+    herd.status === "HIGH"
+      ? (lang === "Hindi" ? "उच्च जोखिम (संक्रमण खतरा)" : lang === "Tamil" ? "தீவிர ஆபத்து (பரவல் எச்சரிக்கை)" : "HIGH RISK — OUTBREAK PROTOCOL")
+      : herd.status === "MODERATE"
+      ? (lang === "Hindi" ? "मध्यम जोखिम (निगरानी आवश्यक)" : lang === "Tamil" ? "இடைநிலை ஆபத்து (கண்காணிப்பு தேவை)" : "MODERATE RISK — EPIDEMIOLOGY WATCH")
+      : (lang === "Hindi" ? "कम जोखिम (सुरक्षित व स्वस्थ)" : lang === "Tamil" ? "குறைந்த ஆபத்து (பாதுகாப்பானது)" : "LOW RISK — BIOSECURE & HEALTHY");
+
+  return (
+    <div
+      style={{
+        background: statusBg,
+        border: `1.5px solid ${statusBorder}`,
+        borderRadius: 16,
+        padding: "16px 16px",
+        marginBottom: 14,
+        color: "#FFFFFF",
+        boxShadow: "0 6px 20px rgba(0,0,0,0.22)",
+      }}
+    >
+      {/* Header row: Level badge + Herd Selector */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 800,
+              letterSpacing: "0.08em",
+              background: "rgba(255,255,255,0.2)",
+              padding: "2px 7px",
+              borderRadius: 6,
+              textTransform: "uppercase",
+            }}
+          >
+            LEVEL 2 ASSESSMENT
+          </span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#E2E8F0" }}>
+            {lang === "Hindi" ? "समग्र हर्ड/झुंड जोखिम स्थिति" : lang === "Tamil" ? "பண்ணை மந்தை அளவிலான இடர் நிலை" : "Herd-Level Risk Condition"}
+          </span>
+        </div>
+        {/* Herd Selector */}
+        <select
+          value={selectedHerdId}
+          onChange={(e) => setSelectedHerdId(e.target.value)}
+          style={{
+            background: "rgba(255,255,255,0.15)",
+            border: "1px solid rgba(255,255,255,0.3)",
+            borderRadius: 8,
+            color: "#FFFFFF",
+            fontSize: 10,
+            fontWeight: 700,
+            padding: "4px 8px",
+            outline: "none",
+            cursor: "pointer",
+          }}
+        >
+          <option value="all" style={{ color: "#1C2714", background: "#FFFFFF" }}>🌐 All Herds</option>
+          {herds.map((h) => (
+            <option key={h.id} value={h.id} style={{ color: "#1C2714", background: "#FFFFFF" }}>
+              🐄 {h.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* HRI + Status */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 10 }}>
+        <div>
+          <div style={{ fontFamily: "'Fraunces', serif", fontSize: 28, fontWeight: 800, color: "#FFFFFF", display: "flex", alignItems: "baseline", gap: 8 }}>
+            <span>HRI {herd.hri}%</span>
+            <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 8, background: "rgba(255,255,255,0.22)", color: "#FFFFFF" }}>
+              {statusLabel}
+            </span>
+          </div>
+          {/* Previous vs Current HRI delta */}
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.8)", marginTop: 3, display: "flex", gap: 10 }}>
+            <span>Prev: <strong>{herd.prevHri}%</strong></span>
+            <span style={{ color: herd.hriDelta > 0 ? "#FCA5A5" : herd.hriDelta < 0 ? "#86EFAC" : "#FDE68A", fontWeight: 700 }}>
+              {herd.hriDelta > 0 ? `▲ +${herd.hriDelta}pts` : herd.hriDelta < 0 ? `▼ ${herd.hriDelta}pts` : "● No change"}
+            </span>
+          </div>
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.75)" }}>HERD TREND</div>
+          <div style={{ fontSize: 12, fontWeight: 800, color: herd.trend === "worsening" ? "#FCA5A5" : herd.trend === "improving" ? "#86EFAC" : "#FDE68A" }}>
+            {herd.trend === "worsening" ? "▲ Worsening" : herd.trend === "improving" ? "▼ Improving" : "● Stable"}
+          </div>
+          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.7)", marginTop: 2 }}>
+            {herd.totalAnimals} animals monitored
+          </div>
+        </div>
+      </div>
+
+      {/* Key Metrics Row: Avg Risk, HRP, MHRP */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 10 }}>
+        {[
+          { label: "Avg AI Risk",   value: `${herd.avgRisk}%`,              sub: "mean score",    icon: "🤖" },
+          { label: "High-Risk (HRP)", value: `${herd.highRiskPercentage}%`,  sub: `${herd.counts.high} animals`, icon: "🚨" },
+          { label: "Mod+High (MHRP)", value: `${herd.moderateHighPercentage}%`, sub: `${herd.counts.moderate + herd.counts.high} animals`, icon: "⚠️" },
+        ].map((m) => (
+          <div
+            key={m.label}
+            style={{
+              background: "rgba(255,255,255,0.1)",
+              borderRadius: 10,
+              padding: "8px 8px",
+              textAlign: "center",
+              border: "1px solid rgba(255,255,255,0.15)",
+            }}
+          >
+            <div style={{ fontSize: 14 }}>{m.icon}</div>
+            <div style={{ fontFamily: "'Fraunces', serif", fontSize: 15, fontWeight: 800, color: "#FFFFFF", marginTop: 2 }}>{m.value}</div>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.7)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>{m.label}</div>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.6)" }}>{m.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Mathematical formula badge */}
+      <div
+        style={{
+          background: "rgba(0,0,0,0.25)",
+          borderRadius: 8,
+          padding: "6px 10px",
+          fontSize: 10,
+          fontFamily: "'JetBrains Mono', monospace",
+          color: "rgba(255,255,255,0.9)",
+          marginBottom: 10,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: 4,
+        }}
+      >
+        <span>Formula: [(Low×0 + Mod×1 + High×2) / (Total×2)] × 100</span>
+        <span style={{ color: "#FDE68A" }}>
+          [{herd.counts.low}×0 + {herd.counts.moderate}×1 + {herd.counts.high}×2] / {herd.totalAnimals * 2}
+        </span>
+      </div>
+
+      {/* 7-Day HRI Trend Graph */}
+      {herd.hriHistory.length > 0 && (
+        <div style={{ marginBottom: 10 }}>
+          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.7)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
+            7-Day HRI Trend
+          </div>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 48 }}>
+            {herd.hriHistory.map((pt, i) => {
+              const maxHri = Math.max(...herd.hriHistory.map((p) => p.hri), 1);
+              const barH = Math.max(4, Math.round((pt.hri / maxHri) * 44));
+              const isToday = i === herd.hriHistory.length - 1;
+              const barColor = pt.hri >= 70 ? "#EF4444" : pt.hri >= 40 ? "#F59E0B" : "#22C55E";
+              return (
+                <div key={pt.day} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                  <div style={{ fontSize: 9, color: "rgba(255,255,255,0.6)", fontWeight: isToday ? 800 : 400 }}>
+                    {pt.hri}%
+                  </div>
+                  <div
+                    style={{
+                      width: "100%",
+                      height: barH,
+                      background: barColor,
+                      borderRadius: "3px 3px 0 0",
+                      opacity: isToday ? 1 : 0.65,
+                      boxShadow: isToday ? `0 0 6px ${barColor}` : "none",
+                      transition: "height 0.4s ease",
+                    }}
+                  />
+                  <div style={{ fontSize: 8, color: "rgba(255,255,255,0.5)", whiteSpace: "nowrap", overflow: "hidden", maxWidth: "100%", textAlign: "center" }}>
+                    {pt.day === "Today" ? "Today" : pt.day === "Yesterday" ? "Yst" : `D${i - 6}`}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Multi-species herd distribution */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 10 }}>
+        {[
+          { label: "🐄 Cows", data: herd.speciesBreakdown.cows },
+          { label: "🐐 Goats", data: herd.speciesBreakdown.goats },
+          { label: "🐃 Buffaloes", data: herd.speciesBreakdown.buffaloes },
+        ].map((sp) => (
+          <div
+            key={sp.label}
+            style={{
+              background: "rgba(255,255,255,0.1)",
+              borderRadius: 10,
+              padding: "8px 8px",
+              textAlign: "center",
+              border: "1px solid rgba(255,255,255,0.15)",
+            }}
+          >
+            <div style={{ fontSize: 11, fontWeight: 700 }}>{sp.label}</div>
+            <div style={{ fontSize: 14, fontWeight: 800, marginTop: 2 }}>{sp.data.count} heads</div>
+            <div style={{ fontSize: 10, color: sp.data.high > 0 ? "#FCA5A5" : sp.data.moderate > 0 ? "#FDE68A" : "#86EFAC" }}>
+              HRI: {sp.data.hri}% ({sp.data.status})
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Clinical biosecurity advisory */}
+      <div style={{ fontSize: 11, lineHeight: 1.45, color: "rgba(255,255,255,0.9)", background: "rgba(0,0,0,0.2)", padding: "8px 10px", borderRadius: 8 }}>
+        {herd.clinicalAdvisory}
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
+        <button
+          onClick={() => onNavigate("analytics")}
+          style={{
+            background: "none",
+            border: "none",
+            color: "rgba(255,255,255,0.9)",
+            fontSize: 11,
+            fontWeight: 700,
+            cursor: "pointer",
+            textDecoration: "underline",
+            padding: 0,
+          }}
+        >
+          {lang === "Hindi" ? "विस्तृत हर्ड विश्लेषण देखें →" : "View Full Herd Epidemiology Analytics →"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function HomeScreen({
   onNavigate,
   lang,
@@ -254,16 +509,22 @@ export function HomeScreen({
   lang: string;
 }) {
   const { animals, setSelectedAnimal } = useAnimals();
-  const priorityAnimals = animals.filter((a) => a.risk === "high" || a.risk === "moderate").slice(0, 3);
+  const { selectedHerdId, setSelectedHerdId, herds, selectedHerd } = useHerd();
+  
+  const displayedAnimals = selectedHerdId === "all"
+    ? animals
+    : animals.filter((a) => a.herdId === selectedHerdId);
+
+  const priorityAnimals = displayedAnimals.filter((a) => a.risk === "high" || a.risk === "moderate").slice(0, 4);
   const counts = {
-    high: animals.filter((a) => a.risk === "high").length,
-    moderate: animals.filter((a) => a.risk === "moderate").length,
-    low: animals.filter((a) => a.risk === "low").length,
-    none: animals.filter((a) => a.risk === "none").length,
+    high: displayedAnimals.filter((a) => a.risk === "high").length,
+    moderate: displayedAnimals.filter((a) => a.risk === "moderate").length,
+    low: displayedAnimals.filter((a) => a.risk === "low").length,
+    none: displayedAnimals.filter((a) => a.risk === "none").length,
   };
 
-  // Real milk totals from animal data
-  const totalMilk = animals.reduce((sum, a) => sum + (a.milk || 0), 0);
+  // Real milk totals from displayed herd data
+  const totalMilk = displayedAnimals.reduce((sum, a) => sum + (a.milk || 0), 0);
   const milkData = [
     { label: "Mon", value: Math.round(totalMilk * 0.90) },
     { label: "Tue", value: Math.round(totalMilk * 0.93) },
@@ -277,11 +538,13 @@ export function HomeScreen({
   const { isLive, lastTelemetry } = useESP32();
   const { user } = useUser();
   const farmerName = user?.name || "Farmer";
-  const farmLabel = [user?.farmName, user?.village, user?.state].filter(Boolean).join(" · ") || "My Dairy Farm";
-  const speechText = generateLiveSituationSummary(animals, lang, isLive ? lastTelemetry : null);
+  const farmLabel = selectedHerd
+    ? `${selectedHerd.name} · ${selectedHerd.location}`
+    : [user?.farmName, user?.village, user?.state].filter(Boolean).join(" · ") || "My Dairy Farm";
+  const speechText = generateLiveSituationSummary(displayedAnimals, lang, isLive ? lastTelemetry : null);
 
   // Average milk quality from real sensor readings or live ESP32
-  const phAnimals = animals.filter((a) => a.ph != null);
+  const phAnimals = displayedAnimals.filter((a) => a.ph != null);
   const currentPh = isLive && lastTelemetry?.ph != null
     ? lastTelemetry.ph
     : phAnimals.length > 0
@@ -289,14 +552,14 @@ export function HomeScreen({
     : 6.7;
   const currentEc = isLive && lastTelemetry?.conductivity != null
     ? lastTelemetry.conductivity
-    : animals.length > 0
-    ? animals.reduce((s, a) => s + (a.conductivity || 0), 0) / animals.length
+    : displayedAnimals.length > 0
+    ? displayedAnimals.reduce((s, a) => s + (a.conductivity || 0), 0) / displayedAnimals.length
     : 5.0;
 
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
       <ReadAloudFAB screen="home" lang={lang} customText={speechText} />
-      <div style={{ background: "#2A5C1F", padding: "16px 20px 22px" }}>
+      <div style={{ background: "#2A5C1F", padding: "16px 20px 18px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
             <div
@@ -317,6 +580,52 @@ export function HomeScreen({
             </div>
           </div>
         </div>
+
+        {/* Multi-Herd Quick Pill Selector */}
+        <div style={{ display: "flex", gap: 6, marginTop: 12, overflowX: "auto", paddingBottom: 2 }}>
+          <button
+            onClick={() => setSelectedHerdId("all")}
+            style={{
+              background: selectedHerdId === "all" ? "#FFFFFF" : "rgba(255,255,255,0.18)",
+              color: selectedHerdId === "all" ? "#2A5C1F" : "#FFFFFF",
+              border: "none",
+              borderRadius: 14,
+              padding: "5px 12px",
+              fontSize: 11,
+              fontWeight: 700,
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              transition: "all 0.15s",
+            }}
+          >
+            🌐 All Herds ({animals.length})
+          </button>
+          {herds.map((h) => {
+            const herdCount = animals.filter((a) => a.herdId === h.id).length;
+            const isSelected = selectedHerdId === h.id;
+            return (
+              <button
+                key={h.id}
+                onClick={() => setSelectedHerdId(h.id)}
+                style={{
+                  background: isSelected ? "#FFFFFF" : "rgba(255,255,255,0.18)",
+                  color: isSelected ? "#2A5C1F" : "#FFFFFF",
+                  border: "none",
+                  borderRadius: 14,
+                  padding: "5px 12px",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  transition: "all 0.15s",
+                }}
+              >
+                🐄 {h.name.split("–")[0].trim()} ({herdCount})
+              </button>
+            );
+          })}
+        </div>
+
         {counts.high > 0 && (
           <div
             onClick={() => onNavigate("alerts")}
@@ -324,7 +633,7 @@ export function HomeScreen({
               background: "rgba(184,50,32,0.92)",
               borderRadius: 12,
               padding: "10px 14px",
-              marginTop: 14,
+              marginTop: 12,
               display: "flex",
               alignItems: "center",
               gap: 10,
@@ -345,8 +654,11 @@ export function HomeScreen({
       </div>
 
       <div style={{ flex: 1, overflow: "auto", padding: "16px 16px 8px" }}>
-        {/* Situation Voice Summary Card — real animal data, no hardcoded names */}
+        {/* Situation Voice Summary Card */}
         <HomeSituationSummaryCard onNavigate={onNavigate} lang={lang} />
+
+        {/* ── LEVEL 2: Dedicated Herd-Level Risk Assessment Card ──────────────── */}
+        <HerdRiskConditionCard lang={lang} onNavigate={onNavigate} />
 
         {/* Visual Udder AI Scan Banner */}
         <div
@@ -376,7 +688,7 @@ export function HomeScreen({
           <span style={{ fontSize: 14, color: "#8AE68A", fontWeight: 700 }}>→</span>
         </div>
 
-        {/* Herd Overview */}
+        {/* Herd Overview Donut */}
         <Card style={{ marginBottom: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
             <div>
@@ -407,11 +719,14 @@ export function HomeScreen({
           </div>
         </Card>
 
-        {/* Priority Animals / Live Monitored Cow */}
+        {/* ── LEVEL 1: Animal-Wise Risk Assessments ────────────────────────── */}
         <div style={{ marginBottom: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <SectionLabel>{isLive ? "📡 LIVE ESP32 MONITORED HERD" : t("priority_animals", lang)}</SectionLabel>
+              <span style={{ fontSize: 9, fontWeight: 800, background: "#E2E8F0", color: "#334155", padding: "2px 6px", borderRadius: 6 }}>
+                LEVEL 1
+              </span>
+              <SectionLabel>{isLive ? "📡 LIVE MONITORED ANIMAL" : "INDIVIDUAL ANIMAL RISK ASSESSMENTS"}</SectionLabel>
               {isLive && (
                 <span style={{ fontSize: 9, background: "#DCFCE7", color: "#166534", fontWeight: 800, padding: "2px 6px", borderRadius: 8, border: "1px solid #86EFAC" }}>
                   ● LIVE
@@ -423,7 +738,7 @@ export function HomeScreen({
             </button>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {/* If ESP32 is live and card is scanned, show the active monitored cow card */}
+            {/* If ESP32 is live and card is scanned, show the active monitored animal card */}
             {isLive && lastTelemetry?.cowScanned ? (
               <button
                 onClick={() => {
@@ -450,7 +765,7 @@ export function HomeScreen({
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                    <span style={{ fontWeight: 800, fontSize: 13, color: "#1C2714" }}>{lastTelemetry.cowName || "Cow 1 (Active ESP32)"}</span>
+                    <span style={{ fontWeight: 800, fontSize: 13, color: "#1C2714" }}>{lastTelemetry.cowName || "Active ESP32 Sensor"}</span>
                     <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 9, color: "#166534", background: "#DCFCE7", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>
                       {lastTelemetry.rfidTag || "0xE3995556"}
                     </span>
@@ -482,48 +797,56 @@ export function HomeScreen({
                 <div style={{ fontSize: 28, marginBottom: 6 }}>📡</div>
                 <div style={{ fontSize: 14, fontWeight: 800, color: "#86EFAC" }}>
                   {lang === "Tamil"
-                    ? "ESP32 இணைக்கப்பட்டது — மாட்டின் RFID அட்டைக்காக காத்திருக்கிறது"
+                    ? "ESP32 இணைக்கப்பட்டது — RFID அட்டைக்காக காத்திருக்கிறது"
                     : lang === "Hindi"
-                    ? "ESP32 कनेक्टेड — गाय के RFID कार्ड की प्रतीक्षा है"
-                    : "ESP32 Connected — Waiting for Cow RFID Card"}
+                    ? "ESP32 कनेक्टेड — पशु के RFID कार्ड की प्रतीक्षा है"
+                    : "ESP32 Connected — Waiting for Animal RFID Card"}
                 </div>
                 <div style={{ fontSize: 11, color: "rgba(255,255,255,0.8)", marginTop: 4, lineHeight: 1.4 }}>
                   {lang === "Tamil"
-                    ? "சீரியல் மானிட்டர்: 'Waiting for Cow RFID card...'\nRFID அட்டையை ESP32 ஸ்கேனரில் வைத்தால் மாடு தானாக சேர்க்கப்படும்."
+                    ? "சீரியல் மானிட்டர்: 'Waiting for RFID card...'\nRFID அட்டையை ESP32 ஸ்கேனரில் வைத்தால் மாடு/ஆடு தானாக சேர்க்கப்படும்."
                     : lang === "Hindi"
-                    ? "सीरियल मॉनिटर: 'Waiting for Cow RFID card...'\nगाय को स्वतः जोड़ने के लिए RFID कार्ड स्कैनर पर लगाएं।"
-                    : "Serial monitor: 'Waiting for Cow RFID card...'\nTap your RFID card on the RC522 scanner to auto-register cow & stream live telemetry."}
+                    ? "सीरियल मॉनिटर: 'Waiting for RFID card...'\nपशु को स्वतः जोड़ने के लिए RFID कार्ड स्कैनर पर लगाएं।"
+                    : "Serial monitor: 'Waiting for RFID card...'\nTap your RFID card on the RC522 scanner to auto-register animal & stream live telemetry."}
                 </div>
               </div>
             ) : null}
 
-            {/* Other animals list */}
+            {/* Priority animals list with species icons and quarter/half indicator */}
             {(!isLive ? priorityAnimals : priorityAnimals.filter((a) => a.id !== lastTelemetry?.cowId && a.rfidTag !== lastTelemetry?.rfidTag))
-              .map((a) => (
-                <button
-                  key={a.id}
-                  onClick={() => { setSelectedAnimal(a); onNavigate("animal-profile"); }}
-                  style={{ display: "flex", alignItems: "center", gap: 12, background: "#FFFFFF", border: "1px solid #E0DAD0", borderRadius: 14, padding: "12px 14px", cursor: "pointer", textAlign: "left", width: "100%" }}
-                >
-                  <div style={{ width: 40, height: 40, borderRadius: 12, background: RISK_COLOR[a.risk].bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🐄</div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                      <span style={{ fontWeight: 700, fontSize: 13, color: "#1C2714" }}>{a.name}</span>
-                      <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 10, color: "#9BA88C" }}>{a.id}</span>
-                      <span style={{ background: "#EEF6E4", color: "#2A5C1F", fontSize: 9, fontWeight: 700, padding: "1px 6px", borderRadius: 12, border: "1px solid #C4DDA0" }}>🎂 {a.age}</span>
+              .map((a) => {
+                const sp = a.species || (a.id.startsWith("GT") ? "Goat" : a.id.startsWith("BF") ? "Buffalo" : "Cow");
+                const spIcon = sp === "Goat" ? "🐐" : sp === "Buffalo" ? "🐃" : "🐄";
+                return (
+                  <button
+                    key={a.id}
+                    onClick={() => { setSelectedAnimal(a); onNavigate("animal-profile"); }}
+                    style={{ display: "flex", alignItems: "center", gap: 12, background: "#FFFFFF", border: "1px solid #E0DAD0", borderRadius: 14, padding: "12px 14px", cursor: "pointer", textAlign: "left", width: "100%" }}
+                  >
+                    <div style={{ width: 40, height: 40, borderRadius: 12, background: RISK_COLOR[a.risk].bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                      {spIcon}
                     </div>
-                    <div style={{ fontSize: 11, color: "#6B7A5C" }}>
-                      {a.breed} · Lac {a.lactation}
-                      {a.scc != null ? ` · SCC ${((a.scc) / 1000).toFixed(0)}k` : ""}
-                      {a.ph != null ? ` · pH ${a.ph}` : ""} · EC {a.conductivity} mS/cm
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                        <span style={{ fontWeight: 700, fontSize: 13, color: "#1C2714" }}>{a.name}</span>
+                        <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 10, color: "#9BA88C" }}>{a.id}</span>
+                        <span style={{ background: "#EEF6E4", color: "#2A5C1F", fontSize: 9, fontWeight: 700, padding: "1px 6px", borderRadius: 12, border: "1px solid #C4DDA0" }}>
+                          {sp} · {a.age}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 11, color: "#6B7A5C", marginTop: 2 }}>
+                        {a.breed} · {sp === "Goat" ? "2 Halves" : "4 Quarters"}
+                        {a.scc != null ? ` · SCC ${((a.scc) / 1000).toFixed(0)}k` : ""}
+                        {a.ph != null ? ` · pH ${a.ph}` : ""} · EC {a.conductivity} mS/cm
+                      </div>
                     </div>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-                    <RiskBadge level={a.risk} small lang={lang} />
-                    <TrendArrow dir={a.trend} />
-                  </div>
-                </button>
-              ))}
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+                      <RiskBadge level={a.risk} small lang={lang} />
+                      <TrendArrow dir={a.trend} />
+                    </div>
+                  </button>
+                );
+              })}
           </div>
         </div>
 

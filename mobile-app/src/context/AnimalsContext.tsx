@@ -15,7 +15,7 @@ interface AnimalsContextType {
   loading: boolean;
   refreshAnimals: () => Promise<void>;
   updateRisk: (animalId: string, risk: RiskLevel, temp: number, ph?: number, conductivity?: number) => Promise<void>;
-  addAnimal: (rfidTag: string, name: string, ageYears: number, ageMonths: number, breed: string) => Animal;
+  addAnimal: (rfidTag: string, name: string, ageYears: number, ageMonths: number, breed: string, species?: "Cow" | "Goat" | "Buffalo") => Animal;
 }
 
 const AnimalsContext = createContext<AnimalsContextType>({
@@ -114,6 +114,7 @@ export function AnimalsProvider({ children }: { children: React.ReactNode }) {
       const temp = lastTelemetry.temp != null ? Number(lastTelemetry.temp) : 38.6;
       const ph = lastTelemetry.ph != null ? Number(lastTelemetry.ph) : 6.70;
       const conductivity = lastTelemetry.conductivity != null ? Number(lastTelemetry.conductivity) : 5.0;
+      const weight = lastTelemetry.weight != null ? Number(lastTelemetry.weight) : 12.5;
       const calculatedRiskSummary = computeMilkRisk(lastTelemetry);
       const calculatedRisk = calculatedRiskSummary.risk;
       const scc = lastTelemetry.scc != null ? Number(lastTelemetry.scc) : (calculatedRisk === "high" ? 1850000 : calculatedRisk === "moderate" ? 420000 : 85000);
@@ -213,17 +214,19 @@ export function AnimalsProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
-  // Add a new cow via RFID scan — name entered by farmer at scan time
+  // Add a new animal via RFID scan — name entered by farmer at scan time
   const addAnimal = useCallback(
-    (rfidTag: string, name: string, ageYears: number, ageMonths: number, breed: string): Animal => {
+    (rfidTag: string, name: string, ageYears: number, ageMonths: number, breed: string, species: "Cow" | "Goat" | "Buffalo" = "Cow"): Animal => {
       const totalAnimals = animals.length;
-      const cowNumber = totalAnimals + 1;
-      const padded = String(cowNumber).padStart(3, "0");
+      const num = totalAnimals + 1;
+      const padded = String(num).padStart(3, "0");
+      const prefix = species === "Goat" ? "GT" : species === "Buffalo" ? "BF" : "KA";
 
       const newAnimal: Animal = {
-        id: `KA-${padded}`,
-        name: name.trim() || `Cow ${cowNumber}`,
-        breed: breed || "Mixed",
+        id: `${prefix}-${padded}`,
+        name: name.trim() || `${species} ${num}`,
+        species,
+        breed: breed || (species === "Goat" ? "Jamnapari" : species === "Buffalo" ? "Murrah" : "HF Cross"),
         age: `${ageYears}y ${ageMonths}m`,
         ageYears,
         ageMonths,
@@ -231,13 +234,15 @@ export function AnimalsProvider({ children }: { children: React.ReactNode }) {
         lactation: 1,
         risk: "none",
         trend: "stable",
-        temp: 38.5,
+        temp: species === "Goat" ? 38.9 : 38.5,
         ph: 6.7,
         conductivity: 5.0,
+        scc: species === "Goat" ? 450000 : 120000,
+        scs: 3.0,
         activity: "normal",
-        milk: 0,
+        milk: species === "Goat" ? 2.5 : 14.0,
         lastSync: "Just now",
-        quarter: "All Clear",
+        quarter: species === "Goat" ? "Both Halves Clear" : "All Quarters Clear",
       };
 
       if (isLive) {

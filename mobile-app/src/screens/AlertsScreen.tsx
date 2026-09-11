@@ -16,126 +16,253 @@ export function AlertsScreen({
   onNavigate: (s: Screen) => void;
   lang: string;
 }) {
+  const [filterType, setFilterType] = useState<"all" | "herd" | "animal">("all");
+
   const alerts = [
+    // ── LEVEL 2: HERD-LEVEL EPIDEMIOLOGY ALERTS ──
     {
-      id: 1,
-      animal: "Cow 1 (KA-001)",
+      id: "herd-1",
+      type: "herd" as const,
+      level: "Level 2 — Herd Assessment",
+      target: "Herd A (Main Barn – Anand, Gujarat)",
       risk: "high" as RiskLevel,
+      hriDelta: "+29 pts",
       reason:
         lang === "Tamil"
-          ? "பால் EC 9.4 mS/cm + pH 7.35 உயர்வு — மடிநோய் உறுதி"
+          ? "🚨 மந்தை A அபாய நிலை மாற்றம்: HRI 38% (MODERATE) லிருந்து 67% (HIGH RISK) ஆக அதிகரித்துள்ளது. 3 மாடுகள் தீவிர தொற்றில் உள்ளன."
           : lang === "Hindi"
-          ? "दूध चालकता 9.4 mS/cm + pH 7.35 असामान्य — थनैला पुष्टि"
-          : "Milk EC 9.4 mS/cm + pH 7.35 elevated — Clinical mastitis confirmed",
+          ? "🚨 हर्ड A संक्रमण चेतावनी: HRI 38% (मध्यम) से बढ़कर 67% (उच्च जोखिम) हो गया है। 3 पशु तीव्र थनैला से प्रभावित हैं।"
+          : "🚨 Herd A Outbreak Transition: HRI escalated from 38% (MODERATE) to 67% (HIGH RISK). 3 cows showing acute clinical mastitis.",
+      urgency: lang === "Tamil" ? "உடனடி" : lang === "Hindi" ? "तुरंत" : "Immediate",
+      time: "5 min ago",
+      action:
+        lang === "Tamil"
+          ? "கால்நடை மருத்துவர் ஆலோசனை பெற்று பாதிக்கப்பட்ட மாடுகளை தனிமைப்படுத்தவும்."
+          : lang === "Hindi"
+          ? "पशु चिकित्सक को बुलाएं और तुरंत झुंड पृथक्करण (Quarantine) लागू करें।"
+          : "Enforce biosecurity quarantine, sanitize milking clusters between cows, and request emergency vet visit.",
+    },
+    {
+      id: "herd-2",
+      type: "herd" as const,
+      level: "Level 2 — Herd Assessment",
+      target: "Herd B (East Field – Karnal, Haryana)",
+      risk: "moderate" as RiskLevel,
+      hriDelta: "+14 pts",
+      reason:
+        lang === "Tamil"
+          ? "⚠️ மந்தை B ஆடுகள் கண்காணிப்பு: ஆடுகளின் சராசரி பால் EC 1.8 mS/cm அதிகரித்துள்ளது (7-14 நாள் ஆபத்து)."
+          : lang === "Hindi"
+          ? "⚠️ हर्ड B उप-नैदानिक चेतावनी: बकरियों की दूध चालकता (EC) में वृद्धि दर्ज की गई है।"
+          : "⚠️ Herd B Caprine Subclinical Watch: Caprine baseline conductivity drifted up +1.8 mS/cm. Goat 1 in incubation.",
+      urgency: lang === "Tamil" ? "இன்று" : lang === "Hindi" ? "आज" : "Today",
+      time: "35 min ago",
+      action:
+        lang === "Tamil"
+          ? "அனைத்து ஆடுகளுக்கும் பால் கறந்த பின் 0.5% அயோடின் டிப் தடவவும்."
+          : lang === "Hindi"
+          ? "दूध दुहने के बाद 0.5% आयोडीन टीट डिप का प्रयोग करें।"
+          : "Apply 0.5% post-milking iodine teat dip on all goats and monitor daily 2-half symmetry.",
+    },
+    // ── LEVEL 1: INDIVIDUAL ANIMAL ALERTS ──
+    {
+      id: "animal-1",
+      type: "animal" as const,
+      level: "Level 1 — Animal Assessment",
+      target: "Cow 1 (KA-001) · Herd A",
+      risk: "high" as RiskLevel,
+      hriDelta: null,
+      reason:
+        lang === "Tamil"
+          ? "பால் EC 12.4 mS/cm + pH 6.1 அசாதாரண உயர்வு — வலது முன் மடி தீவிர தொற்று"
+          : lang === "Hindi"
+          ? "दूध चालकता 12.4 mS/cm + pH 6.1 — फ्रंट-राइट अयन में थनैला संक्रमण पुष्टि"
+          : "Milk EC 12.4 mS/cm + pH 6.1 + Temp 39.4°C — Acute mastitis confirmed in Front-Right quarter",
       urgency: lang === "Tamil" ? "உடனடி" : lang === "Hindi" ? "तुरंत" : "Immediate",
       time: "8 min ago",
       action:
         lang === "Tamil"
-          ? "இன்றே கால்நடை மருத்துவ பரிசோதனை தேவை"
+          ? "இன்றே கால்நடை மருத்துவ பரிசோதனை தேவை, வலது மடி பாலை தனியாக கொட்டவும்"
           : lang === "Hindi"
-          ? "आज ही पशु चिकित्सक की जांच जरूरी"
-          : "Vet exam required today",
+          ? "आज ही पशु चिकित्सक की जांच जरूरी, प्रभावित अयन का दूध अलग करें"
+          : "Vet exam required today. Discard Front-Right quarter milk to prevent tank contamination.",
     },
     {
-      id: 2,
-      animal: "Cow 8 (KA-052)",
+      id: "animal-2",
+      type: "animal" as const,
+      level: "Level 1 — Animal Assessment",
+      target: "Goat 1 (GT-001) · Herd B",
       risk: "high" as RiskLevel,
+      hriDelta: null,
       reason:
         lang === "Tamil"
-          ? "பால் EC 9.8 mS/cm + காய்ச்சல் 39.4°C — தீவிர மடிநோய் அறிகுறி"
+          ? "ஆடு 1: பால் EC 13.8 mS/cm + காய்ச்சல் 40.1°C — வலது மடி பகுதியில் கடுமையான தொற்று"
           : lang === "Hindi"
-          ? "दूध चालकता 9.8 mS/cm + बुखार 39.4°C — थनैला के गंभीर लक्षण"
-          : "Milk EC 9.8 mS/cm + Fever 39.4°C — Active clinical mastitis",
+          ? "बकरी 1: दूध चालकता 13.8 mS/cm + बुखार 40.1°C — राइट हाफ में तीव्र संक्रमण"
+          : "Goat 1: Milk EC 13.8 mS/cm + Fever 40.1°C — Acute unilateral mastitis in Right Half",
       urgency: lang === "Tamil" ? "உடனடி" : lang === "Hindi" ? "तुरंत" : "Immediate",
-      time: "22 min ago",
+      time: "15 min ago",
       action:
         lang === "Tamil"
-          ? "மந்தையை விட்டு தனிமைப்படுத்தி மருத்துவரை அழைக்கவும்"
+          ? "மருத்துவரை அழைத்து அழற்சி எதிர்ப்பு சிகிச்சை அளிக்கவும்"
           : lang === "Hindi"
-          ? "झुंड से अलग करें और डॉक्टर को बुलाएं"
-          : "Isolate and call vet",
+          ? "डॉक्टर को बुलाएं और एंटी-बायोटिक स्प्रे लगाएं"
+          : "Administer caprine anti-inflammatory protocol and isolate from kid nursing.",
     },
     {
-      id: 3,
-      animal: "Cow 2 (KA-007)",
+      id: "animal-3",
+      type: "animal" as const,
+      level: "Level 1 — Animal Assessment",
+      target: "Cow 2 (KA-007) · Herd A",
       risk: "moderate" as RiskLevel,
+      hriDelta: null,
       reason:
         lang === "Tamil"
-          ? "பால் கடத்துதிறன் (EC) 3 நாட்களில் 6.8 mS/cm ஆக உயர்ந்துள்ளது (7-14 நாள் ஆபத்து)"
+          ? "பால் கடத்துதிறன் (EC) 3 நாட்களில் 9.8 mS/cm ஆக உயர்ந்துள்ளது (7-14 நாள் ஆபத்து)"
           : lang === "Hindi"
-          ? "दूध चालकता (EC) 3 दिनों में 6.8 mS/cm तक बढ़ी (7-14 दिन का जोखिम)"
-          : "Milk EC trending up to 6.8 mS/cm over 3 days (7–14d mastitis risk)",
+          ? "दूध चालकता (EC) 3 दिनों में 9.8 mS/cm तक बढ़ी (7-14 दिन का जोखिम)"
+          : "Milk EC trending up to 9.8 mS/cm over 3 days (7–14d subclinical mastitis forecast)",
       urgency: lang === "Tamil" ? "இன்று" : lang === "Hindi" ? "आज" : "Today",
       time: "1 hr ago",
       action:
         lang === "Tamil"
-          ? "கண்காணிப்பு முறையை அதிகரிக்கவும்"
+          ? "கண்காணிப்பு முறையை அதிகரிக்கவும், மூலிகை லேப் தடவவும்"
           : lang === "Hindi"
-          ? "निगरानी बढ़ाएं"
-          : "Increase monitoring frequency",
+          ? "निगरानी बढ़ाएं और आयुर्वेदिक लेप का प्रयोग करें"
+          : "Increase IoT monitoring frequency; apply herbal masticare aloe/turmeric paste.",
     },
   ];
 
-  const [acknowledged, setAcknowledged] = useState<number[]>([]);
+  const [acknowledged, setAcknowledged] = useState<string[]>([]);
+
+  const filteredAlerts = alerts.filter((a) => {
+    if (filterType === "herd") return a.type === "herd";
+    if (filterType === "animal") return a.type === "animal";
+    return true;
+  });
 
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "#F7F4EE", position: "relative" }}>
       <ReadAloudFAB screen="alerts" lang={lang} />
       <div style={{ background: "#FFFFFF", borderBottom: "1px solid #E0DAD0" }}>
-        <div style={{ padding: "12px 16px 12px" }}>
-          <div style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 700, color: "#1C2714" }}>
-            {t("alerts_title", lang)}{" "}
-            <span
-              style={{
-                background: "#FCE8E5",
-                color: "#B83220",
-                fontSize: 13,
-                fontWeight: 700,
-                padding: "2px 10px",
-                borderRadius: 12,
-                fontFamily: "'Outfit', sans-serif",
-              }}
-            >
-              {t("critical_badge", lang)}
-            </span>
+        <div style={{ padding: "12px 16px 10px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <div style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 700, color: "#1C2714" }}>
+              {t("alerts_title", lang)}{" "}
+              <span
+                style={{
+                  background: "#FCE8E5",
+                  color: "#B83220",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  padding: "2px 10px",
+                  borderRadius: 12,
+                  fontFamily: "'Outfit', sans-serif",
+                }}
+              >
+                {t("critical_badge", lang)}
+              </span>
+            </div>
+            <div style={{ fontSize: 11, color: "#6B7A5C", fontWeight: 600 }}>
+              {alerts.length} Total Alerts ({alerts.filter(a => a.type === "herd").length} Herd · {alerts.filter(a => a.type === "animal").length} Animal)
+            </div>
+          </div>
+
+          {/* Filter Tabs */}
+          <div style={{ display: "flex", gap: 6, overflowX: "auto" }}>
+            {[
+              { id: "all", label: `🌐 All Alerts (${alerts.length})` },
+              { id: "herd", label: `🚨 Herd Outbreaks – Level 2 (${alerts.filter(a => a.type === "herd").length})` },
+              { id: "animal", label: `🐄 Animal Alerts – Level 1 (${alerts.filter(a => a.type === "animal").length})` },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setFilterType(tab.id as any)}
+                style={{
+                  background: filterType === tab.id ? "#2A5C1F" : "#F0EDE6",
+                  color: filterType === tab.id ? "#FFFFFF" : "#6B7A5C",
+                  border: "none",
+                  borderRadius: 14,
+                  padding: "6px 12px",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  transition: "all 0.15s",
+                }}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
         </div>
       </div>
+
       <div style={{ flex: 1, overflow: "auto", padding: 16 }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {alerts.map((alert) => (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {filteredAlerts.map((alert) => (
             <Card
               key={alert.id}
               style={{
-                borderLeft: `4px solid ${RISK_COLOR[alert.risk].dot}`,
+                borderLeft: `5px solid ${RISK_COLOR[alert.risk].dot}`,
+                background: alert.type === "herd" ? "linear-gradient(135deg, #FFFDF8, #FFFFFF)" : "#FFFFFF",
+                border: alert.type === "herd" ? "1.5px solid #FCD34D" : "1px solid #E0DAD0",
                 opacity: acknowledged.includes(alert.id) ? 0.65 : 1,
+                boxShadow: alert.type === "herd" ? "0 4px 14px rgba(245,158,11,0.15)" : "0 2px 8px rgba(0,0,0,0.04)",
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
-                <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+                  <span
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 800,
+                      background: alert.type === "herd" ? "#78350F" : "#1C3814",
+                      color: "#FFFFFF",
+                      padding: "2px 7px",
+                      borderRadius: 6,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.04em",
+                    }}
+                  >
+                    {alert.level}
+                  </span>
                   <RiskBadge level={alert.risk} small lang={lang} />
+                  {alert.hriDelta && (
+                    <span style={{ fontSize: 10, fontWeight: 800, color: "#B83220", background: "#FEE2E2", padding: "1px 6px", borderRadius: 6 }}>
+                      ▲ {alert.hriDelta}
+                    </span>
+                  )}
                   <span style={{ fontSize: 11, color: "#9BA88C", fontWeight: 500 }}>{alert.time}</span>
                 </div>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#B83220" }}>⏱ {alert.urgency}</span>
+                <span style={{ fontSize: 11, fontWeight: 800, color: "#B83220" }}>⏱ {alert.urgency}</span>
               </div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#1C2714", marginBottom: 4 }}>{alert.animal}</div>
-              <div style={{ fontSize: 12, color: "#6B7A5C", lineHeight: 1.4, marginBottom: 8 }}>{alert.reason}</div>
+
+              <div style={{ fontSize: 14, fontWeight: 800, color: "#1C2714", marginBottom: 4 }}>
+                {alert.target}
+              </div>
+
+              <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.45, marginBottom: 8 }}>
+                {alert.reason}
+              </div>
+
               <div
                 style={{
                   background: "#F7F4EE",
                   borderRadius: 10,
-                  padding: "8px 12px",
+                  padding: "9px 12px",
                   marginBottom: 10,
                   display: "flex",
                   gap: 8,
                   alignItems: "flex-start",
                 }}
               >
-                <span style={{ fontSize: 14 }}>💡</span>
-                <span style={{ fontSize: 12, color: "#1C2714", fontWeight: 500 }}>{alert.action}</span>
+                <span style={{ fontSize: 15 }}>💡</span>
+                <span style={{ fontSize: 12, color: "#1C2714", fontWeight: 600 }}>{alert.action}</span>
               </div>
+
               <button
-                onClick={() => sendWhatsAppAlert(alert.animal, alert.risk, alert.reason, alert.action, alert.urgency, lang)}
+                onClick={() => sendWhatsAppAlert(alert.target, alert.risk, alert.reason, alert.action, alert.urgency, lang)}
                 style={{
                   width: "100%",
                   display: "flex",
@@ -160,6 +287,7 @@ export function AlertsScreen({
                 </svg>
                 {t("whatsapp_btn", lang)}
               </button>
+
               {!acknowledged.includes(alert.id) && (
                 <div style={{ display: "flex", gap: 8 }}>
                   <button
@@ -180,7 +308,7 @@ export function AlertsScreen({
                     ✓ {t("acknowledge", lang)}
                   </button>
                   <button
-                    onClick={() => onNavigate("recommendations")}
+                    onClick={() => onNavigate(alert.type === "herd" ? "analytics" : "recommendations")}
                     style={{
                       flex: 1,
                       background: "#2A5C1F",
@@ -194,7 +322,7 @@ export function AlertsScreen({
                       minHeight: 40,
                     }}
                   >
-                    ↑ {t("escalate", lang)}
+                    {alert.type === "herd" ? "📊 View Herd Analytics →" : `↑ ${t("escalate", lang)}`}
                   </button>
                 </div>
               )}

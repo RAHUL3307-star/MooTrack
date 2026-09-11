@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StatusBar,
   BackHeader,
@@ -6,9 +6,11 @@ import {
   SectionLabel,
   ReadAloudFAB,
 } from "../components/ui";
-import { RISK_COLOR } from "../types/index";
-import type { Screen } from "../types/index";
+import { ANIMALS, RISK_COLOR } from "../types/index";
+import type { Screen, RiskLevel } from "../types/index";
 import { t } from "../i18n/index";
+import { useAnimals } from "../context/AnimalsContext";
+import { calculateHerdRisk } from "../services/herdService";
 
 export function AIRiskScreen({
   onBack,
@@ -19,77 +21,169 @@ export function AIRiskScreen({
   onNavigate?: (s: Screen) => void;
   lang: string;
 }) {
+  const { animals, selectedAnimal, setSelectedAnimal } = useAnimals();
+  const [activeAnimalId, setActiveAnimalId] = useState<string>(
+    selectedAnimal?.id || (animals[0] ? animals[0].id : "KA-001")
+  );
+
+  const animal = animals.find((a) => a.id === activeAnimalId) || animals[0] || ANIMALS[0];
+  const species = animal.species || (animal.id.startsWith("GT") ? "Goat" : animal.id.startsWith("BF") ? "Buffalo" : "Cow");
+  const speciesIcon = species === "Goat" ? "🐐" : species === "Buffalo" ? "🐃" : "🐄";
+
+  const herd = calculateHerdRisk(animals);
+
+  // Individual risk calculation
+  const riskScore = animal.risk === "high" ? 88 : animal.risk === "moderate" ? 64 : animal.risk === "low" ? 22 : 8;
+
   const forecastDays = [
-    { day: t("today", lang), prob: 0.88, label: t("risk_high", lang) },
-    { day: "D+1", prob: 0.91, label: t("risk_high", lang) },
-    { day: "D+2", prob: 0.93, label: t("risk_high", lang) },
-    { day: "D+3", prob: 0.89, label: t("risk_high", lang) },
-    { day: "D+7", prob: 0.74, label: t("risk_moderate", lang) },
-    { day: "D+14", prob: 0.52, label: t("risk_moderate", lang) },
+    { day: t("today", lang), prob: animal.risk === "high" ? 0.88 : animal.risk === "moderate" ? 0.64 : 0.18 },
+    { day: "D+1", prob: animal.risk === "high" ? 0.91 : animal.risk === "moderate" ? 0.71 : 0.20 },
+    { day: "D+2", prob: animal.risk === "high" ? 0.93 : animal.risk === "moderate" ? 0.78 : 0.22 },
+    { day: "D+3", prob: animal.risk === "high" ? 0.89 : animal.risk === "moderate" ? 0.82 : 0.19 },
+    { day: "D+7", prob: animal.risk === "high" ? 0.74 : animal.risk === "moderate" ? 0.75 : 0.15 },
+    { day: "D+14", prob: animal.risk === "high" ? 0.52 : animal.risk === "moderate" ? 0.60 : 0.12 },
   ];
+
+  const handleAnimalChange = (id: string) => {
+    setActiveAnimalId(id);
+    const found = animals.find((a) => a.id === id);
+    if (found) setSelectedAnimal(found);
+  };
 
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "#F7F4EE", position: "relative" }}>
       <ReadAloudFAB screen="ai-risk" lang={lang} />
-      <div style={{ background: "#FFFFFF" }}>
+      <div style={{ background: "#FFFFFF", borderBottom: "1px solid #E0DAD0" }}>
         <BackHeader title={t("ai_risk_title", lang)} onBack={onBack} />
+        {/* Animal Selector Dropdown Bar */}
+        <div style={{ padding: "0 16px 12px", display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: "#6B7A5C", whiteSpace: "nowrap" }}>
+            Select Animal:
+          </span>
+          <select
+            value={animal.id}
+            onChange={(e) => handleAnimalChange(e.target.value)}
+            style={{
+              flex: 1,
+              background: "#F7F4EE",
+              border: "1.5px solid #D0CCC4",
+              borderRadius: 10,
+              padding: "8px 10px",
+              fontSize: 13,
+              fontWeight: 700,
+              color: "#1C2714",
+              outline: "none",
+            }}
+          >
+            {animals.map((a) => {
+              const sp = a.species || (a.id.startsWith("GT") ? "Goat" : a.id.startsWith("BF") ? "Buffalo" : "Cow");
+              const icon = sp === "Goat" ? "🐐" : sp === "Buffalo" ? "🐃" : "🐄";
+              return (
+                <option key={a.id} value={a.id}>
+                  {icon} {a.name} ({a.id}) — {a.risk.toUpperCase()}
+                </option>
+              );
+            })}
+          </select>
+        </div>
       </div>
+
       <div style={{ flex: 1, overflow: "auto", padding: 16 }}>
-        {/* Risk verdict */}
+        {/* ── LEVEL 1: Individual Animal AI Risk Assessment ────────────────── */}
+        <div style={{ marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: 9, fontWeight: 800, background: "#1C2714", color: "#FFFFFF", padding: "2px 6px", borderRadius: 6 }}>
+            LEVEL 1
+          </span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: "#475569", textTransform: "uppercase" }}>
+            Individual Animal Predictive Risk
+          </span>
+        </div>
+
         <div
           style={{
-            background: RISK_COLOR.high.bg,
-            border: `1.5px solid ${RISK_COLOR.high.border}`,
+            background: RISK_COLOR[animal.risk].bg,
+            border: `1.5px solid ${RISK_COLOR[animal.risk].border}`,
             borderRadius: 18,
-            padding: 20,
+            padding: 16,
             marginBottom: 16,
             display: "flex",
-            gap: 16,
+            gap: 14,
             alignItems: "center",
           }}
         >
           <div
             style={{
-              width: 72,
-              height: 72,
+              width: 68,
+              height: 68,
               borderRadius: "50%",
-              border: `3px solid ${RISK_COLOR.high.dot}`,
+              border: `3px solid ${RISK_COLOR[animal.risk].dot}`,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
               background: "#FFFFFF",
+              flexShrink: 0,
             }}
           >
-            <div style={{ fontFamily: "'Fraunces', serif", fontSize: 24, fontWeight: 700, color: "#B83220", lineHeight: 1 }}>
-              88%
+            <div style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 700, color: RISK_COLOR[animal.risk].text, lineHeight: 1 }}>
+              {riskScore}%
             </div>
-            <div style={{ fontSize: 9, color: "#B83220", fontWeight: 700 }}>{t("risk_score_label", lang)}</div>
+            <div style={{ fontSize: 8.5, color: RISK_COLOR[animal.risk].text, fontWeight: 700 }}>RISK SCORE</div>
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-              <span style={{ fontSize: 18 }}>!</span>
-              <span style={{ fontWeight: 800, fontSize: 18, color: "#B83220", fontFamily: "'Fraunces', serif" }}>
-                {t("risk_high", lang)}
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
+              <span style={{ fontSize: 18 }}>{speciesIcon}</span>
+              <span style={{ fontWeight: 800, fontSize: 16, color: RISK_COLOR[animal.risk].text, fontFamily: "'Fraunces', serif" }}>
+                {animal.risk.toUpperCase()} RISK
               </span>
             </div>
-            <div style={{ fontSize: 12, color: "#6B7A5C", lineHeight: 1.4 }}>
-              Cow 1 (KA-001) {t("high_risk_alert", lang)}
+            <div style={{ fontSize: 12, color: "#1C2714", fontWeight: 700 }}>
+              {animal.name} ({animal.id}) · {species} ({animal.breed})
             </div>
-            <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
-              <span style={{ fontSize: 10, background: "#FFFFFF", border: "1px solid #E0DAD0", padding: "2px 8px", borderRadius: 6, color: "#6B7A5C", fontWeight: 600 }}>
-                {t("confidence", lang)}
+            <div style={{ fontSize: 11, color: "#6B7A5C", marginTop: 2 }}>
+              Affected: <strong>{animal.quarter}</strong> · Lactation {animal.lactation}
+            </div>
+            <div style={{ display: "flex", gap: 4, marginTop: 6, flexWrap: "wrap" }}>
+              <span style={{ fontSize: 9.5, background: "#FFFFFF", border: "1px solid #E0DAD0", padding: "2px 6px", borderRadius: 6, color: "#6B7A5C", fontWeight: 600 }}>
+                94.8% ML Confidence
               </span>
-              <span style={{ fontSize: 10, background: "#FFFFFF", border: "1px solid #E0DAD0", padding: "2px 8px", borderRadius: 6, color: "#6B7A5C", fontWeight: 600 }}>
-                {t("signals_active", lang)}
+              <span style={{ fontSize: 9.5, background: "#FFFFFF", border: "1px solid #E0DAD0", padding: "2px 6px", borderRadius: 6, color: "#6B7A5C", fontWeight: 600 }}>
+                {species === "Goat" ? "2-Halves Telemetry" : "4-Quarters Telemetry"}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Forecast */}
+        {/* ── LEVEL 2: Herd-Level Epidemiological Context ─────────────────── */}
+        <div style={{ marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: 9, fontWeight: 800, background: "#0F766E", color: "#FFFFFF", padding: "2px 6px", borderRadius: 6 }}>
+            LEVEL 2
+          </span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: "#475569", textTransform: "uppercase" }}>
+            Herd-Level Epidemiological Baseline
+          </span>
+        </div>
+
+        <Card style={{ marginBottom: 14 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#1C2714" }}>
+                Herd Risk Index (HRI): <strong style={{ color: herd.status === "HIGH" ? "#B83220" : herd.status === "MODERATE" ? "#C47A10" : "#2A5C1F" }}>{herd.hri}% ({herd.status})</strong>
+              </div>
+              <div style={{ fontSize: 11, color: "#64748B" }}>
+                {herd.quarantineCount} animals in quarantine · {herd.watchListCount} on subclinical watchlist
+              </div>
+            </div>
+            <div style={{ fontSize: 24 }}>🛡️</div>
+          </div>
+          <div style={{ fontSize: 11, color: "#475569", background: "#F8FAFC", padding: "8px 10px", borderRadius: 8, border: "1px solid #E2E8F0" }}>
+            <strong>Herd Impact:</strong> This {species.toLowerCase()}'s risk level of <strong>{animal.risk.toUpperCase()}</strong> contributes to the herd's biosecurity score. {herd.status === "HIGH" ? "Immediate herd isolation protocols in effect." : "Routine herd biosecurity adequate."}
+          </div>
+        </Card>
+
+        {/* 14-Day Early Forecast Trajectory */}
         <Card style={{ marginBottom: 12 }}>
-          <SectionLabel>{t("forecast_label", lang)}</SectionLabel>
+          <SectionLabel>14-Day Early Forecast Trajectory ({animal.name})</SectionLabel>
           <div style={{ display: "flex", gap: 6 }}>
             {forecastDays.map((d, i) => (
               <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
@@ -99,15 +193,15 @@ export function AIRiskScreen({
                     width: "100%",
                     height: 48,
                     borderRadius: 8,
-                    background: d.prob > 0.7 ? RISK_COLOR.high.bg : RISK_COLOR.moderate.bg,
+                    background: d.prob > 0.7 ? RISK_COLOR.high.bg : d.prob > 0.35 ? RISK_COLOR.moderate.bg : RISK_COLOR.low.bg,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    border: `1px solid ${d.prob > 0.7 ? RISK_COLOR.high.border : RISK_COLOR.moderate.border}`,
+                    border: `1px solid ${d.prob > 0.7 ? RISK_COLOR.high.border : d.prob > 0.35 ? RISK_COLOR.moderate.border : RISK_COLOR.low.border}`,
                   }}
                 >
                   <div style={{ textAlign: "center" }}>
-                    <div style={{ fontSize: 12, fontWeight: 800, color: d.prob > 0.7 ? "#B83220" : "#C47A10" }}>
+                    <div style={{ fontSize: 12, fontWeight: 800, color: d.prob > 0.7 ? "#B83220" : d.prob > 0.35 ? "#C47A10" : "#2D7A26" }}>
                       {Math.round(d.prob * 100)}%
                     </div>
                   </div>
@@ -117,15 +211,31 @@ export function AIRiskScreen({
           </div>
         </Card>
 
-        {/* Why at risk */}
+        {/* Why at risk (Explainability) */}
         <Card style={{ marginBottom: 14 }}>
-          <SectionLabel>{t("why_risk", lang)}</SectionLabel>
+          <SectionLabel>{t("why_risk", lang)} (Species-Calibrated Signals)</SectionLabel>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {[
-              { label: lang === "Tamil" ? "பால் pH காரத்தன்மை மாறுபாடு" : lang === "Hindi" ? "दूध pH असंतुलन (क्षारीय)" : "Milk pH Shift (Alkaline)", weight: 0.82, detail: "pH 7.35 (alkaline shift ↑)" },
-              { label: lang === "Tamil" ? "பால் கடத்துதிறன் அதிகம்" : "Conductivity Elevated", weight: 0.76, detail: "14.2 mS/cm Front-Right" },
-              { label: lang === "Tamil" ? "பால் உற்பத்தி குறைவு" : "Milk Yield Decline", weight: 0.71, detail: "10.2L vs 14.8L baseline (↓31%)" },
-              { label: lang === "Tamil" ? "உடல் வெப்பநிலை அதிகம்" : "Body Temperature", weight: 0.68, detail: "39.4°C > 39.0°C" },
+              {
+                label: "Milk Electrical Conductivity (EC)",
+                weight: animal.conductivity > 8 ? 0.84 : 0.25,
+                detail: `${animal.conductivity} mS/cm (${animal.quarter} asymmetric shift)`,
+              },
+              {
+                label: "Somatic Cell Count (SCC)",
+                weight: (animal.scc || 185000) > (species === "Goat" ? 1200000 : 500000) ? 0.88 : (animal.scc || 185000) > (species === "Goat" ? 750000 : 200000) ? 0.62 : 0.15,
+                detail: `${(((animal.scc || (species === "Goat" ? 450000 : 185000))) / 1000).toFixed(0)}k cells/mL (SCS ${(animal.scs || 3.2).toFixed(1)})`,
+              },
+              {
+                label: "Milk pH Shift",
+                weight: (animal.ph || 6.6) > 7.0 || (animal.ph || 6.6) < 6.4 ? 0.76 : 0.20,
+                detail: `pH ${animal.ph || 6.6} ${(animal.ph || 6.6) > 7.0 ? "(Alkaline shift ↑)" : "(Normal physiological range)"}`,
+              },
+              {
+                label: "Milk Yield Loss vs Expected",
+                weight: animal.risk === "high" ? 0.72 : animal.risk === "moderate" ? 0.45 : 0.10,
+                detail: `${animal.milk}L daily yield (${species} expected: ${species === "Goat" ? "2.5–3.5L" : "14–18L"})`,
+              },
             ].map((f, i) => (
               <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
                 <div style={{ flex: 1 }}>
@@ -134,7 +244,7 @@ export function AIRiskScreen({
                     <div
                       style={{
                         height: "100%",
-                        background: f.weight > 0.7 ? "#B83220" : "#C47A10",
+                        background: f.weight > 0.7 ? "#B83220" : f.weight > 0.4 ? "#C47A10" : "#2A5C1F",
                         borderRadius: 3,
                         width: `${f.weight * 100}%`,
                       }}
@@ -184,3 +294,4 @@ export function AIRiskScreen({
     </div>
   );
 }
+

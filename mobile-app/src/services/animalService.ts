@@ -54,6 +54,7 @@ export async function fetchAnimals(): Promise<Animal[]> {
     return data.map((row) => ({
       id: row.id,
       name: normalizeCowName(row.id, row.name),
+      species: (row as any).species || (row.id.startsWith("GT") ? "Goat" : row.id.startsWith("BF") ? "Buffalo" : "Cow"),
       breed: row.breed,
       age: row.age,
       ageYears: row.age_years ?? undefined,

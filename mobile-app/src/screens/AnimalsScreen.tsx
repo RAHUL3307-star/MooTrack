@@ -4,8 +4,10 @@ import { RISK_COLOR } from "../types/index";
 import type { Screen, RiskLevel } from "../types/index";
 import { t } from "../i18n/index";
 import { useAnimals } from "../context/AnimalsContext";
+import { useHerd } from "../context/HerdContext";
 import { useESP32 } from "../context/ESP32Context";
 
+// ─── RFID Registration Modal ──────────────────────────────────────────────────
 // ─── RFID Registration Modal ──────────────────────────────────────────────────
 function RFIDRegisterModal({
   onClose,
@@ -13,30 +15,43 @@ function RFIDRegisterModal({
   lang,
 }: {
   onClose: () => void;
-  onRegister: (rfid: string, name: string, ageYears: number, ageMonths: number, breed: string) => void;
+  onRegister: (rfid: string, name: string, ageYears: number, ageMonths: number, breed: string, species: "Cow" | "Goat" | "Buffalo") => void;
   lang: string;
 }) {
   const { isLive, lastTelemetry } = useESP32();
   const { animals } = useAnimals();
-  const defaultName = `Cow ${animals.length + 1}`;
+  const [species, setSpecies] = useState<"Cow" | "Goat" | "Buffalo">("Cow");
+  const defaultName = `${species} ${animals.length + 1}`;
   const [name, setName] = useState(defaultName);
   const [rfidTag, setRfidTag] = useState(
     isLive && lastTelemetry?.rfidTag ? lastTelemetry.rfidTag : isLive && lastTelemetry?.cowId ? lastTelemetry.cowId : ""
   );
   const [ageYears, setAgeYears] = useState("3");
   const [ageMonths, setAgeMonths] = useState("0");
-  const [breed, setBreed] = useState("HF Cross");
+
+  const SPECIES_BREEDS: Record<"Cow" | "Goat" | "Buffalo", string[]> = {
+    Cow: ["HF Cross", "Sahiwal", "Jersey X", "Gir", "Tharparkar", "Red Sindhi", "Mixed"],
+    Goat: ["Jamnapari", "Sirohi", "Beetal", "Barbari", "Osmanabadi", "Black Bengal", "Mixed"],
+    Buffalo: ["Murrah", "Nili-Ravi", "Jaffarabadi", "Surti", "Bhadawari", "Mehsana"],
+  };
+
+  const [breed, setBreed] = useState(SPECIES_BREEDS.Cow[0]);
+
+  const handleSpeciesChange = (newSp: "Cow" | "Goat" | "Buffalo") => {
+    setSpecies(newSp);
+    setBreed(SPECIES_BREEDS[newSp][0]);
+    setName(`${newSp} ${animals.length + 1}`);
+  };
+
   const [scanning, setScanning] = useState(false);
   const [scanned, setScanned] = useState(false);
-
-  const BREEDS = ["HF Cross", "Murrah Buf.", "Sahiwal", "Jersey X", "Gir", "Tharparkar", "Red Sindhi", "Mixed"];
 
   const handleScan = () => {
     setScanning(true);
     setTimeout(() => {
       const tag = isLive && (lastTelemetry?.rfidTag || lastTelemetry?.cowId)
         ? (lastTelemetry.rfidTag || lastTelemetry.cowId)
-        : `RFID-${Math.floor(Math.random() * 9000) + 1000}`;
+        : `RFID-${species === "Goat" ? "G" : species === "Buffalo" ? "B" : "0"}${Math.floor(Math.random() * 900) + 100}`;
       setRfidTag(tag);
       setScanning(false);
       setScanned(true);
@@ -45,7 +60,7 @@ function RFIDRegisterModal({
 
   const handleSubmit = () => {
     if (!rfidTag.trim()) return;
-    onRegister(rfidTag.trim(), name.trim() || defaultName, parseInt(ageYears) || 0, parseInt(ageMonths) || 0, breed);
+    onRegister(rfidTag.trim(), name.trim() || defaultName, parseInt(ageYears) || 0, parseInt(ageMonths) || 0, breed, species);
     onClose();
   };
 
@@ -80,6 +95,8 @@ function RFIDRegisterModal({
           padding: "24px 20px 36px",
           boxShadow: "0 -8px 40px rgba(0,0,0,0.18)",
           display: "flex", flexDirection: "column", gap: 16,
+          maxHeight: "90vh",
+          overflowY: "auto",
         }}
       >
         {/* Handle */}
@@ -89,16 +106,50 @@ function RFIDRegisterModal({
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div style={{ fontFamily: "'Fraunces', serif", fontSize: 20, fontWeight: 700, color: "#1C2714" }}>
-              📡 {lang === "Hindi" ? "नई गाय दर्ज करें" : lang === "Tamil" ? "புதிய மாடு பதிவு" : "Register New Cow"}
+              📡 {lang === "Hindi" ? "नया पशु दर्ज करें" : lang === "Tamil" ? "புதிய கால்நடை பதிவு" : "Register New Animal"}
             </div>
             <div style={{ fontSize: 12, color: "#9BA88C", marginTop: 2 }}>
-              {lang === "Hindi" ? "RFID स्कैन करके या मैन्युअल दर्ज करें" : "Scan RFID card or enter manually"}
+              {lang === "Hindi" ? "गाय, बकरी या भैंस का RFID स्कैन करें" : "Scan RFID card or enter Cow, Goat, Buffalo details"}
             </div>
           </div>
           <button
             onClick={onClose}
             style={{ background: "#F0EDE6", border: "none", borderRadius: 10, padding: "8px 12px", fontSize: 16, cursor: "pointer" }}
           >✕</button>
+        </div>
+
+        {/* Species Selection */}
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#6B7A5C", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            🐾 {lang === "Hindi" ? "पशु प्रजाति" : lang === "Tamil" ? "கால்நடை வகை" : "Animal Species"}
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+            {(["Cow", "Goat", "Buffalo"] as const).map((sp) => (
+              <button
+                key={sp}
+                type="button"
+                onClick={() => handleSpeciesChange(sp)}
+                style={{
+                  background: species === sp ? "#2A5C1F" : "#F7F4EE",
+                  color: species === sp ? "#FFFFFF" : "#1C2714",
+                  border: `1.5px solid ${species === sp ? "#2A5C1F" : "#D0CCC4"}`,
+                  borderRadius: 12,
+                  padding: "10px 6px",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 3,
+                  transition: "all 0.15s",
+                }}
+              >
+                <span style={{ fontSize: 20 }}>{sp === "Goat" ? "🐐" : sp === "Buffalo" ? "🐃" : "🐄"}</span>
+                <span>{sp === "Cow" ? "Cow 🐄" : sp === "Goat" ? "Goat 🐐" : "Buffalo 🐃"}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* RFID Scan Area */}
@@ -127,7 +178,7 @@ function RFIDRegisterModal({
             <div>
               <div style={{ fontSize: 28, marginBottom: 4 }}>🏷️</div>
               <div style={{ fontSize: 12, color: "#9BA88C" }}>
-                {isLive ? "ESP32 connected — tap to scan" : "No hardware — tap to simulate scan"}
+                {isLive ? "ESP32 connected — tap to scan" : "Tap to scan RFID or simulate tag"}
               </div>
             </div>
           )}
@@ -156,15 +207,15 @@ function RFIDRegisterModal({
           </div>
         </div>
 
-        {/* Cow Name */}
+        {/* Animal Name */}
         <div>
           <div style={{ fontSize: 12, fontWeight: 700, color: "#6B7A5C", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-            🏷️ {lang === "Hindi" ? "गाय का नाम" : lang === "Tamil" ? "மாட்டின் பெயர்" : "Cow Name"}
+            🏷️ {lang === "Hindi" ? "पशु का नाम" : lang === "Tamil" ? "கால்நடை பெயர்" : "Animal Name"}
           </div>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Cow 1, Cow 2, Lakshmi..."
+            placeholder={`e.g. ${species} 1, Lakshmi, Chandani...`}
             style={inputStyle}
           />
         </div>
@@ -205,14 +256,14 @@ function RFIDRegisterModal({
         {/* Breed */}
         <div>
           <div style={{ fontSize: 12, fontWeight: 700, color: "#6B7A5C", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-            🐄 {lang === "Hindi" ? "नस्ल" : lang === "Tamil" ? "இனம்" : "Breed"}
+            🐾 {lang === "Hindi" ? "नस्ल" : lang === "Tamil" ? "இனம்" : "Breed"}
           </div>
           <select
             value={breed}
             onChange={(e) => setBreed(e.target.value)}
             style={{ ...inputStyle }}
           >
-            {BREEDS.map((b) => <option key={b} value={b}>{b}</option>)}
+            {SPECIES_BREEDS[species].map((b) => <option key={b} value={b}>{b}</option>)}
           </select>
         </div>
 
@@ -229,7 +280,7 @@ function RFIDRegisterModal({
             boxShadow: rfidTag.trim() ? "0 4px 16px rgba(42,92,31,0.3)" : "none",
           }}
         >
-          ✅ {lang === "Hindi" ? "गाय दर्ज करें" : lang === "Tamil" ? "மாட்டை பதிவு செய்" : "Register Cow"}
+          ✅ {lang === "Hindi" ? `${species === "Goat" ? "बकरी" : species === "Buffalo" ? "भैंस" : "गाय"} दर्ज करें` : `Register ${species}`}
         </button>
       </div>
     </div>
@@ -246,30 +297,68 @@ export function AnimalsScreen({
 }) {
   const { isLive, lastTelemetry } = useESP32();
   const { animals, setSelectedAnimal, addAnimal } = useAnimals();
-  const [filter, setFilter] = useState<"all" | RiskLevel>("all");
+  const { selectedHerdId, setSelectedHerdId, herds } = useHerd();
+  const [speciesFilter, setSpeciesFilter] = useState<"all" | "Cow" | "Goat" | "Buffalo">("all");
+  const [riskFilter, setRiskFilter] = useState<"all" | RiskLevel>("all");
+  const [lactationFilter, setLactationFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"risk_desc" | "risk_asc" | "milk_desc" | "name" | "lactation_desc">("risk_desc");
   const [search, setSearch] = useState("");
   const [showRFIDModal, setShowRFIDModal] = useState(false);
   const [justAdded, setJustAdded] = useState<string | null>(null);
 
-  const filters: { id: "all" | RiskLevel; label: string }[] = [
-    { id: "all", label: lang === "Tamil" ? "அனைத்தும்" : lang === "Hindi" ? "सभी" : "All" },
+  const riskFilters: { id: "all" | RiskLevel; label: string }[] = [
+    { id: "all", label: lang === "Tamil" ? "அனைத்து இடர்" : lang === "Hindi" ? "सभी रिस्क" : "All Risks" },
     { id: "high", label: t("risk_high", lang) },
     { id: "moderate", label: t("risk_moderate", lang) },
     { id: "low", label: t("risk_low", lang) },
     { id: "none", label: t("risk_none", lang) },
   ];
 
-  const visible = animals.filter(
-    (a) =>
-      (filter === "all" || a.risk === filter) &&
-      (search === "" ||
+  const speciesFilters: { id: "all" | "Cow" | "Goat" | "Buffalo"; label: string; icon: string }[] = [
+    { id: "all", label: "All Species", icon: "🐾" },
+    { id: "Cow", label: "Cows", icon: "🐄" },
+    { id: "Goat", label: "Goats", icon: "🐐" },
+    { id: "Buffalo", label: "Buffaloes", icon: "🐃" },
+  ];
+
+  const getRiskScore = (risk: RiskLevel): number => {
+    switch (risk) {
+      case "high": return 88;
+      case "moderate": return 64;
+      case "low": return 22;
+      case "none": return 8;
+    }
+  };
+
+  const visible = animals
+    .filter((a) => {
+      const sp = a.species || (a.id.startsWith("GT") ? "Goat" : a.id.startsWith("BF") ? "Buffalo" : "Cow");
+      const matchesHerd = selectedHerdId === "all" || a.herdId === selectedHerdId;
+      const matchesSpecies = speciesFilter === "all" || sp === speciesFilter;
+      const matchesRisk = riskFilter === "all" || a.risk === riskFilter;
+      const matchesLactation =
+        lactationFilter === "all" ||
+        (lactationFilter === "4+" ? a.lactation >= 4 : a.lactation.toString() === lactationFilter);
+      const matchesSearch =
+        search === "" ||
         a.name.toLowerCase().includes(search.toLowerCase()) ||
         a.id.toLowerCase().includes(search.toLowerCase()) ||
-        (a.rfidTag?.toLowerCase().includes(search.toLowerCase()) ?? false))
-  );
+        (a.rfidTag?.toLowerCase().includes(search.toLowerCase()) ?? false) ||
+        (a.breed?.toLowerCase().includes(search.toLowerCase()) ?? false);
 
-  const handleRegister = (rfid: string, cowName: string, ageYears: number, ageMonths: number, breed: string) => {
-    const newAnimal = addAnimal(rfid, cowName, ageYears, ageMonths, breed);
+      return matchesHerd && matchesSpecies && matchesRisk && matchesLactation && matchesSearch;
+    })
+    .sort((a, b) => {
+      if (sortBy === "risk_desc") return getRiskScore(b.risk) - getRiskScore(a.risk);
+      if (sortBy === "risk_asc") return getRiskScore(a.risk) - getRiskScore(b.risk);
+      if (sortBy === "milk_desc") return (b.milk || 0) - (a.milk || 0);
+      if (sortBy === "name") return a.name.localeCompare(b.name);
+      if (sortBy === "lactation_desc") return b.lactation - a.lactation;
+      return 0;
+    });
+
+  const handleRegister = (rfid: string, animalName: string, ageYears: number, ageMonths: number, breed: string, species: "Cow" | "Goat" | "Buffalo") => {
+    const newAnimal = addAnimal(rfid, animalName, ageYears, ageMonths, breed, species);
     setJustAdded(newAnimal.id);
     setTimeout(() => setJustAdded(null), 3000);
   };
@@ -287,13 +376,18 @@ export function AnimalsScreen({
       )}
 
       <div style={{ background: "#FFFFFF", borderBottom: "1px solid #E0DAD0", padding: "12px 0 0" }}>
-        <div style={{ padding: "4px 16px 12px" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-            <div style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 700, color: "#1C2714" }}>
-              {t("tab_animals", lang)}{" "}
-              <span style={{ fontSize: 14, fontWeight: 500, color: "#9BA88C", fontFamily: "'Outfit', sans-serif" }}>
-                {animals.length} {t("animals_total", lang)}
-              </span>
+        <div style={{ padding: "4px 16px 10px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+            <div>
+              <div style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 700, color: "#1C2714" }}>
+                {t("tab_animals", lang)}{" "}
+                <span style={{ fontSize: 14, fontWeight: 500, color: "#9BA88C", fontFamily: "'Outfit', sans-serif" }}>
+                  ({animals.length} {t("animals_total", lang)})
+                </span>
+              </div>
+              <div style={{ fontSize: 11, color: "#6B7A5C", marginTop: 2 }}>
+                🐄 {animals.filter(a => (a.species || (a.id.startsWith("GT") ? "Goat" : a.id.startsWith("BF") ? "Buffalo" : "Cow")) === "Cow").length} Cows · 🐐 {animals.filter(a => (a.species || (a.id.startsWith("GT") ? "Goat" : a.id.startsWith("BF") ? "Buffalo" : "Cow")) === "Goat").length} Goats · 🐃 {animals.filter(a => (a.species || (a.id.startsWith("GT") ? "Goat" : a.id.startsWith("BF") ? "Buffalo" : "Cow")) === "Buffalo").length} Buffaloes
+              </div>
             </div>
             {/* RFID Register Button */}
             <button
@@ -314,53 +408,183 @@ export function AnimalsScreen({
                 whiteSpace: "nowrap",
               }}
             >
-              📡 {lang === "Hindi" ? "+ नई गाय" : lang === "Tamil" ? "+ புதிய மாடு" : "+ Scan RFID"}
+              📡 {lang === "Hindi" ? "+ नया पशु" : lang === "Tamil" ? "+ புதிய கால்நடை" : "+ Add Animal (RFID)"}
             </button>
           </div>
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder={lang === "Hindi" ? "नाम, ID या RFID खोजें..." : lang === "Tamil" ? "பெயர், ID அல்லது RFID தேடுக..." : "Search by name, ID or RFID..."}
+            placeholder={lang === "Hindi" ? "नाम, ID, RFID या नस्ल खोजें..." : lang === "Tamil" ? "பெயர், ID, RFID அல்லது இனம் தேடுக..." : "Search by name, ID, RFID or breed..."}
             style={{
               width: "100%",
               background: "#F7F4EE",
               border: "1.5px solid #E0DAD0",
               borderRadius: 12,
-              padding: "12px 14px",
-              fontSize: 14,
+              padding: "10px 14px",
+              fontSize: 13,
               color: "#1C2714",
               outline: "none",
               boxSizing: "border-box",
             }}
           />
         </div>
-        <div style={{ display: "flex", gap: 8, padding: "0 16px 12px", overflowX: "auto" }}>
-          {filters.map((f) => (
+
+        {/* Multi-Herd Filter Tabs */}
+        <div style={{ display: "flex", gap: 6, padding: "0 16px 8px", overflowX: "auto" }}>
+          <button
+            onClick={() => setSelectedHerdId("all")}
+            style={{
+              background: selectedHerdId === "all" ? "#2A5C1F" : "#F0EDE6",
+              color: selectedHerdId === "all" ? "#FFFFFF" : "#6B7A5C",
+              border: "none",
+              borderRadius: 16,
+              padding: "5px 12px",
+              fontSize: 11,
+              fontWeight: 700,
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              transition: "all 0.15s",
+            }}
+          >
+            🌐 All Herds ({animals.length})
+          </button>
+          {herds.map((h) => {
+            const count = animals.filter((a) => a.herdId === h.id).length;
+            const isSelected = selectedHerdId === h.id;
+            return (
+              <button
+                key={h.id}
+                onClick={() => setSelectedHerdId(h.id)}
+                style={{
+                  background: isSelected ? "#2A5C1F" : "#F0EDE6",
+                  color: isSelected ? "#FFFFFF" : "#6B7A5C",
+                  border: "none",
+                  borderRadius: 16,
+                  padding: "5px 12px",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  transition: "all 0.15s",
+                }}
+              >
+                🐄 {h.name.split("–")[0].trim()} ({count})
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Species Filter Tabs */}
+        <div style={{ display: "flex", gap: 6, padding: "0 16px 8px", overflowX: "auto" }}>
+          {speciesFilters.map((s) => (
+            <button
+              key={s.id}
+              onClick={() => setSpeciesFilter(s.id)}
+              style={{
+                background: speciesFilter === s.id ? "#1C3814" : "#F0EDE6",
+                color: speciesFilter === s.id ? "#FFFFFF" : "#6B7A5C",
+                border: "none",
+                borderRadius: 16,
+                padding: "5px 11px",
+                fontSize: 11,
+                fontWeight: 700,
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                transition: "all 0.15s",
+              }}
+            >
+              <span>{s.icon}</span>
+              <span>{s.label}</span>
+              {s.id !== "all" && (
+                <span style={{ opacity: 0.8, fontSize: 10 }}>
+                  ({animals.filter((a) => (a.species || (a.id.startsWith("GT") ? "Goat" : a.id.startsWith("BF") ? "Buffalo" : "Cow")) === s.id).length})
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Risk Filter Tabs */}
+        <div style={{ display: "flex", gap: 6, padding: "0 16px 8px", overflowX: "auto" }}>
+          {riskFilters.map((f) => (
             <button
               key={f.id}
-              onClick={() => setFilter(f.id)}
+              onClick={() => setRiskFilter(f.id)}
               style={{
-                background: filter === f.id ? "#2A5C1F" : "#F0EDE6",
-                color: filter === f.id ? "#FFFFFF" : "#6B7A5C",
-                border: "none",
-                borderRadius: 20,
-                padding: "8px 16px",
-                fontSize: 12,
+                background: riskFilter === f.id ? "#2A5C1F" : "#FFFFFF",
+                color: riskFilter === f.id ? "#FFFFFF" : "#6B7A5C",
+                border: `1px solid ${riskFilter === f.id ? "#2A5C1F" : "#E0DAD0"}`,
+                borderRadius: 16,
+                padding: "4px 10px",
+                fontSize: 11,
                 fontWeight: 600,
                 cursor: "pointer",
                 whiteSpace: "nowrap",
-                minHeight: 36,
                 transition: "all 0.15s",
               }}
             >
               {f.label}
               {f.id !== "all" && (
-                <span style={{ marginLeft: 4, opacity: 0.7 }}>
+                <span style={{ marginLeft: 4, opacity: 0.8 }}>
                   ({animals.filter((a) => a.risk === f.id).length})
                 </span>
               )}
             </button>
           ))}
+        </div>
+
+        {/* Sort & Lactation Filter Controls Bar */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 16px 10px", gap: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ fontSize: 10, fontWeight: 700, color: "#6B7A5C", textTransform: "uppercase" }}>Lactation:</span>
+            <select
+              value={lactationFilter}
+              onChange={(e) => setLactationFilter(e.target.value)}
+              style={{
+                background: "#F7F4EE",
+                border: "1px solid #D0CCC4",
+                borderRadius: 8,
+                padding: "3px 8px",
+                fontSize: 11,
+                fontWeight: 600,
+                color: "#1C2714",
+                outline: "none",
+              }}
+            >
+              <option value="all">All Lactations</option>
+              <option value="1">Lactation 1</option>
+              <option value="2">Lactation 2</option>
+              <option value="3">Lactation 3</option>
+              <option value="4+">Lactation 4+</option>
+            </select>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ fontSize: 10, fontWeight: 700, color: "#6B7A5C", textTransform: "uppercase" }}>Sort:</span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              style={{
+                background: "#F7F4EE",
+                border: "1px solid #D0CCC4",
+                borderRadius: 8,
+                padding: "3px 8px",
+                fontSize: 11,
+                fontWeight: 600,
+                color: "#1C2714",
+                outline: "none",
+              }}
+            >
+              <option value="risk_desc">Risk % (High → Low)</option>
+              <option value="risk_asc">Risk % (Low → High)</option>
+              <option value="milk_desc">Milk Yield (High → Low)</option>
+              <option value="lactation_desc">Lactation Stage</option>
+              <option value="name">Name (A → Z)</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -381,13 +605,13 @@ export function AnimalsScreen({
                 {animals.find(a => a.id === justAdded)?.name} Registered!
               </div>
               <div style={{ fontSize: 11, color: "#6B7A5C" }}>
-                RFID: {animals.find(a => a.id === justAdded)?.rfidTag} · ID: {justAdded}
+                Species: {animals.find(a => a.id === justAdded)?.species || "Cow"} · RFID: {animals.find(a => a.id === justAdded)?.rfidTag} · ID: {justAdded}
               </div>
             </div>
           </div>
         )}
 
-        {/* Live ESP32 Hardware Banner & Active Monitored Cow */}
+        {/* Live ESP32 Hardware Banner */}
         {isLive && lastTelemetry?.cowScanned ? (
           <div
             style={{
@@ -414,7 +638,7 @@ export function AnimalsScreen({
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
                 <div style={{ fontSize: 16, fontWeight: 800 }}>
-                  🐄 {lastTelemetry.cowName || lastTelemetry.cowId || "COW 1"}
+                  🐄 {lastTelemetry.cowName || lastTelemetry.cowId || "LIVE ANIMAL"}
                 </div>
                 <div style={{ fontSize: 11, color: "rgba(255,255,255,0.8)", marginTop: 2 }}>
                   RFID: {lastTelemetry.rfidTag || "0xE3995556"}
@@ -448,38 +672,6 @@ export function AnimalsScreen({
               </div>
             </div>
           </div>
-        ) : isLive && (!lastTelemetry || !lastTelemetry.cowScanned) ? (
-          <div
-            style={{
-              background: "linear-gradient(135deg, #1C2714, #2A5C1F)",
-              border: "1.5px dashed #4ADE80",
-              borderRadius: 14,
-              padding: "16px 18px",
-              marginBottom: 12,
-              color: "#FFFFFF",
-              boxShadow: "0 4px 16px rgba(42,92,31,0.2)",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 24 }}>📡</span>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 800, color: "#86EFAC" }}>
-                  {lang === "Tamil"
-                    ? "ESP32 இணைக்கப்பட்டது — மாட்டின் RFID அட்டைக்காக காத்திருக்கிறது"
-                    : lang === "Hindi"
-                    ? "ESP32 कनेक्टेड — गाय के RFID कार्ड की प्रतीक्षा है"
-                    : "ESP32 Connected — Waiting for Cow RFID Card"}
-                </div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.8)", marginTop: 2 }}>
-                  {lang === "Tamil"
-                    ? "சீரியல் மானிட்டர்: 'Waiting for Cow RFID card...'. RFID அட்டையை ஸ்கேன் செய்தால் மாடு தானாக பட்டியலில் தோன்றும்."
-                    : lang === "Hindi"
-                    ? "सीरियल मॉनिटर: 'Waiting for Cow RFID card...'. RFID कार्ड स्कैन करते ही गाय स्वतः सूची में जुड़ जाएगी।"
-                    : "Serial monitor: 'Waiting for Cow RFID card...'. Tap card on RC522 scanner to auto-register cow."}
-                </div>
-              </div>
-            </div>
-          </div>
         ) : null}
 
         {visible.length === 0 ? (
@@ -487,11 +679,16 @@ export function AnimalsScreen({
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {visible.map((a) => {
+              const sp = a.species || (a.id.startsWith("GT") ? "Goat" : a.id.startsWith("BF") ? "Buffalo" : "Cow");
+              const spIcon = sp === "Goat" ? "🐐" : sp === "Buffalo" ? "🐃" : "🐄";
               const isMonitoredCow = isLive && lastTelemetry?.cowScanned && (a.id === lastTelemetry.cowId || a.rfidTag === lastTelemetry.rfidTag);
               const displayPh = isMonitoredCow && lastTelemetry.ph != null ? lastTelemetry.ph : a.ph;
               const displayEc = isMonitoredCow && lastTelemetry.conductivity != null ? lastTelemetry.conductivity : a.conductivity;
               const displayTemp = isMonitoredCow && lastTelemetry.temp != null ? lastTelemetry.temp : a.temp;
               const displayRisk = isMonitoredCow && lastTelemetry.riskTier ? (lastTelemetry.riskTier.toLowerCase() as RiskLevel) : a.risk;
+              const riskPct = getRiskScore(displayRisk);
+              const herdObj = herds.find((h) => h.id === a.herdId);
+              const herdLabel = herdObj ? herdObj.name.split("–")[0].trim() : (a.herdId || "Herd A");
 
               return (
               <button
@@ -507,7 +704,7 @@ export function AnimalsScreen({
                   background: isMonitoredCow ? "#F2F9EE" : a.id === justAdded ? "#F0FAF0" : "#FFFFFF",
                   border: `1px solid ${isMonitoredCow ? "#68B946" : a.id === justAdded ? "#B8DBBA" : "#E0DAD0"}`,
                   borderLeft: `4px solid ${isMonitoredCow ? "#2A5C1F" : RISK_COLOR[a.risk].dot}`,
-                  borderRadius: 12,
+                  borderRadius: 14,
                   padding: "12px 14px",
                   cursor: "pointer",
                   textAlign: "left",
@@ -515,8 +712,11 @@ export function AnimalsScreen({
                   transition: "all 0.2s",
                 }}
               >
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
+                <div style={{ width: 42, height: 42, borderRadius: 12, background: RISK_COLOR[a.risk].bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>
+                  {spIcon}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3, flexWrap: "wrap" }}>
                     <span style={{ fontWeight: 700, fontSize: 14, color: "#1C2714" }}>{a.name}</span>
                     <span
                       style={{
@@ -530,10 +730,17 @@ export function AnimalsScreen({
                     >
                       {a.id}
                     </span>
+                    <span style={{ fontSize: 10, fontWeight: 700, background: "#EEF6E4", color: "#2A5C1F", padding: "1px 6px", borderRadius: 6 }}>
+                      {sp}
+                    </span>
+                    <span style={{ fontSize: 9.5, fontWeight: 700, background: "#F1F5F9", color: "#475569", padding: "1px 6px", borderRadius: 6, border: "1px solid #CBD5E1" }}>
+                      🏡 {herdLabel}
+                    </span>
                     <TrendArrow dir={a.trend} />
                   </div>
-                  {/* Age badge + breed */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+
+                  {/* Age badge + breed + lactation + RFID info */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4, flexWrap: "wrap" }}>
                     <span
                       style={{
                         background: "#EEF6E4",
@@ -547,8 +754,11 @@ export function AnimalsScreen({
                     >
                       🎂 {a.age}
                     </span>
+                    <span style={{ fontSize: 10.5, fontWeight: 600, color: "#6B7A5C", background: "#F8FAFC", padding: "2px 6px", borderRadius: 6 }}>
+                      🥛 Lac {a.lactation}
+                    </span>
                     <span style={{ fontSize: 11, color: "#6B7A5C" }}>
-                      {a.breed} · Lac {a.lactation}
+                      {a.breed} · {sp === "Goat" ? "2 Halves" : "4 Quarters"}
                     </span>
                     {a.rfidTag && (
                       <span style={{ fontSize: 9, color: "#9BA88C", fontFamily: "'JetBrains Mono'" }}>
@@ -556,7 +766,9 @@ export function AnimalsScreen({
                       </span>
                     )}
                   </div>
-                  <div style={{ display: "flex", gap: 12, fontSize: 11 }}>
+
+                  {/* Sensor telemetry row */}
+                  <div style={{ display: "flex", gap: 10, fontSize: 11, flexWrap: "wrap" }}>
                     <span style={{ color: "#6B7A5C" }}>
                       pH <strong style={{ color: displayPh && (displayPh > 7.0 || displayPh < 6.4) ? "#B83220" : "#1C2714" }}>{displayPh != null ? Number(displayPh).toFixed(2) : "6.7"}</strong>
                     </span>
@@ -569,9 +781,31 @@ export function AnimalsScreen({
                     <span style={{ color: "#6B7A5C" }}>
                       🥛 <strong style={{ color: "#1C2714" }}>{isMonitoredCow && lastTelemetry.weight != null ? `${Number(lastTelemetry.weight).toFixed(1)}kg` : `${a.milk}L`}</strong>
                     </span>
+                    {a.scc != null && (
+                      <span style={{ color: "#6B7A5C" }}>
+                        SCC <strong style={{ color: a.scc > (sp === "Goat" ? 1200000 : 500000) ? "#B83220" : "#1C2714" }}>{((a.scc) / 1000).toFixed(0)}k</strong>
+                      </span>
+                    )}
+                    {a.rumination != null && (
+                      <span style={{ color: "#6B7A5C" }}>
+                        🔄 <strong>{a.rumination}m</strong>
+                      </span>
+                    )}
                   </div>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
+
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+                  {/* Risk % Pill Badge */}
+                  <div
+                    style={{
+                      fontFamily: "'Fraunces', serif",
+                      fontSize: 14,
+                      fontWeight: 800,
+                      color: RISK_COLOR[displayRisk].text,
+                    }}
+                  >
+                    {riskPct}% <span style={{ fontSize: 10, fontFamily: "sans-serif", fontWeight: 700 }}>Risk</span>
+                  </div>
                   <RiskBadge level={displayRisk} small lang={lang} />
                   <div style={{ fontSize: 10, color: isMonitoredCow ? "#2A5C1F" : "#9BA88C", fontWeight: isMonitoredCow ? 700 : 400 }}>
                     {isMonitoredCow ? "Live ESP32" : a.lastSync}
@@ -586,3 +820,6 @@ export function AnimalsScreen({
     </div>
   );
 }
+
+
+

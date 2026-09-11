@@ -55,27 +55,47 @@ export function SensorsScreen({
     });
   }, [isLive, lastTelemetry]);
 
-  const matchedCow = isLive && lastTelemetry
-    ? animals.find((a) => (lastTelemetry.rfidTag && a.rfidTag === lastTelemetry.rfidTag) || a.id === lastTelemetry.cowId)
-    : null;
+  const [activeAnimalId, setActiveAnimalId] = useState<string>(
+    animals[0]?.id || "KA-001"
+  );
+
+  const matchedAnimal = isLive && lastTelemetry
+    ? (animals.find((a) => (lastTelemetry.rfidTag && a.rfidTag === lastTelemetry.rfidTag) || a.id === lastTelemetry.cowId) || animals[0])
+    : (animals.find((a) => a.id === activeAnimalId) || animals[0]);
+
+  const targetAnimal = matchedAnimal || animals[0];
+  const species = targetAnimal?.species || (targetAnimal?.id.startsWith("GT") ? "Goat" : targetAnimal?.id.startsWith("BF") ? "Buffalo" : "Cow");
+  const speciesIcon = species === "Goat" ? "🐐" : species === "Buffalo" ? "🐃" : "🐄";
 
   const effectiveSCC = isLive && lastTelemetry?.scc != null
     ? lastTelemetry.scc
     : (isLive && lastTelemetry
-      ? (computeMilkRisk(lastTelemetry).risk === "high" ? 1850000 : computeMilkRisk(lastTelemetry).risk === "moderate" ? 420000 : 85000)
-      : (targetCow?.scc || 185000));
+      ? (computeMilkRisk(lastTelemetry).risk === "high" ? 1850000 : computeMilkRisk(lastTelemetry).risk === "moderate" ? 420000 : (species === "Goat" ? 450000 : 85000))
+      : (targetAnimal?.scc || (species === "Goat" ? 450000 : 185000)));
+
+  const sccCriticalLimit = species === "Goat" ? 1500000 : 500000;
+  const sccElevatedLimit = species === "Goat" ? 750000 : 200000;
+  const ambientT = targetAnimal?.ambientTemp || 28.5;
+  const shedHum = isLive && lastTelemetry?.humidity != null ? lastTelemetry.humidity : (targetAnimal?.humidity || 68);
+  // Temperature-Humidity Index (THI): THI = (1.8 × T + 32) - (0.55 - 0.0055 × RH) × (1.8 × T - 26)
+  const thi = Math.round((1.8 * ambientT + 32) - (0.55 - 0.0055 * shedHum) * (1.8 * ambientT - 26));
+  const thiStatus = thi >= 79 ? "High Stress 🚨" : thi >= 72 ? "Mild Stress ⚠️" : "Comfortable ✅";
+  const thiColor = thi >= 79 ? "#B83220" : thi >= 72 ? "#C47A10" : "#2A5C1F";
+
+  const ruminationMins = targetAnimal?.rumination || (targetAnimal?.risk === "high" ? 210 : targetAnimal?.risk === "moderate" ? 285 : 420);
+  const feedingMins = targetAnimal?.feeding || (targetAnimal?.risk === "high" ? 130 : targetAnimal?.risk === "moderate" ? 185 : 240);
 
   const readings = [
     {
       label: lang === "Tamil" ? "சோமாடிக் செல் எண்ணிக்கை (SCC)" : lang === "Hindi" ? "सोमैटिक सेल काउंट (SCC)" : "Somatic Cell Count (SCC)",
       value: `${(effectiveSCC / 1000).toFixed(0)}k cells/mL`,
-      status: effectiveSCC > 500000 ? "Critical 🚨" : effectiveSCC > 200000 ? "Elevated ⚠️" : "Normal ✅",
+      status: effectiveSCC > sccCriticalLimit ? "Critical 🚨" : effectiveSCC > sccElevatedLimit ? "Elevated ⚠️" : "Normal ✅",
       icon: "🔬",
-      color: effectiveSCC > 500000 ? "#B83220" : effectiveSCC > 200000 ? "#C47A10" : "#2A5C1F",
+      color: effectiveSCC > sccCriticalLimit ? "#B83220" : effectiveSCC > sccElevatedLimit ? "#C47A10" : "#2A5C1F",
     },
     {
       label: lang === "Tamil" ? "பால் pH" : "Milk pH (GPIO 34)",
-      value: isLive && lastTelemetry?.ph != null ? `${lastTelemetry.ph.toFixed(2)}` : "6.7",
+      value: isLive && lastTelemetry?.ph != null ? `${lastTelemetry.ph.toFixed(2)}` : `${targetAnimal?.ph || 6.7}`,
       status: isLive && lastTelemetry?.ph != null
         ? (lastTelemetry.ph < 6.3 || lastTelemetry.ph > 7.0 ? "Abnormal" : "Normal")
         : "Normal",
@@ -84,38 +104,59 @@ export function SensorsScreen({
     },
     {
       label: lang === "Tamil" ? "பால் EC (கடத்துதிறன்)" : "Milk EC (GPIO 35)",
-      value: isLive && lastTelemetry ? `${lastTelemetry.conductivity.toFixed(1)} mS/cm` : "5.0 mS/cm",
-      status: isLive && lastTelemetry && lastTelemetry.conductivity > 10 ? "High ⚠️" : "Normal",
+      value: isLive && lastTelemetry ? `${lastTelemetry.conductivity.toFixed(1)} mS/cm` : `${targetAnimal?.conductivity || 5.0} mS/cm`,
+      status: isLive && lastTelemetry && lastTelemetry.conductivity > 10 ? "High ⚠️" : (targetAnimal?.conductivity || 5) > 8 ? "High ⚠️" : "Normal",
       icon: "⚡",
-      color: isLive && lastTelemetry && lastTelemetry.conductivity > 10 ? "#B83220" : "#2A5C1F",
+      color: isLive && lastTelemetry && lastTelemetry.conductivity > 10 ? "#B83220" : (targetAnimal?.conductivity || 5) > 8 ? "#B83220" : "#2A5C1F",
     },
     {
       label: lang === "Tamil" ? "பால் வெப்பநிலை (DS18B20)" : "Milk Temp DS18B20 (GPIO 4)",
-      value: isLive && lastTelemetry ? `${lastTelemetry.temp}°C` : "38.5°C",
-      status: isLive && lastTelemetry && lastTelemetry.temp > 39.2 ? "Elevated ⚠️" : "Normal",
+      value: isLive && lastTelemetry ? `${lastTelemetry.temp}°C` : `${targetAnimal?.temp || 38.5}°C`,
+      status: (isLive && lastTelemetry ? lastTelemetry.temp : (targetAnimal?.temp || 38.5)) > 39.2 ? "Elevated ⚠️" : "Normal",
       icon: "🌡",
-      color: isLive && lastTelemetry && lastTelemetry.temp > 39.2 ? "#C47A10" : "#2A5C1F",
+      color: (isLive && lastTelemetry ? lastTelemetry.temp : (targetAnimal?.temp || 38.5)) > 39.2 ? "#C47A10" : "#2A5C1F",
+    },
+    {
+      label: lang === "Tamil" ? "அசைபோடுதல் நேரம்" : "Rumination (IoT Collar)",
+      value: `${ruminationMins} min/day`,
+      status: ruminationMins < 250 ? "Severely Low 🚨" : ruminationMins < 350 ? "Reduced ⚠️" : "Healthy ✅",
+      icon: "🫁",
+      color: ruminationMins < 250 ? "#B83220" : ruminationMins < 350 ? "#C47A10" : "#2A5C1F",
+    },
+    {
+      label: lang === "Tamil" ? "உணவு உட்கொள்ளல்" : "Feeding Duration (IoT)",
+      value: `${feedingMins} min/day`,
+      status: feedingMins < 150 ? "Reduced ⚠️" : "Normal ✅",
+      icon: "🌾",
+      color: feedingMins < 150 ? "#C47A10" : "#2A5C1F",
     },
     {
       label: lang === "Tamil" ? "எடை (HX711 Load Cell)" : "Milk Weight HX711 (GPIO 32/33)",
-      value: isLive && lastTelemetry?.weight != null ? `${lastTelemetry.weight.toFixed(1)} kg` : "—",
+      value: isLive && lastTelemetry?.weight != null ? `${lastTelemetry.weight.toFixed(1)} kg` : `${targetAnimal?.milk || (species === "Goat" ? 2.5 : 12.0)} kg`,
       status: "Live",
       icon: "⚖️",
       color: "#2A5C1F",
     },
     {
+      label: lang === "Tamil" ? "கொட்டகை சூழல் (THI)" : `Shed Ambient & THI (${ambientT}°C)`,
+      value: `THI ${thi} (${thiStatus})`,
+      status: thiStatus,
+      icon: "🌤",
+      color: thiColor,
+    },
+    {
       label: lang === "Tamil" ? "கொட்டகை ஈரப்பதம் (DHT22)" : "Shed Humidity DHT22 (GPIO 27)",
-      value: isLive && lastTelemetry?.humidity != null ? `${lastTelemetry.humidity}%` : "68%",
-      status: isLive && lastTelemetry?.humidity != null && lastTelemetry.humidity > 80 ? "High" : "Normal",
+      value: `${shedHum}%`,
+      status: shedHum > 80 ? "High" : "Normal",
       icon: "💧",
-      color: isLive && lastTelemetry?.humidity != null && lastTelemetry.humidity > 80 ? "#B83220" : "#2A5C1F",
+      color: shedHum > 80 ? "#B83220" : "#2A5C1F",
     },
     {
       label: lang === "Tamil" ? "செயல்பாட்டு அளவீடு (MPU6050)" : "Activity MPU6050 (GPIO 21/22)",
-      value: isLive && lastTelemetry?.activity != null ? `${lastTelemetry.activity}%` : "—",
-      status: isLive && lastTelemetry?.activity != null && lastTelemetry.activity < 30 ? "Low ⚠️" : "Normal",
+      value: isLive && lastTelemetry?.activity != null ? `${lastTelemetry.activity}%` : `${targetAnimal?.activity === "low" ? "32%" : "78%"}`,
+      status: (isLive && lastTelemetry?.activity != null ? lastTelemetry.activity < 30 : targetAnimal?.activity === "low") ? "Low ⚠️" : "Normal",
       icon: "📐",
-      color: isLive && lastTelemetry?.activity != null && lastTelemetry.activity < 30 ? "#C47A10" : "#2A5C1F",
+      color: (isLive && lastTelemetry?.activity != null ? lastTelemetry.activity < 30 : targetAnimal?.activity === "low") ? "#C47A10" : "#2A5C1F",
     },
   ];
 
@@ -267,6 +308,41 @@ void loop() {
         <BackHeader title={t("sensors_title", lang)} onBack={onBack} />
       </div>
       <div style={{ flex: 1, overflow: "auto", padding: 16 }}>
+        {/* Animal Selector Pill Bar */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 14, overflowX: "auto", paddingBottom: 2 }}>
+          {animals.map((a) => {
+            const isSel = a.id === targetAnimal.id;
+            const spIcon = a.species === "Goat" ? "🐐" : a.species === "Buffalo" ? "🐃" : "🐄";
+            return (
+              <button
+                key={a.id}
+                onClick={() => setActiveAnimalId(a.id)}
+                style={{
+                  background: isSel ? "#2A5C1F" : "#FFFFFF",
+                  color: isSel ? "#FFFFFF" : "#4A5A38",
+                  border: `1.5px solid ${isSel ? "#2A5C1F" : "#D8D2C6"}`,
+                  borderRadius: 20,
+                  padding: "5px 12px",
+                  fontSize: 11.5,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 5,
+                  boxShadow: isSel ? "0 2px 6px rgba(42,92,31,0.25)" : "none",
+                }}
+              >
+                <span>{spIcon}</span>
+                <span>{a.name.split(" ")[0]} ({a.id})</span>
+                {a.risk === "high" && (
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#EF4444" }} />
+                )}
+              </button>
+            );
+          })}
+        </div>
+
         {/* Real ESP32 Hardware Integration Card */}
         <Card
           style={{
@@ -289,7 +365,7 @@ void loop() {
                 }}
               />
               <strong style={{ fontSize: 13, color: isLive ? "#FFFFFF" : "#1C2714" }}>
-                {isLive ? "🟢 Real ESP32 is Live & Streaming" : "⚪ Real ESP32 Disconnected"}
+                {isLive ? "🟢 Real ESP32 is Live & Streaming" : "⚪ Real ESP32 Hardware Hub"}
               </strong>
             </div>
             <span
@@ -312,71 +388,94 @@ void loop() {
             {isLive ? (
               <>
                 Live hardware stream active from <strong>{deviceId || "ESP32-WROOM32"}</strong>. Monitored Cow:{" "}
-                <strong style={{ color: "#FCD34D" }}>{lastTelemetry?.cowId || "KA-001"}</strong>. Telemetry updating
+                <strong style={{ color: "#FCD34D" }}>{lastTelemetry?.cowId || targetAnimal.name}</strong>. Telemetry updating
                 in real-time via SSE.
               </>
             ) : (
               <>
-                Connect your physical ESP32 microcontroller via USB cable (Web Serial) or WiFi telemetry stream to
-                inject live milk sensors.
+                Inspecting telemetry for <strong style={{ color: "#2A5C1F" }}>{speciesIcon} {targetAnimal.name} ({targetAnimal.id})</strong>.
+                Connect your physical ESP32 microcontroller via USB cable (Web Serial) or WiFi telemetry stream for live hardware feed.
               </>
             )}
           </div>
 
-          {/* Quad-Quarter Conductivity & Thermal Asymmetry Matrix */}
-          {isLive && (
-            <div
-              style={{
-                background: "rgba(255,255,255,0.08)",
-                borderRadius: 12,
-                padding: "10px 12px",
-                marginBottom: 12,
-                border: "1px solid rgba(255,255,255,0.12)",
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#86EFAC", textTransform: "uppercase", letterSpacing: 0.5 }}>
-                  🐄 4-Quarter Udder EC & Symmetry
-                </span>
-                <span
-                  style={{
-                    fontSize: 10,
-                    padding: "2px 6px",
-                    borderRadius: 4,
-                    fontWeight: 700,
-                    background: (lastTelemetry?.quarterRatio || 1.0) > 1.15 ? "#EF4444" : "#22C55E",
-                    color: "#FFFFFF",
-                  }}
-                >
-                  {(lastTelemetry?.quarterRatio || 1.0) > 1.15 ? "⚠️ Asymmetry Alert" : "✓ Balanced Quarters"}
-                </span>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 8 }}>
-                <div style={{ background: "rgba(0,0,0,0.25)", padding: "6px 8px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)" }}>
-                  <div style={{ fontSize: 9, color: "#94A3B8" }}>Front Left (FL)</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#F8FAFC" }}>{lastTelemetry?.ec_fl || (lastTelemetry?.conductivity || 5.1).toFixed(2)} <span style={{ fontSize: 9, color: "#94A3B8" }}>mS/cm</span></div>
-                </div>
-                <div style={{ background: "rgba(0,0,0,0.25)", padding: "6px 8px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)" }}>
-                  <div style={{ fontSize: 9, color: "#94A3B8" }}>Front Right (FR)</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: (lastTelemetry?.ec_fr || 5.1) > 6.5 ? "#F87171" : "#F8FAFC" }}>{lastTelemetry?.ec_fr || (lastTelemetry?.conductivity || 5.1).toFixed(2)} <span style={{ fontSize: 9, color: "#94A3B8" }}>mS/cm</span></div>
-                </div>
-                <div style={{ background: "rgba(0,0,0,0.25)", padding: "6px 8px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)" }}>
-                  <div style={{ fontSize: 9, color: "#94A3B8" }}>Rear Left (RL)</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#F8FAFC" }}>{lastTelemetry?.ec_rl || (lastTelemetry?.conductivity || 5.1).toFixed(2)} <span style={{ fontSize: 9, color: "#94A3B8" }}>mS/cm</span></div>
-                </div>
-                <div style={{ background: "rgba(0,0,0,0.25)", padding: "6px 8px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)" }}>
-                  <div style={{ fontSize: 9, color: "#94A3B8" }}>Rear Right (RR)</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#F8FAFC" }}>{lastTelemetry?.ec_rr || (lastTelemetry?.conductivity || 5.1).toFixed(2)} <span style={{ fontSize: 9, color: "#94A3B8" }}>mS/cm</span></div>
-                </div>
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#CBD5E1" }}>
-                <span>ΔEC Ratio: <strong style={{ color: "#FDE047" }}>{lastTelemetry?.quarterRatio ? `${lastTelemetry.quarterRatio}x` : "1.02x"}</strong></span>
-                <span>Thermal Asymmetry: <strong style={{ color: "#FDE047" }}>{lastTelemetry?.thermalAsymmetry ? `${lastTelemetry.thermalAsymmetry}°C` : "0.18°C"}</strong></span>
-              </div>
+          {/* Udder Telemetry (4 Quarters for Cows/Buffaloes vs 2 Halves for Goats) */}
+          <div
+            style={{
+              background: isLive ? "rgba(255,255,255,0.08)" : "#FBF9F4",
+              borderRadius: 12,
+              padding: "10px 12px",
+              marginBottom: 12,
+              border: isLive ? "1px solid rgba(255,255,255,0.12)" : "1px solid #ECE7DE",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: isLive ? "#86EFAC" : "#2A5C1F", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                {speciesIcon} {species === "Goat" ? "2-Half Udder EC & Symmetry" : "4-Quarter Udder EC & Symmetry"} ({targetAnimal.name})
+              </span>
+              <span
+                style={{
+                  fontSize: 10,
+                  padding: "2px 6px",
+                  borderRadius: 4,
+                  fontWeight: 700,
+                  background: targetAnimal.risk === "high" ? "#EF4444" : targetAnimal.risk === "moderate" ? "#F59E0B" : "#22C55E",
+                  color: "#FFFFFF",
+                }}
+              >
+                {targetAnimal.quarter || "All Clear"}
+              </span>
             </div>
-          )}
+
+            {species === "Goat" ? (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 8 }}>
+                <div style={{ background: isLive ? "rgba(0,0,0,0.25)" : "#FFFFFF", padding: "6px 8px", borderRadius: 8, border: "1px solid #ECE7DE" }}>
+                  <div style={{ fontSize: 9, color: isLive ? "#94A3B8" : "#8A7356" }}>Left Half</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: targetAnimal.quarter?.includes("Left") ? "#B83220" : isLive ? "#F8FAFC" : "#1C2714" }}>
+                    {(targetAnimal.conductivity || 5.1).toFixed(1)} <span style={{ fontSize: 9, color: "#8A7356" }}>mS/cm</span>
+                  </div>
+                </div>
+                <div style={{ background: isLive ? "rgba(0,0,0,0.25)" : "#FFFFFF", padding: "6px 8px", borderRadius: 8, border: "1px solid #ECE7DE" }}>
+                  <div style={{ fontSize: 9, color: isLive ? "#94A3B8" : "#8A7356" }}>Right Half</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: targetAnimal.quarter?.includes("Right") ? "#B83220" : isLive ? "#F8FAFC" : "#1C2714" }}>
+                    {((targetAnimal.conductivity || 5.1) * (targetAnimal.quarter?.includes("Right") ? 1.3 : 0.95)).toFixed(1)} <span style={{ fontSize: 9, color: "#8A7356" }}>mS/cm</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 8 }}>
+                <div style={{ background: isLive ? "rgba(0,0,0,0.25)" : "#FFFFFF", padding: "6px 8px", borderRadius: 8, border: "1px solid #ECE7DE" }}>
+                  <div style={{ fontSize: 9, color: isLive ? "#94A3B8" : "#8A7356" }}>Front Left (FL)</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: isLive ? "#F8FAFC" : "#1C2714" }}>
+                    {lastTelemetry?.ec_fl || (targetAnimal.conductivity || 5.1).toFixed(2)} <span style={{ fontSize: 9, color: "#8A7356" }}>mS/cm</span>
+                  </div>
+                </div>
+                <div style={{ background: isLive ? "rgba(0,0,0,0.25)" : "#FFFFFF", padding: "6px 8px", borderRadius: 8, border: "1px solid #ECE7DE" }}>
+                  <div style={{ fontSize: 9, color: isLive ? "#94A3B8" : "#8A7356" }}>Front Right (FR)</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: targetAnimal.quarter?.includes("Front-Right") ? "#B83220" : isLive ? "#F8FAFC" : "#1C2714" }}>
+                    {lastTelemetry?.ec_fr || (targetAnimal.conductivity || 5.1).toFixed(2)} <span style={{ fontSize: 9, color: "#8A7356" }}>mS/cm</span>
+                  </div>
+                </div>
+                <div style={{ background: isLive ? "rgba(0,0,0,0.25)" : "#FFFFFF", padding: "6px 8px", borderRadius: 8, border: "1px solid #ECE7DE" }}>
+                  <div style={{ fontSize: 9, color: isLive ? "#94A3B8" : "#8A7356" }}>Rear Left (RL)</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: targetAnimal.quarter?.includes("Rear-Left") ? "#B83220" : isLive ? "#F8FAFC" : "#1C2714" }}>
+                    {lastTelemetry?.ec_rl || (targetAnimal.conductivity || 5.1).toFixed(2)} <span style={{ fontSize: 9, color: "#8A7356" }}>mS/cm</span>
+                  </div>
+                </div>
+                <div style={{ background: isLive ? "rgba(0,0,0,0.25)" : "#FFFFFF", padding: "6px 8px", borderRadius: 8, border: "1px solid #ECE7DE" }}>
+                  <div style={{ fontSize: 9, color: isLive ? "#94A3B8" : "#8A7356" }}>Rear Right (RR)</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: targetAnimal.quarter?.includes("Rear-Right") ? "#B83220" : isLive ? "#F8FAFC" : "#1C2714" }}>
+                    {lastTelemetry?.ec_rr || (targetAnimal.conductivity || 5.1).toFixed(2)} <span style={{ fontSize: 9, color: "#8A7356" }}>mS/cm</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: isLive ? "#CBD5E1" : "#7B6F5D" }}>
+              <span>ΔEC Ratio: <strong style={{ color: targetAnimal.risk === "high" ? "#DC2626" : "#2A5C1F" }}>{targetAnimal.risk === "high" ? "1.42x" : "1.02x"}</strong></span>
+              <span>Lactation: <strong>#{targetAnimal.lactation}</strong> · Breed: <strong>{targetAnimal.breed}</strong></span>
+            </div>
+          </div>
 
           {/* ── AI PREDICTIVE FORECASTING SUMMARY CARD (TRAINED ML MODEL) ── */}
           {isLive && mlSummary && (
@@ -408,7 +507,7 @@ void loop() {
               {/* Scanned Cow and RFID Identification */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 11, marginBottom: 8, color: "#E2E8F0" }}>
                 <span>
-                  🐄 Cow: <strong style={{ color: "#FDE047" }}>{matchedCow ? `${matchedCow.name} (${matchedCow.id})` : (lastTelemetry?.cowId || "KA-001")}</strong>
+                  {speciesIcon} Animal: <strong style={{ color: "#FDE047" }}>{matchedAnimal ? `${matchedAnimal.name} (${matchedAnimal.id})` : (lastTelemetry?.cowId || "KA-001")}</strong>
                 </span>
                 {lastTelemetry?.rfidTag && (
                   <span style={{ fontSize: 9.5, background: "rgba(255,255,255,0.12)", padding: "1px 6px", borderRadius: 4, fontFamily: "'JetBrains Mono'" }}>
@@ -519,7 +618,7 @@ void loop() {
               {/* Step 2 Handoff: Take Cow Udder Photo (Image ML Scan) */}
               <button
                 onClick={() => {
-                  if (matchedCow) setSelectedAnimal(matchedCow);
+                  if (matchedAnimal) setSelectedAnimal(matchedAnimal);
                   if (onNavigate) onNavigate("visual-ai");
                 }}
                 style={{
