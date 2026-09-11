@@ -74,7 +74,7 @@ export interface ESP32GatewayState {
   loraSnr: number;          // Signal-to-noise ratio dB (e.g. +9.2 dB)
   loraFrequency: string;    // "433 MHz" | "868 MHz" | "915 MHz"
   oledDisplay: {
-    line1: string;          // e.g. "COW: Gauri (KA-001)"
+    line1: string;          // e.g. "COW: Cow 1 (KA-001)"
     line2: string;          // e.g. "EC: 12.4 | pH: 6.1"
     line3: string;          // e.g. "TEMP: 39.4C | WT: 10.2kg"
     line4: string;          // e.g. "STATUS: CRITICAL ALERT"

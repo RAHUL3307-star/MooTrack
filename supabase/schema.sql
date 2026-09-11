@@ -160,16 +160,16 @@ VALUES ('Ramesh Patel', '+919876543210', 'Shri Balaji Dairy Farm', 'COw sensing'
 ON CONFLICT DO NOTHING;
 
 INSERT INTO public.animals (id, name, species, herd_id, breed, age, age_years, age_months, rfid_tag, lactation, risk_level, trend, ph, conductivity, scc, scs, temperature, activity, milk_yield, rumination, feeding, ambient_temp, humidity, last_sync, quarter) VALUES
-('KA-001', 'Cow 1 (Gauri)',     'Cow',     'HERD_A', 'HF Cross',  '5y 3m', 5, 3, 'RFID-001', 3, 'high',     'up',     6.1, 12.4, 1850000, 7.2, 39.4, 'low',    10.2, 210, 140, 28.4, 72.0, '8 min ago',  'Front-Right'),
-('KA-007', 'Cow 2 (Kamdhenu)',  'Cow',     'HERD_A', 'Sahiwal',   '4y 1m', 4, 1, 'RFID-007', 2, 'moderate', 'up',     6.3,  9.8,  480000, 5.3, 38.9, 'normal', 14.8, 285, 185, 27.9, 69.0, '12 min ago', 'Rear-Left'),
-('GT-001', 'Goat 1 (Chandani)', 'Goat',    'HERD_B', 'Jamnapari', '3y 0m', 3, 0, 'RFID-G01', 2, 'high',     'up',     7.1, 13.8, 1650000, 7.0, 40.1, 'low',     1.4, 195, 125, 29.2, 75.0, '3 min ago',  'Right Half'),
-('GT-002', 'Goat 2 (Roshni)',   'Goat',    'HERD_B', 'Sirohi',    '2y 4m', 2, 4, 'RFID-G02', 1, 'low',      'stable', 6.6,  5.1,  480000, 4.2, 38.8, 'high',    2.8, 340, 215, 28.1, 68.0, '5 min ago',  'Both Clear'),
-('KA-014', 'Cow 3 (Lakshmi)',   'Cow',     'HERD_A', 'Jersey X',  '6y 8m', 6, 8, 'RFID-014', 5, 'moderate', 'stable', 6.5,  8.9,  360000, 4.8, 38.7, 'normal',  9.6, 310, 195, 28.0, 70.0, '5 min ago',  'All Clear'),
-('BF-001', 'Buffalo 1 (Durga)', 'Buffalo', 'HERD_A', 'Murrah',    '6y 0m', 6, 0, 'RFID-B01', 4, 'high',     'up',     7.1, 14.0, 1950000, 7.4, 39.8, 'low',     9.8, 205, 130, 28.8, 74.0, '1 min ago',  'Front-Right'),
-('KA-022', 'Cow 4 (Nandini)',   'Cow',     'HERD_B', 'Gir Cow',   '3y 2m', 3, 2, 'RFID-022', 1, 'low',      'down',   6.6,  6.2,  140000, 3.5, 38.5, 'high',   18.4, 355, 220, 27.5, 65.0, '3 min ago',  'All Clear'),
-('GT-003', 'Goat 3 (Heera)',    'Goat',    'HERD_C', 'Beetal',    '4y 2m', 4, 2, 'RFID-G03', 3, 'moderate', 'up',     6.9,  9.2,  920000, 5.8, 39.5, 'normal',  2.1, 265, 165, 29.0, 73.0, '9 min ago',  'Left Half'),
-('KA-031', 'Cow 5 (Shanti)',    'Cow',     'HERD_B', 'Sahiwal',   '4y 6m', 4, 6, 'RFID-031', 3, 'none',     'stable', 6.7,  5.1,   65000, 2.7, 38.4, 'normal', 19.2, 370, 230, 27.2, 63.0, '6 min ago',  'All Clear'),
-('KA-052', 'Cow 6 (Kalyani)',   'Cow',     'HERD_C', 'HF Cross',  '5y 5m', 5, 5, 'RFID-052', 4, 'high',     'up',     5.9, 14.2, 2200000, 7.5, 39.6, 'low',     8.4, 190, 120, 29.5, 77.0, '22 min ago', 'Rear-Right')
+('KA-001', 'Cow 1',     'Cow',     'HERD_A', 'HF Cross',  '5y 3m', 5, 3, 'RFID-001', 3, 'high',     'up',     6.1, 12.4, 1850000, 7.2, 39.4, 'low',    10.2, 210, 140, 28.4, 72.0, '8 min ago',  'Front-Right'),
+('KA-007', 'Cow 2',     'Cow',     'HERD_A', 'Sahiwal',   '4y 1m', 4, 1, 'RFID-007', 2, 'moderate', 'up',     6.3,  9.8,  480000, 5.3, 38.9, 'normal', 14.8, 285, 185, 27.9, 69.0, '12 min ago', 'Rear-Left'),
+('GT-001', 'Goat 1',    'Goat',    'HERD_B', 'Jamnapari', '3y 0m', 3, 0, 'RFID-G01', 2, 'high',     'up',     7.1, 13.8, 1650000, 7.0, 40.1, 'low',     1.4, 195, 125, 29.2, 75.0, '3 min ago',  'Right Half'),
+('GT-002', 'Goat 2',    'Goat',    'HERD_B', 'Sirohi',    '2y 4m', 2, 4, 'RFID-G02', 1, 'low',      'stable', 6.6,  5.1,  480000, 4.2, 38.8, 'high',    2.8, 340, 215, 28.1, 68.0, '5 min ago',  'Both Clear'),
+('KA-014', 'Cow 3',     'Cow',     'HERD_A', 'Jersey X',  '6y 8m', 6, 8, 'RFID-014', 5, 'moderate', 'stable', 6.5,  8.9,  360000, 4.8, 38.7, 'normal',  9.6, 310, 195, 28.0, 70.0, '5 min ago',  'All Clear'),
+('BF-001', 'Buffalo 1', 'Buffalo', 'HERD_A', 'Murrah',    '6y 0m', 6, 0, 'RFID-B01', 4, 'high',     'up',     7.1, 14.0, 1950000, 7.4, 39.8, 'low',     9.8, 205, 130, 28.8, 74.0, '1 min ago',  'Front-Right'),
+('KA-022', 'Cow 4',     'Cow',     'HERD_B', 'Gir Cow',   '3y 2m', 3, 2, 'RFID-022', 1, 'low',      'down',   6.6,  6.2,  140000, 3.5, 38.5, 'high',   18.4, 355, 220, 27.5, 65.0, '3 min ago',  'All Clear'),
+('GT-003', 'Goat 3',    'Goat',    'HERD_C', 'Beetal',    '4y 2m', 4, 2, 'RFID-G03', 3, 'moderate', 'up',     6.9,  9.2,  920000, 5.8, 39.5, 'normal',  2.1, 265, 165, 29.0, 73.0, '9 min ago',  'Left Half'),
+('KA-031', 'Cow 5',     'Cow',     'HERD_B', 'Sahiwal',   '4y 6m', 4, 6, 'RFID-031', 3, 'none',     'stable', 6.7,  5.1,   65000, 2.7, 38.4, 'normal', 19.2, 370, 230, 27.2, 63.0, '6 min ago',  'All Clear'),
+('KA-052', 'Cow 6',     'Cow',     'HERD_C', 'HF Cross',  '5y 5m', 5, 5, 'RFID-052', 4, 'high',     'up',     5.9, 14.2, 2200000, 7.5, 39.6, 'low',     8.4, 190, 120, 29.5, 77.0, '22 min ago', 'Rear-Right')
 ON CONFLICT (id) DO UPDATE SET
     risk_level = EXCLUDED.risk_level,
     species = EXCLUDED.species,

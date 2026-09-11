@@ -10,7 +10,7 @@ const DEFAULT_GATEWAY_STATE = {
   loraSnr: 9.4,
   loraFrequency: "868.0 MHz (LoRa SF7/BW125)",
   oledDisplay: {
-    line1: "COW: Gauri (KA-001)",
+    line1: "COW: Cow 1 (KA-001)",
     line2: "EC: 5.2 mS | pH: 6.6",
     line3: "TEMP: 38.5C | WT: 12.0kg",
     line4: "STATUS: HEALTHY (NORMAL)",
@@ -79,7 +79,7 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
       lastPacketTime: !prev.gatewayLive ? "Just now" : prev.lastPacketTime,
       packetsReceived: !prev.gatewayLive ? prev.packetsReceived + 1 : prev.packetsReceived,
       oledDisplay: !prev.gatewayLive ? {
-        line1: "COW: Gauri (KA-001)",
+        line1: "COW: Cow 1 (KA-001)",
         line2: "EC: 5.2 mS | pH: 6.6",
         line3: "TEMP: 38.5C | WT: 12.0kg",
         line4: "STATUS: HEALTHY (NORMAL)",
