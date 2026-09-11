@@ -67,6 +67,28 @@ export interface ESP32Notification {
   message?: string;
 }
 
+export interface ESP32GatewayState {
+  gatewayDeviceId: string;
+  gatewayLive: boolean;
+  loraRssi: number;         // Signal strength dBm (e.g. -78 dBm)
+  loraSnr: number;          // Signal-to-noise ratio dB (e.g. +9.2 dB)
+  loraFrequency: string;    // "433 MHz" | "868 MHz" | "915 MHz"
+  oledDisplay: {
+    line1: string;          // e.g. "COW: Gauri (KA-001)"
+    line2: string;          // e.g. "EC: 12.4 | pH: 6.1"
+    line3: string;          // e.g. "TEMP: 39.4C | WT: 10.2kg"
+    line4: string;          // e.g. "STATUS: CRITICAL ALERT"
+  };
+  ledStatus: {
+    green: boolean;         // Normal (EC < 6.5)
+    yellow: boolean;        // Subclinical watch (EC 6.5–10.0)
+    red: boolean;           // Clinical mastitis alert (EC > 10.0)
+  };
+  buzzerActive: boolean;    // Active acoustic buzzer for acute mastitis
+  packetsReceived: number;
+  lastPacketTime: string;
+}
+
 export interface ESP32ContextType extends ESP32State {
   notification: ESP32Notification | null;
   dismissNotification: () => void;
@@ -75,6 +97,10 @@ export interface ESP32ContextType extends ESP32State {
   dismissBanner: () => void;
   bannerDismissed: boolean;
   setBannerDismissed: (v: boolean) => void;
+  // Dual ESP32 Gateway Brain controls
+  gatewayState: ESP32GatewayState;
+  triggerBuzzerTest: () => void;
+  toggleGatewayLive: () => void;
 }
 
 export interface BiomarkerComparison {

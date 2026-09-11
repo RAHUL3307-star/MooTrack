@@ -18,7 +18,7 @@ export function SensorsScreen({
   onNavigate?: (s: Screen) => void;
   lang: string;
 }) {
-  const { isLive, deviceId, lastTelemetry, connectUsbSerial, toggleEsp32 } = useESP32();
+  const { isLive, deviceId, lastTelemetry, connectUsbSerial, toggleEsp32, gatewayState, triggerBuzzerTest, toggleGatewayLive } = useESP32();
   const { animals, setSelectedAnimal } = useAnimals();
   const [showSketch, setShowSketch] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -757,6 +757,133 @@ void loop() {
             </div>
           )}
         </Card>
+
+        {/* ═══════════════════════════════════════════════════════════
+            ESP32 #2 — GATEWAY BRAIN (LoRa Receiver / Cloud Bridge)
+        ═══════════════════════════════════════════════════════════ */}
+        <Card style={{ marginBottom: 14, background: "linear-gradient(145deg, #0f172a 0%, #1a2744 100%)", border: "1px solid rgba(99,179,237,0.25)", borderRadius: 16 }}>
+          {/* Header */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 800, color: "#63B3ED", letterSpacing: 1.5, textTransform: "uppercase" }}>ESP32 #2 — Gateway Brain</div>
+              <div style={{ fontSize: 9.5, color: "#94A3B8", marginTop: 2 }}>LoRa Receiver · OLED · Buzzer · LED · Wi-Fi Bridge</div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <div style={{
+                width: 8, height: 8, borderRadius: "50%",
+                background: gatewayState.gatewayLive ? "#22C55E" : "#6B7280",
+                boxShadow: gatewayState.gatewayLive ? "0 0 8px #22C55E" : "none",
+              }} />
+              <span style={{ fontSize: 10, fontWeight: 700, color: gatewayState.gatewayLive ? "#86EFAC" : "#6B7280" }}>
+                {gatewayState.gatewayLive ? "LIVE" : "OFFLINE"}
+              </span>
+            </div>
+          </div>
+
+          {/* OLED Display Simulation */}
+          <div style={{
+            background: "#000",
+            borderRadius: 8,
+            padding: "10px 14px",
+            marginBottom: 12,
+            border: "2px solid #1E3A5F",
+            fontFamily: "'JetBrains Mono', monospace",
+            boxShadow: "inset 0 0 18px rgba(0,100,255,0.08)",
+          }}>
+            <div style={{ fontSize: 8, color: "#60A5FA", marginBottom: 4, letterSpacing: 1, textTransform: "uppercase" }}>OLED Display (128×64)</div>
+            {[gatewayState.oledDisplay.line1, gatewayState.oledDisplay.line2, gatewayState.oledDisplay.line3, gatewayState.oledDisplay.line4].map((line, i) => (
+              <div key={i} style={{ fontSize: 10.5, color: gatewayState.gatewayLive ? "#BFDBFE" : "#374151", lineHeight: 1.55, letterSpacing: 0.3 }}>{line}</div>
+            ))}
+          </div>
+
+          {/* LED Status Indicators */}
+          <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 12 }}>
+            <span style={{ fontSize: 10, color: "#94A3B8", fontWeight: 600 }}>LEDs:</span>
+            {[
+              { label: "GREEN", active: gatewayState.ledStatus.green, color: "#22C55E", meaning: "Healthy" },
+              { label: "YELLOW", active: gatewayState.ledStatus.yellow, color: "#EAB308", meaning: "Warning" },
+              { label: "RED", active: gatewayState.ledStatus.red, color: "#EF4444", meaning: "Alert" },
+            ].map((led) => (
+              <div key={led.label} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <div style={{
+                  width: 12, height: 12, borderRadius: "50%",
+                  background: led.active ? led.color : "rgba(255,255,255,0.08)",
+                  boxShadow: led.active ? `0 0 10px ${led.color}` : "none",
+                  border: `1px solid ${led.active ? led.color : "rgba(255,255,255,0.15)"}`,
+                  transition: "all 0.3s ease",
+                }} />
+                <span style={{ fontSize: 9, color: led.active ? led.color : "#4B5563", fontWeight: 700 }}>{led.label}</span>
+              </div>
+            ))}
+            {/* Buzzer */}
+            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4 }}>
+              <div style={{
+                width: 12, height: 12, borderRadius: "50%",
+                background: gatewayState.buzzerActive ? "#F97316" : "rgba(255,255,255,0.08)",
+                boxShadow: gatewayState.buzzerActive ? "0 0 10px #F97316" : "none",
+                border: `1px solid ${gatewayState.buzzerActive ? "#F97316" : "rgba(255,255,255,0.15)"}`,
+                transition: "all 0.3s ease",
+              }} />
+              <span style={{ fontSize: 9, color: gatewayState.buzzerActive ? "#FB923C" : "#4B5563", fontWeight: 700 }}>BUZZER</span>
+            </div>
+          </div>
+
+          {/* LoRa Metrics */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 12 }}>
+            {[
+              { label: "RSSI", value: `${gatewayState.loraRssi} dBm`, icon: "📡", color: gatewayState.loraRssi > -85 ? "#86EFAC" : "#FCA5A5" },
+              { label: "SNR", value: `${gatewayState.loraSnr} dB`, icon: "〰️", color: "#93C5FD" },
+              { label: "Packets", value: `${gatewayState.packetsReceived}`, icon: "📦", color: "#C4B5FD" },
+            ].map((m) => (
+              <div key={m.label} style={{ background: "rgba(255,255,255,0.05)", borderRadius: 8, padding: "7px 10px", border: "1px solid rgba(255,255,255,0.08)" }}>
+                <div style={{ fontSize: 9, color: "#94A3B8", marginBottom: 2 }}>{m.icon} {m.label}</div>
+                <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 12, fontWeight: 700, color: m.color }}>{m.value}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ fontSize: 9, color: "#64748B", marginBottom: 10 }}>
+            📶 {gatewayState.loraFrequency} · Last packet: {gatewayState.lastPacketTime}
+          </div>
+
+          {/* Control Buttons */}
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              onClick={toggleGatewayLive}
+              style={{
+                flex: 1,
+                background: gatewayState.gatewayLive ? "rgba(239,68,68,0.15)" : "linear-gradient(135deg, #1D4ED8 0%, #3B82F6 100%)",
+                color: gatewayState.gatewayLive ? "#FCA5A5" : "#FFFFFF",
+                border: `1px solid ${gatewayState.gatewayLive ? "#EF4444" : "#3B82F6"}`,
+                borderRadius: 8,
+                padding: "8px 10px",
+                fontSize: 10.5,
+                fontWeight: 700,
+                cursor: "pointer",
+              }}
+            >
+              {gatewayState.gatewayLive ? "⏹ Go Offline" : "⚡ Simulate Gateway Live"}
+            </button>
+            <button
+              onClick={triggerBuzzerTest}
+              disabled={gatewayState.buzzerActive}
+              style={{
+                background: gatewayState.buzzerActive ? "rgba(249,115,22,0.25)" : "rgba(249,115,22,0.12)",
+                color: gatewayState.buzzerActive ? "#FB923C" : "#F97316",
+                border: "1px solid rgba(249,115,22,0.35)",
+                borderRadius: 8,
+                padding: "8px 12px",
+                fontSize: 10.5,
+                fontWeight: 700,
+                cursor: gatewayState.buzzerActive ? "not-allowed" : "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {gatewayState.buzzerActive ? "🔔 Buzzing…" : "🔔 Test Buzzer"}
+            </button>
+          </div>
+        </Card>
+
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 14 }}>
           {[
             { label: t("online", lang), value: "42", total: "48", color: "#2A5C1F", bg: "#E6F0E2" },

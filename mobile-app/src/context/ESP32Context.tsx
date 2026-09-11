@@ -3,6 +3,28 @@ import type { ESP32ContextType, ESP32State, ESP32Telemetry, ESP32Notification } 
 import { logTelemetry } from "../services/telemetryService";
 
 // ─── Default State ────────────────────────────────────────────────────────────
+const DEFAULT_GATEWAY_STATE = {
+  gatewayDeviceId: "ESP32-GATEWAY-BRAIN",
+  gatewayLive: false,
+  loraRssi: -78,
+  loraSnr: 9.4,
+  loraFrequency: "868.0 MHz (LoRa SF7/BW125)",
+  oledDisplay: {
+    line1: "COW: Gauri (KA-001)",
+    line2: "EC: 5.2 mS | pH: 6.6",
+    line3: "TEMP: 38.5C | WT: 12.0kg",
+    line4: "STATUS: HEALTHY (NORMAL)",
+  },
+  ledStatus: {
+    green: true,
+    yellow: false,
+    red: false,
+  },
+  buzzerActive: false,
+  packetsReceived: 1420,
+  lastPacketTime: "Just now",
+};
+
 const DEFAULT_STATE: ESP32ContextType = {
   isLive: false,
   connected: false,
@@ -17,6 +39,9 @@ const DEFAULT_STATE: ESP32ContextType = {
   dismissBanner: () => {},
   bannerDismissed: false,
   setBannerDismissed: () => {},
+  gatewayState: DEFAULT_GATEWAY_STATE,
+  triggerBuzzerTest: () => {},
+  toggleGatewayLive: () => {},
 };
 
 export const ESP32Context = createContext<ESP32ContextType>(DEFAULT_STATE);
@@ -38,6 +63,35 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
 
   const [notification, setNotification] = useState<ESP32Notification | null>(null);
   const [bannerDismissed, setBannerDismissed] = useState(false);
+
+  // ── ESP32 #2 Gateway Brain State ──────────────────────────────────────────
+  const [gatewayState, setGatewayState] = useState(DEFAULT_GATEWAY_STATE);
+
+  const triggerBuzzerTest = useCallback(() => {
+    setGatewayState((prev) => ({ ...prev, buzzerActive: true }));
+    setTimeout(() => setGatewayState((prev) => ({ ...prev, buzzerActive: false })), 2500);
+  }, []);
+
+  const toggleGatewayLive = useCallback(() => {
+    setGatewayState((prev) => ({
+      ...prev,
+      gatewayLive: !prev.gatewayLive,
+      lastPacketTime: !prev.gatewayLive ? "Just now" : prev.lastPacketTime,
+      packetsReceived: !prev.gatewayLive ? prev.packetsReceived + 1 : prev.packetsReceived,
+      oledDisplay: !prev.gatewayLive ? {
+        line1: "COW: Gauri (KA-001)",
+        line2: "EC: 5.2 mS | pH: 6.6",
+        line3: "TEMP: 38.5C | WT: 12.0kg",
+        line4: "STATUS: HEALTHY (NORMAL)",
+      } : {
+        line1: "GATEWAY OFFLINE",
+        line2: "LoRa Rx: IDLE",
+        line3: "-- No packets --",
+        line4: "Awaiting sensor node",
+      },
+      ledStatus: !prev.gatewayLive ? { green: true, yellow: false, red: false } : { green: false, yellow: false, red: false },
+    }));
+  }, []);
 
   // Transition tracking refs so notifications ONLY trigger once per real state transition
   const prevLiveRef = useRef<boolean>(false);
@@ -415,6 +469,9 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
         dismissBanner: () => setBannerDismissed(true),
         bannerDismissed,
         setBannerDismissed,
+        gatewayState,
+        triggerBuzzerTest,
+        toggleGatewayLive,
       }}
     >
       {children}

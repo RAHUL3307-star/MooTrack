@@ -5,7 +5,7 @@ import type { Screen, RiskLevel, VisualScanResult } from "../types/index";
 import { useAnimals } from "../context/AnimalsContext";
 import { useESP32 } from "../context/ESP32Context";
 import { computeMilkRisk } from "../types/esp32";
-import { validateImageWithMobileNet } from "../services/imageValidationService";
+import { validateImageWithMobileNet, checkHumanFingerOrHand } from "../services/imageValidationService";
 import { predictFromImage } from "../services/mlApiService";
 import type { ImagePredictionResult } from "../services/mlApiService";
 
@@ -263,6 +263,27 @@ function analyzeUdderImageWithDataset(
           }
         } catch (e) {
           console.warn("MobileNet check skipped:", e);
+        }
+
+        // ── 2. BIOMETRIC HUMAN FINGER / HAND PIXEL HEURISTIC ────────────────
+        // Catches human skin even when MobileNet's labels are ambiguous
+        try {
+          const fingerCheck = checkHumanFingerOrHand(ctx, w, h);
+          if (fingerCheck.isFingerOrHand) {
+            resolve({
+              validation: {
+                isValid: false,
+                bovineTissueMatch: 3,
+                detectedSubject: fingerCheck.reason || "Human Skin / Finger Detected",
+                reason: REJECT_MSG_EN,
+                hindiReason: REJECT_MSG_HI,
+                tamilReason: REJECT_MSG_TA,
+              },
+            });
+            return;
+          }
+        } catch (e) {
+          console.warn("Biometric finger check skipped:", e);
         }
 
         const imgData = ctx.getImageData(0, 0, w, h);
