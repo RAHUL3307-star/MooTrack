@@ -23,6 +23,7 @@ import {
   MLLabScreen,
   ProfileScreen,
   VisualScanScreen,
+  LocationScreen,
 } from "./screens/index";
 
 function MainAppShell() {
@@ -130,6 +131,7 @@ function MainAppShell() {
           <AnalyticsScreen
             onBack={goBack}
             lang={lang}
+            onNavigate={navigate}
             onSelectAnimal={(animal) => {
               setSelectedAnimal(animal);
               navigate("animal-profile");
@@ -155,6 +157,17 @@ function MainAppShell() {
         return <MLLabScreen onBack={goBack} lang={lang} />;
       case "visual-ai":
         return <VisualScanScreen onNavigate={navigate} lang={lang} />;
+      case "location":
+        return (
+          <LocationScreen
+            onBack={goBack}
+            lang={lang}
+            onSelectAnimal={(animal) => {
+              setSelectedAnimal(animal);
+              navigate("animal-profile");
+            }}
+          />
+        );
       case "profile":
         return <ProfileScreen onBack={goBack} lang={lang} onLangChange={setLang} />;
       default:

@@ -1,7 +1,7 @@
 export type Screen =
   | "splash" | "language" | "login" | "home" | "animals" | "animal-profile"
   | "ai-risk" | "alerts" | "recommendations" | "analytics" | "sensors"
-  | "gis" | "interventions" | "profile" | "ml-lab" | "visual-ai";
+  | "gis" | "interventions" | "profile" | "ml-lab" | "visual-ai" | "location";
 
 export type RiskLevel = "none" | "low" | "moderate" | "high";
 

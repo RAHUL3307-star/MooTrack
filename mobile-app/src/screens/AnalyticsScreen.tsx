@@ -3,6 +3,7 @@ import { BackHeader, Card, SectionLabel, ReadAloudFAB, RiskBadge } from "../comp
 import { useAnimals } from "../context/AnimalsContext";
 import { useHerd } from "../context/HerdContext";
 import { HERDS, type Animal } from "../types/index";
+import type { Screen } from "../types/index";
 import { calculateHerdRisk, filterAnimalsByHerd } from "../services/herdService";
 import { t } from "../i18n/index";
 
@@ -10,10 +11,12 @@ export function AnalyticsScreen({
   onBack,
   lang,
   onSelectAnimal,
+  onNavigate,
 }: {
   onBack: () => void;
   lang: string;
   onSelectAnimal?: (animal: Animal) => void;
+  onNavigate?: (s: Screen) => void;
 }) {
   const { animals } = useAnimals();
   const { selectedHerdId, setSelectedHerdId } = useHerd();
@@ -119,6 +122,39 @@ export function AnalyticsScreen({
       </div>
 
       <div style={{ flex: 1, overflow: "auto", padding: "14px 16px 80px" }}>
+
+        {/* ── Live GPS Location Shortcut Banner ── */}
+        {onNavigate && (
+          <button
+            onClick={() => onNavigate("location")}
+            style={{
+              width: "100%",
+              background: "linear-gradient(135deg, #1C2714 0%, #0E1809 100%)",
+              border: "1.5px solid #2A5C1F",
+              borderRadius: 14,
+              padding: "12px 16px",
+              marginBottom: 14,
+              cursor: "pointer",
+              textAlign: "left",
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              boxShadow: "0 4px 16px rgba(28,38,20,0.2)",
+            }}
+          >
+            <span style={{ fontSize: 26 }}>📍</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ color: "#4ADE80", fontWeight: 800, fontSize: 13, marginBottom: 2 }}>
+                {lang === "Tamil" ? "நேரலை GPS இடம் கண்காணிப்பு" : lang === "Hindi" ? "लाइव GPS ट्रैकिंग" : "Live GPS Cattle Tracking"}
+              </div>
+              <div style={{ color: "#86EFAC", fontSize: 11 }}>
+                {lang === "Tamil" ? "ஒவ்வொரு மாட்டின் இடத்தை நேரடியாக பார்க்கவும்" : "Track every animal's real-time GPS position →"}
+              </div>
+            </div>
+            <span style={{ color: "#4ADE80", fontSize: 18 }}>→</span>
+          </button>
+        )}
+
         {/* Herd Filter Selector Pill Bar */}
         <div style={{ display: "flex", gap: 6, marginBottom: 14, overflowX: "auto", paddingBottom: 2 }}>
           <button
