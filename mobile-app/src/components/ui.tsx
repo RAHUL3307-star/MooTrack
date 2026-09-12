@@ -333,6 +333,7 @@ export function BottomNav({
   const tabs: { id: Tab; key: string; icon: string }[] = [
     { id: "home", key: "tab_home", icon: "⌂" },
     { id: "animals", key: "tab_animals", icon: "🐄" },
+    { id: "location", key: "tab_location", icon: "📍" },
     { id: "alerts", key: "tab_alerts", icon: "🔔" },
     { id: "analytics", key: "tab_analytics", icon: "📊" },
     { id: "profile", key: "tab_profile", icon: "◎" },

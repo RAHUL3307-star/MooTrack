@@ -660,32 +660,70 @@ export function HomeScreen({
         {/* ── LEVEL 2: Dedicated Herd-Level Risk Assessment Card ──────────────── */}
         <HerdRiskConditionCard lang={lang} onNavigate={onNavigate} />
 
-        {/* Visual Udder AI Scan Banner */}
-        <div
-          onClick={() => onNavigate("visual-ai")}
-          style={{
-            background: "linear-gradient(135deg, #1C2714, #2A5C1F)",
-            borderRadius: 14,
-            padding: "12px 14px",
-            marginBottom: 12,
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            cursor: "pointer",
-            boxShadow: "0 4px 12px rgba(42,92,31,0.2)",
-            color: "#FFFFFF",
-          }}
-        >
-          <div style={{ fontSize: 22, background: "rgba(255,255,255,0.15)", borderRadius: 10, padding: "6px 8px" }}>📸</div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 13, fontWeight: 700 }}>
-              {lang === "Hindi" ? "अयन फोटो एआई जांच" : lang === "Tamil" ? "மடி புகைப்பட ஏஐ ஆய்வு" : "Visual Udder AI Scan"}
+        {/* Two-banner grid: Visual Udder Scan & Live GPS Farm Map */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12 }}>
+          {/* Visual Udder AI Scan Banner */}
+          <div
+            onClick={() => onNavigate("visual-ai")}
+            style={{
+              background: "linear-gradient(135deg, #1C2714, #2A5C1F)",
+              borderRadius: 14,
+              padding: "12px 12px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              cursor: "pointer",
+              boxShadow: "0 4px 12px rgba(42,92,31,0.2)",
+              color: "#FFFFFF",
+              border: "1px solid rgba(255,255,255,0.15)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <span style={{ fontSize: 20, background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: "4px 6px" }}>📸</span>
+              <span style={{ fontSize: 10, fontWeight: 800, background: "#86EFAC", color: "#052E16", padding: "1px 6px", borderRadius: 6 }}>AI SCAN</span>
             </div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.8)" }}>
-              {lang === "Hindi" ? "फोटो खींचकर तुरंत बीमारी का पता लगाएं" : lang === "Tamil" ? "படத்தை பதிவேற்றி உடனே நோய் கண்டறியுங்கள்" : "Upload udder photo for instant clinical diagnosis"}
+            <div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, lineHeight: 1.2 }}>
+                {lang === "Hindi" ? "अयन फोटो एआई जांच" : lang === "Tamil" ? "மடி புகைப்பட ஆய்வு" : "Visual Udder AI"}
+              </div>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.75)", marginTop: 2 }}>
+                Instant photo scan
+              </div>
             </div>
           </div>
-          <span style={{ fontSize: 14, color: "#8AE68A", fontWeight: 700 }}>→</span>
+
+          {/* Live GPS Map Banner */}
+          <div
+            onClick={() => onNavigate("location")}
+            style={{
+              background: "linear-gradient(135deg, #0A2213, #153E22)",
+              borderRadius: 14,
+              padding: "12px 12px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              cursor: "pointer",
+              boxShadow: "0 4px 12px rgba(10,34,19,0.25)",
+              color: "#FFFFFF",
+              border: "1.5px solid #22C55E",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <span style={{ fontSize: 20, background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: "4px 6px" }}>🛰️</span>
+              <span style={{ fontSize: 9, fontWeight: 800, background: "#22C55E", color: "#052E16", padding: "2px 6px", borderRadius: 8, display: "flex", alignItems: "center", gap: 3 }}>
+                <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#052E16" }} />
+                LIVE GPS
+              </span>
+            </div>
+            <div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, lineHeight: 1.2 }}>
+                {lang === "Hindi" ? "लाइव फार्म मैप व GPS" : lang === "Tamil" ? "நேரலை ஜிபிஎஸ் வரைபடம்" : "Live GPS & Pasture"}
+              </div>
+              <div style={{ fontSize: 10, color: "#86EFAC", marginTop: 2 }}>
+                Geofence · 10 online
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Herd Overview Donut */}

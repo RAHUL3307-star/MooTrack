@@ -5,7 +5,7 @@ export type Screen =
 
 export type RiskLevel = "none" | "low" | "moderate" | "high";
 
-export type Tab = "home" | "animals" | "alerts" | "analytics" | "profile";
+export type Tab = "home" | "animals" | "location" | "alerts" | "analytics" | "profile";
 
 export interface VisualScanResult {
   erythemaScore: number;       // 0-100% (Redness / Acute inflammation)

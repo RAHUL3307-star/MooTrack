@@ -24,6 +24,7 @@ export const UI_STRINGS: Record<string, Record<string, string>> = {
   English: {
     tab_home: "Home",
     tab_animals: "Animals",
+    tab_location: "Map",
     tab_alerts: "Alerts",
     tab_analytics: "Analytics",
     tab_profile: "Profile",
@@ -129,6 +130,7 @@ export const UI_STRINGS: Record<string, Record<string, string>> = {
   Tamil: {
     tab_home: "முகப்பு",
     tab_animals: "மாடுகள்",
+    tab_location: "வரைபடம்",
     tab_alerts: "எச்சரிக்கைகள்",
     tab_analytics: "பகுப்பாய்வு",
     tab_profile: "சுயவிவரம்",
@@ -234,6 +236,7 @@ export const UI_STRINGS: Record<string, Record<string, string>> = {
   Hindi: {
     tab_home: "होम",
     tab_animals: "पशु सूची",
+    tab_location: "मानचित्र",
     tab_alerts: "अलर्ट",
     tab_analytics: "एनालिटिक्स",
     tab_profile: "प्रोफाइल",
@@ -339,6 +342,7 @@ export const UI_STRINGS: Record<string, Record<string, string>> = {
   Kannada: {
     tab_home: "ಮುಖಪುಟ",
     tab_animals: "ಪ್ರಾಣಿಗಳು",
+    tab_location: "ನಕ್ಷೆ",
     tab_alerts: "ಎಚ್ಚರಿಕೆಗಳು",
     tab_analytics: "ವಿಶ್ಲೇಷಣೆ",
     tab_profile: "ಪ್ರೊಫೈಲ್",
@@ -444,6 +448,7 @@ export const UI_STRINGS: Record<string, Record<string, string>> = {
   Telugu: {
     tab_home: "హోమ్",
     tab_animals: "పశువులు",
+    tab_location: "మ్యాప్",
     tab_alerts: "హెచ్చరికలు",
     tab_analytics: "విశ్లేషణ",
     tab_profile: "ప్రొఫైల్",
@@ -549,6 +554,7 @@ export const UI_STRINGS: Record<string, Record<string, string>> = {
   Marathi: {
     tab_home: "मुख्यपृष्ठ",
     tab_animals: "जनावरे",
+    tab_location: "नकाशा",
     tab_alerts: "सूचना",
     tab_analytics: "अहवाल",
     tab_profile: "प्रोफाइल",
@@ -654,6 +660,7 @@ export const UI_STRINGS: Record<string, Record<string, string>> = {
   Gujarati: {
     tab_home: "હોમ",
     tab_animals: "પશુઓ",
+    tab_location: "નકશો",
     tab_alerts: "ચેતવણી",
     tab_analytics: "વિશ્લેષણ",
     tab_profile: "પ્રોફાઇલ",
@@ -759,6 +766,7 @@ export const UI_STRINGS: Record<string, Record<string, string>> = {
   Punjabi: {
     tab_home: "ਮੁੱਖ ਪੰਨਾ",
     tab_animals: "ਪਸ਼ੂ",
+    tab_location: "ਨਕਸ਼ਾ",
     tab_alerts: "ਚੇਤਾਵਨੀਆਂ",
     tab_analytics: "ਵਿਸ਼ਲੇਸ਼ਣ",
     tab_profile: "ਪ੍ਰੋਫਾਈਲ",

@@ -78,6 +78,9 @@ function MainAppShell() {
   const navigate = (s: Screen) => {
     setHistory((h) => [...h, screen]);
     setScreen(s);
+    if (["home", "animals", "location", "alerts", "analytics", "profile"].includes(s)) {
+      setActiveTab(s as Tab);
+    }
   };
 
   const goBack = () => {
@@ -95,6 +98,7 @@ function MainAppShell() {
     const screenMap: Record<Tab, Screen> = {
       home: "home",
       animals: "animals",
+      location: "location",
       alerts: "alerts",
       analytics: "analytics",
       profile: "profile",
@@ -103,7 +107,7 @@ function MainAppShell() {
     setScreen(screenMap[tTab]);
   };
 
-  const mainScreens: Screen[] = ["home", "animals", "alerts", "analytics", "profile"];
+  const mainScreens: Screen[] = ["home", "animals", "location", "alerts", "analytics", "profile"];
   const isMain = mainScreens.includes(screen);
 
   const renderScreen = () => {
