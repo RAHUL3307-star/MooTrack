@@ -646,7 +646,6 @@ export function LocationScreen({
               [
                 { id: "satellite", label: "🛰️ Satellite" },
                 { id: "voyager", label: "🗺️ Clean" },
-                { id: "dark", label: "🌙 Tactical" },
                 { id: "osm", label: "🌾 Topo" },
               ] as const
             ).map((l) => (

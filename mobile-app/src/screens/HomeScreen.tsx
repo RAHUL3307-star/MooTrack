@@ -382,7 +382,7 @@ export function HerdRiskConditionCard({
       )}
 
       {/* Multi-species herd distribution */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 8 }}>
         {[
           { label: "🐄 Cows", data: herd.speciesBreakdown.cows },
           { label: "🐐 Goats", data: herd.speciesBreakdown.goats },
@@ -405,11 +405,6 @@ export function HerdRiskConditionCard({
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Clinical biosecurity advisory */}
-      <div style={{ fontSize: 11, lineHeight: 1.45, color: "rgba(255,255,255,0.9)", background: "rgba(0,0,0,0.2)", padding: "8px 10px", borderRadius: 8 }}>
-        {herd.clinicalAdvisory}
       </div>
 
       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
