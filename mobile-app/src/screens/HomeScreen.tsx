@@ -388,28 +388,6 @@ export function HerdRiskConditionCard({
         ))}
       </div>
 
-      {/* Mathematical formula badge */}
-      <div
-        style={{
-          background: "rgba(0,0,0,0.25)",
-          borderRadius: 8,
-          padding: "6px 10px",
-          fontSize: 10,
-          fontFamily: "'JetBrains Mono', monospace",
-          color: "rgba(255,255,255,0.9)",
-          marginBottom: 10,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: 4,
-        }}
-      >
-        <span>Formula: [(Low×0 + Mod×1 + High×2) / (Total×2)] × 100</span>
-        <span style={{ color: "#FDE68A" }}>
-          [{herd.counts.low}×0 + {herd.counts.moderate}×1 + {herd.counts.high}×2] / {herd.totalAnimals * 2}
-        </span>
-      </div>
 
       {/* 7-Day HRI Trend Graph */}
       {herd.hriHistory.length > 0 && (
@@ -571,9 +549,7 @@ export function HomeScreen({
                 lineHeight: 1.2,
               }}
             >
-              {t("greeting", lang)}
-              <br />
-              {farmerName} 🌅
+              {farmerName}
             </div>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,0.75)", marginTop: 3 }}>
               {farmLabel}

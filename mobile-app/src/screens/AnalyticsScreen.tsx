@@ -320,18 +320,7 @@ export function AnalyticsScreen({
                 Comparative risk matrix across all farm barns &amp; species cohorts
               </div>
             </div>
-            <span
-              style={{
-                fontSize: 10,
-                background: "#E8E3DA",
-                color: "#544634",
-                padding: "2px 8px",
-                borderRadius: 10,
-                fontWeight: 700,
-              }}
-            >
-              Formula: HRI = [(0·L + 1·M + 2·H) / 2T] × 100
-            </span>
+
           </div>
 
           <div style={{ overflowX: "auto" }}>
