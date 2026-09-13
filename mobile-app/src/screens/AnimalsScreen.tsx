@@ -306,6 +306,8 @@ export function AnimalsScreen({
   const [showRFIDModal, setShowRFIDModal] = useState(false);
   const [justAdded, setJustAdded] = useState<string | null>(null);
 
+  const [openFilter, setOpenFilter] = useState<"herd" | "species" | "risk" | null>(null);
+
   const riskFilters: { id: "all" | RiskLevel; label: string }[] = [
     { id: "all", label: lang === "Tamil" ? "அனைத்து இடர்" : lang === "Hindi" ? "सभी रिस्क" : "All Risks" },
     { id: "high", label: t("risk_high", lang) },
@@ -429,111 +431,264 @@ export function AnimalsScreen({
           />
         </div>
 
-        {/* Multi-Herd Filter Tabs */}
-        <div style={{ display: "flex", gap: 6, padding: "0 16px 8px", overflowX: "auto" }}>
-          <button
-            onClick={() => setSelectedHerdId("all")}
-            style={{
-              background: selectedHerdId === "all" ? "#2A5C1F" : "#F0EDE6",
-              color: selectedHerdId === "all" ? "#FFFFFF" : "#6B7A5C",
-              border: "none",
-              borderRadius: 16,
-              padding: "5px 12px",
-              fontSize: 11,
-              fontWeight: 700,
-              cursor: "pointer",
-              whiteSpace: "nowrap",
-              transition: "all 0.15s",
-            }}
-          >
-            🌐 All Herds ({animals.length})
-          </button>
-          {herds.map((h) => {
-            const count = animals.filter((a) => a.herdId === h.id).length;
-            const isSelected = selectedHerdId === h.id;
-            return (
-              <button
-                key={h.id}
-                onClick={() => setSelectedHerdId(h.id)}
-                style={{
-                  background: isSelected ? "#2A5C1F" : "#F0EDE6",
-                  color: isSelected ? "#FFFFFF" : "#6B7A5C",
-                  border: "none",
-                  borderRadius: 16,
-                  padding: "5px 12px",
-                  fontSize: 11,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  transition: "all 0.15s",
-                }}
-              >
-                🐄 {h.name.split("–")[0].trim()} ({count})
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Species Filter Tabs */}
-        <div style={{ display: "flex", gap: 6, padding: "0 16px 8px", overflowX: "auto" }}>
-          {speciesFilters.map((s) => (
+        {/* ── Dynamic Clean Interactive Filter Bar ── */}
+        <div style={{ padding: "0 16px 8px" }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", overflowX: "auto", paddingBottom: 2 }}>
+            {/* 1. Herd Filter Trigger */}
             <button
-              key={s.id}
-              onClick={() => setSpeciesFilter(s.id)}
+              onClick={() => setOpenFilter(openFilter === "herd" ? null : "herd")}
               style={{
-                background: speciesFilter === s.id ? "#1C3814" : "#F0EDE6",
-                color: speciesFilter === s.id ? "#FFFFFF" : "#6B7A5C",
-                border: "none",
-                borderRadius: 16,
-                padding: "5px 11px",
-                fontSize: 11,
+                background: selectedHerdId !== "all" || openFilter === "herd" ? "#2A5C1F" : "#FFFFFF",
+                color: selectedHerdId !== "all" || openFilter === "herd" ? "#FFFFFF" : "#3D4F31",
+                border: `1.5px solid ${selectedHerdId !== "all" || openFilter === "herd" ? "#2A5C1F" : "#D8D2C6"}`,
+                borderRadius: 20,
+                padding: "6px 13px",
+                fontSize: 11.5,
                 fontWeight: 700,
                 cursor: "pointer",
                 whiteSpace: "nowrap",
                 display: "flex",
                 alignItems: "center",
-                gap: 4,
-                transition: "all 0.15s",
+                gap: 5,
+                boxShadow: selectedHerdId !== "all" ? "0 2px 6px rgba(42,92,31,0.2)" : "none",
+                transition: "all 0.15s ease",
               }}
             >
-              <span>{s.icon}</span>
-              <span>{s.label}</span>
-              {s.id !== "all" && (
-                <span style={{ opacity: 0.8, fontSize: 10 }}>
-                  ({animals.filter((a) => (a.species || (a.id.startsWith("GT") ? "Goat" : a.id.startsWith("BF") ? "Buffalo" : "Cow")) === s.id).length})
-                </span>
-              )}
+              <span>
+                {selectedHerdId === "all"
+                  ? `🌐 All Herds (${animals.length})`
+                  : `🐄 ${herds.find((h) => h.id === selectedHerdId)?.name.split("–")[0].trim() || selectedHerdId} (${animals.filter((a) => a.herdId === selectedHerdId).length})`}
+              </span>
+              <span style={{ fontSize: 9, opacity: 0.8 }}>{openFilter === "herd" ? "▲" : "▼"}</span>
             </button>
-          ))}
-        </div>
 
-        {/* Risk Filter Tabs */}
-        <div style={{ display: "flex", gap: 6, padding: "0 16px 8px", overflowX: "auto" }}>
-          {riskFilters.map((f) => (
+            {/* 2. Species Filter Trigger */}
             <button
-              key={f.id}
-              onClick={() => setRiskFilter(f.id)}
+              onClick={() => setOpenFilter(openFilter === "species" ? null : "species")}
               style={{
-                background: riskFilter === f.id ? "#2A5C1F" : "#FFFFFF",
-                color: riskFilter === f.id ? "#FFFFFF" : "#6B7A5C",
-                border: `1px solid ${riskFilter === f.id ? "#2A5C1F" : "#E0DAD0"}`,
-                borderRadius: 16,
-                padding: "4px 10px",
-                fontSize: 11,
-                fontWeight: 600,
+                background: speciesFilter !== "all" || openFilter === "species" ? "#2A5C1F" : "#FFFFFF",
+                color: speciesFilter !== "all" || openFilter === "species" ? "#FFFFFF" : "#3D4F31",
+                border: `1.5px solid ${speciesFilter !== "all" || openFilter === "species" ? "#2A5C1F" : "#D8D2C6"}`,
+                borderRadius: 20,
+                padding: "6px 13px",
+                fontSize: 11.5,
+                fontWeight: 700,
                 cursor: "pointer",
                 whiteSpace: "nowrap",
-                transition: "all 0.15s",
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+                boxShadow: speciesFilter !== "all" ? "0 2px 6px rgba(42,92,31,0.2)" : "none",
+                transition: "all 0.15s ease",
               }}
             >
-              {f.label}
-              {f.id !== "all" && (
-                <span style={{ marginLeft: 4, opacity: 0.8 }}>
-                  ({animals.filter((a) => a.risk === f.id).length})
-                </span>
-              )}
+              <span>
+                {speciesFilter === "all"
+                  ? "🐾 All Species"
+                  : `${speciesFilters.find((s) => s.id === speciesFilter)?.icon} ${speciesFilters.find((s) => s.id === speciesFilter)?.label} (${animals.filter((a) => (a.species || (a.id.startsWith("GT") ? "Goat" : a.id.startsWith("BF") ? "Buffalo" : "Cow")) === speciesFilter).length})`}
+              </span>
+              <span style={{ fontSize: 9, opacity: 0.8 }}>{openFilter === "species" ? "▲" : "▼"}</span>
             </button>
-          ))}
+
+            {/* 3. Risk Filter Trigger */}
+            <button
+              onClick={() => setOpenFilter(openFilter === "risk" ? null : "risk")}
+              style={{
+                background: riskFilter !== "all" || openFilter === "risk" ? "#2A5C1F" : "#FFFFFF",
+                color: riskFilter !== "all" || openFilter === "risk" ? "#FFFFFF" : "#3D4F31",
+                border: `1.5px solid ${riskFilter !== "all" || openFilter === "risk" ? "#2A5C1F" : "#D8D2C6"}`,
+                borderRadius: 20,
+                padding: "6px 13px",
+                fontSize: 11.5,
+                fontWeight: 700,
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+                boxShadow: riskFilter !== "all" ? "0 2px 6px rgba(42,92,31,0.2)" : "none",
+                transition: "all 0.15s ease",
+              }}
+            >
+              <span>
+                {riskFilter === "all"
+                  ? "⚡ All Risks"
+                  : `${riskFilters.find((r) => r.id === riskFilter)?.label} (${animals.filter((a) => a.risk === riskFilter).length})`}
+              </span>
+              <span style={{ fontSize: 9, opacity: 0.8 }}>{openFilter === "risk" ? "▲" : "▼"}</span>
+            </button>
+
+            {/* Clear All Reset Pill */}
+            {(selectedHerdId !== "all" || speciesFilter !== "all" || riskFilter !== "all") && (
+              <button
+                onClick={() => {
+                  setSelectedHerdId("all");
+                  setSpeciesFilter("all");
+                  setRiskFilter("all");
+                  setOpenFilter(null);
+                }}
+                style={{
+                  background: "#FCE8E5",
+                  color: "#B83220",
+                  border: "1px solid #F4B8B3",
+                  borderRadius: 20,
+                  padding: "5px 10px",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 3,
+                }}
+                title="Reset All Filters"
+              >
+                ✕ Reset
+              </button>
+            )}
+          </div>
+
+          {/* ── Expandable Filter Options Tray ── */}
+          {openFilter && (
+            <div
+              style={{
+                marginTop: 8,
+                background: "#F2EEE6",
+                border: "1.5px solid #DDD7CA",
+                borderRadius: 14,
+                padding: "8px 10px",
+                display: "flex",
+                gap: 6,
+                overflowX: "auto",
+                alignItems: "center",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+              }}
+            >
+              {openFilter === "herd" && (
+                <>
+                  <button
+                    onClick={() => {
+                      setSelectedHerdId("all");
+                      setOpenFilter(null);
+                    }}
+                    style={{
+                      background: selectedHerdId === "all" ? "#2A5C1F" : "#FFFFFF",
+                      color: selectedHerdId === "all" ? "#FFFFFF" : "#556447",
+                      border: `1px solid ${selectedHerdId === "all" ? "#2A5C1F" : "#D0CAC0"}`,
+                      borderRadius: 14,
+                      padding: "5px 12px",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    🌐 All Herds ({animals.length})
+                  </button>
+                  {herds.map((h) => {
+                    const count = animals.filter((a) => a.herdId === h.id).length;
+                    const isSel = selectedHerdId === h.id;
+                    return (
+                      <button
+                        key={h.id}
+                        onClick={() => {
+                          setSelectedHerdId(h.id);
+                          setOpenFilter(null);
+                        }}
+                        style={{
+                          background: isSel ? "#2A5C1F" : "#FFFFFF",
+                          color: isSel ? "#FFFFFF" : "#556447",
+                          border: `1px solid ${isSel ? "#2A5C1F" : "#D0CAC0"}`,
+                          borderRadius: 14,
+                          padding: "5px 12px",
+                          fontSize: 11,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        🐄 {h.name.split("–")[0].trim()} ({count})
+                      </button>
+                    );
+                  })}
+                </>
+              )}
+
+              {openFilter === "species" && (
+                <>
+                  {speciesFilters.map((s) => {
+                    const count =
+                      s.id === "all"
+                        ? animals.length
+                        : animals.filter(
+                            (a) =>
+                              (a.species || (a.id.startsWith("GT") ? "Goat" : a.id.startsWith("BF") ? "Buffalo" : "Cow")) === s.id
+                          ).length;
+                    const isSel = speciesFilter === s.id;
+                    return (
+                      <button
+                        key={s.id}
+                        onClick={() => {
+                          setSpeciesFilter(s.id);
+                          setOpenFilter(null);
+                        }}
+                        style={{
+                          background: isSel ? "#2A5C1F" : "#FFFFFF",
+                          color: isSel ? "#FFFFFF" : "#556447",
+                          border: `1px solid ${isSel ? "#2A5C1F" : "#D0CAC0"}`,
+                          borderRadius: 14,
+                          padding: "5px 12px",
+                          fontSize: 11,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          whiteSpace: "nowrap",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 4,
+                        }}
+                      >
+                        <span>{s.icon}</span>
+                        <span>{s.label}</span>
+                        <span style={{ opacity: 0.8, fontSize: 10 }}>({count})</span>
+                      </button>
+                    );
+                  })}
+                </>
+              )}
+
+              {openFilter === "risk" && (
+                <>
+                  {riskFilters.map((f) => {
+                    const count =
+                      f.id === "all" ? animals.length : animals.filter((a) => a.risk === f.id).length;
+                    const isSel = riskFilter === f.id;
+                    return (
+                      <button
+                        key={f.id}
+                        onClick={() => {
+                          setRiskFilter(f.id);
+                          setOpenFilter(null);
+                        }}
+                        style={{
+                          background: isSel ? "#2A5C1F" : "#FFFFFF",
+                          color: isSel ? "#FFFFFF" : "#556447",
+                          border: `1px solid ${isSel ? "#2A5C1F" : "#D0CAC0"}`,
+                          borderRadius: 14,
+                          padding: "5px 12px",
+                          fontSize: 11,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {f.label} ({count})
+                      </button>
+                    );
+                  })}
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Sort & Lactation Filter Controls Bar */}
