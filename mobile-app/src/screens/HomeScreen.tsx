@@ -104,101 +104,55 @@ export function HomeSituationSummaryCard({
         )}
       </div>
 
-      {/* ── Dynamic Live Summary Display ──────────────── */}
-      <div style={{ fontSize: 12, lineHeight: 1.55, color: "rgba(255,255,255,0.95)", marginBottom: 12 }}>
-        {isLive && (!lastTelemetry || !lastTelemetry.cowScanned) ? (
-          <div style={{ background: "rgba(0,0,0,0.25)", borderRadius: 10, padding: "10px 12px", marginBottom: 6, border: "1px dashed rgba(134,239,172,0.5)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#86EFAC", fontWeight: 700, fontSize: 12 }}>
-              <span style={{ fontSize: 16 }}>📡</span>
-              <span>
-                {lang === "Tamil"
-                  ? "ESP32 இணைக்கப்பட்டது — மாட்டின் RFID அட்டைக்காக காத்திருக்கிறது..."
-                  : lang === "Hindi"
-                  ? "ESP32 कनेक्टेड — गाय के RFID कार्ड की प्रतीक्षा है..."
-                  : "ESP32 Connected — Waiting for Cow RFID Card..."}
-              </span>
-            </div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.8)", marginTop: 4 }}>
+      {/* ── Live Telemetry Display if ESP32 Dipping is Active ──────────────── */}
+      {isLive && (!lastTelemetry || !lastTelemetry.cowScanned) ? (
+        <div style={{ background: "rgba(0,0,0,0.25)", borderRadius: 10, padding: "10px 12px", marginBottom: 10, border: "1px dashed rgba(134,239,172,0.5)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#86EFAC", fontWeight: 700, fontSize: 12 }}>
+            <span style={{ fontSize: 16 }}>📡</span>
+            <span>
               {lang === "Tamil"
-                ? "மாட்டை பதிவு செய்து நேரடி பால் தரவை பெற RFID அட்டையை ESP32 ஸ்கேனரில் வையுங்கள்."
+                ? "ESP32 இணைக்கப்பட்டது — மாட்டின் RFID அட்டைக்காக காத்திருக்கிறது..."
                 : lang === "Hindi"
-                ? "गाय को स्वतः दर्ज करने और लाइव डेटा हेतु RFID कार्ड को ESP32 स्कैनर पर लगाएं।"
-                : "Serial monitor: 'Waiting for Cow RFID card...' — Tap RFID card on RC522 scanner to register cow & stream telemetry."}
-            </div>
+                ? "ESP32 कनेक्टेड — गाय के RFID कार्ड की प्रतीक्षा है..."
+                : "ESP32 Connected — Waiting for Cow RFID Card..."}
+            </span>
           </div>
-        ) : isLive && lastTelemetry && lastTelemetry.cowScanned ? (
-          <div style={{ background: "rgba(0,0,0,0.22)", borderRadius: 10, padding: "8px 10px", marginBottom: 6 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#86EFAC" }}>
-                📡 ESP32 Live: {targetCow?.name || lastTelemetry.cowName || lastTelemetry.cowId || "Cow 1"}
-              </span>
-              <span
-                style={{
-                  fontSize: 10,
-                  fontWeight: 800,
-                  padding: "1px 6px",
-                  borderRadius: 6,
-                  background: liveRisk?.risk === "high" ? "#B83220" : liveRisk?.risk === "moderate" ? "#C47A10" : "#2E7D32",
-                  color: "#FFF",
-                }}
-              >
-                {liveRisk?.risk === "high"
-                  ? "ALREADY AFFECTED"
-                  : liveRisk?.risk === "moderate"
-                  ? "CHANCE OF GETTING AFFECTED (7-14d)"
-                  : "NORMAL & HEALTHY"}
-              </span>
-            </div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.85)" }}>
-              RFID: <strong>{lastTelemetry.rfidTag || "0xE3995556"}</strong> · SCC: <strong>{(((lastTelemetry.scc || (liveRisk?.risk === "high" ? 1850000 : liveRisk?.risk === "moderate" ? 420000 : 75000)) / 1000).toFixed(0))}k/mL</strong> · pH: <strong>{lastTelemetry.ph != null ? lastTelemetry.ph.toFixed(2) : "6.7"}</strong> · EC: <strong>{lastTelemetry.conductivity?.toFixed(1) ?? "5.0"} mS/cm</strong> · Temp: <strong>{lastTelemetry.temp}°C</strong>
-            </div>
-          </div>
-        ) : null}
-
-        {animals.length === 0 ? (
-          <div style={{ color: "#86EFAC", fontWeight: 600 }}>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.8)", marginTop: 4 }}>
             {lang === "Tamil"
-              ? "📡 பண்ணையில் மாடுகள் எதுவும் பதிவு செய்யப்படவில்லை. RFID அட்டையை ஸ்கேன் செய்யவும்."
+              ? "மாட்டை பதிவு செய்து நேரடி பால் தரவை பெற RFID அட்டையை ESP32 ஸ்கேனரில் வையுங்கள்."
               : lang === "Hindi"
-              ? "📡 फार्म में कोई पशु दर्ज नहीं है। RFID कार्ड स्कैन करके पशु जोड़ें।"
-              : "📡 No cows registered in herd yet. Tap RFID card on scanner to add cow."}
+              ? "गाय को स्वतः दर्ज करने और लाइव डेटा हेतु RFID कार्ड को ESP32 स्कैनर पर लगाएं।"
+              : "Serial monitor: 'Waiting for Cow RFID card...' — Tap RFID card on RC522 scanner to register cow & stream telemetry."}
           </div>
-        ) : highRisk.length === 0 && modRisk.length === 0 ? (
-          <div style={{ color: "#86EFAC", fontWeight: 600 }}>
-            {lang === "Tamil"
-              ? `✅ பண்ணையில் உள்ள அனைத்து ${animals.length} மாடுகளும் நலமுடன் உள்ளன.`
-              : lang === "Hindi"
-              ? `✅ आपके फार्म के सभी ${animals.length} पशु पूरी तरह स्वस्थ हैं।`
-              : `✅ All ${animals.length} cows in your herd are currently healthy with normal milk parameters.`}
+        </div>
+      ) : isLive && lastTelemetry && lastTelemetry.cowScanned ? (
+        <div style={{ background: "rgba(0,0,0,0.22)", borderRadius: 10, padding: "8px 10px", marginBottom: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "#86EFAC" }}>
+              📡 ESP32 Live: {targetCow?.name || lastTelemetry.cowName || lastTelemetry.cowId || "Cow 1"}
+            </span>
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                padding: "1px 6px",
+                borderRadius: 6,
+                background: liveRisk?.risk === "high" ? "#B83220" : liveRisk?.risk === "moderate" ? "#C47A10" : "#2E7D32",
+                color: "#FFF",
+              }}
+            >
+              {liveRisk?.risk === "high"
+                ? "ALREADY AFFECTED"
+                : liveRisk?.risk === "moderate"
+                ? "CHANCE OF GETTING AFFECTED (7-14d)"
+                : "NORMAL & HEALTHY"}
+            </span>
           </div>
-        ) : (
-          <>
-            {highRisk.length > 0 && (
-              <div style={{ marginBottom: 6 }}>
-                <span style={{ color: "#FCA5A5", fontWeight: 700 }}>
-                  {lang === "Tamil" ? "🚨 ஏற்கனவே தீவிர பாதிப்பு:" : lang === "Hindi" ? "🚨 पहले से गंभीर प्रभावित:" : "🚨 Critical / Already Affected:"}
-                </span>{" "}
-                <span>{highRisk.map((a) => `${a.name} (${a.id})`).join(", ")}</span>
-              </div>
-            )}
-            {modRisk.length > 0 && (
-              <div style={{ color: "#FFE082", fontSize: 11.5 }}>
-                <span style={{ fontWeight: 700 }}>
-                  {lang === "Tamil" ? "⚠️ இடைநிலை ஆபத்து (70%–80%):" : lang === "Hindi" ? "⚠️ मध्यवर्ती चरण (70%–80%):" : "⚠️ Intermediate Stage (70%–80% risk):"}
-                </span>{" "}
-                <span>
-                  {modRisk.map((a) => `${a.name} (${a.id})`).join(", ")} —{" "}
-                  {lang === "Tamil"
-                    ? "அடுத்த 7 முதல் 14 நாட்களில் மடிநோய் தாக்கும் அதிக வாய்ப்பு! உடனே அயோடின் தடுப்பு சிகிச்சை தேவை."
-                    : lang === "Hindi"
-                    ? "अगले 7 से 14 दिनों में रोग होने की पूरी आशंका! तुरंत निवारक आयोडीन उपचार करें।"
-                    : "High chance of clinical mastitis in 7–14 days without intervention. Apply preventive iodine teat barrier."}
-                </span>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.85)" }}>
+            RFID: <strong>{lastTelemetry.rfidTag || "0xE3995556"}</strong> · SCC: <strong>{(((lastTelemetry.scc || (liveRisk?.risk === "high" ? 1850000 : liveRisk?.risk === "moderate" ? 420000 : 75000)) / 1000).toFixed(0))}k/mL</strong> · pH: <strong>{lastTelemetry.ph != null ? lastTelemetry.ph.toFixed(2) : "6.7"}</strong> · EC: <strong>{lastTelemetry.conductivity?.toFixed(1) ?? "5.0"} mS/cm</strong> · Temp: <strong>{lastTelemetry.temp}°C</strong>
+          </div>
+        </div>
+      ) : null}
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
         <button
