@@ -159,6 +159,18 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
           rssi: data.rssi || raw.rssi,
           riskScore: raw.riskScore ?? raw.mastitis_risk_score,
           riskTier: raw.riskTier ?? raw.mastitis_risk,
+          // ── GPS / Location fields from NEO-6M / NEO-8M module ──────────────
+          lat: raw.lat ?? raw.latitude ?? raw.gps_lat,
+          lng: raw.lng ?? raw.longitude ?? raw.gps_lng,
+          latitude: raw.latitude ?? raw.lat,
+          longitude: raw.longitude ?? raw.lng,
+          gps_speed: raw.gps_speed ?? raw.speed,
+          gps_heading: raw.gps_heading ?? raw.heading ?? raw.course,
+          gps_altitude: raw.gps_altitude ?? raw.altitude,
+          gps_satellites: raw.gps_satellites ?? raw.satellites ?? raw.sat_count,
+          gps_fixed: raw.gps_fixed ?? raw.gpsFixed ?? (raw.gps_satellites != null ? raw.gps_satellites >= 3 : undefined),
+          gpsFixed: raw.gpsFixed ?? raw.gps_fixed,
+          herdId: raw.herdId ?? raw.herd_id,
           timestamp: raw.timestamp || new Date().toLocaleTimeString(),
         };
 
@@ -267,6 +279,18 @@ export function ESP32Provider({ children }: { children: React.ReactNode }) {
               rssi: -50,
               riskScore: rawAp.mastitis_risk_score ?? rawAp.riskScore,
               riskTier: rawAp.mastitis_risk ?? rawAp.riskTier ?? "LOW",
+              // ── GPS fields from NEO-6M / NEO-8M ────────────────────────────
+              lat: rawAp.lat ?? rawAp.latitude ?? rawAp.gps_lat,
+              lng: rawAp.lng ?? rawAp.longitude ?? rawAp.gps_lng,
+              latitude: rawAp.latitude ?? rawAp.lat,
+              longitude: rawAp.longitude ?? rawAp.lng,
+              gps_speed: rawAp.gps_speed ?? rawAp.speed,
+              gps_heading: rawAp.gps_heading ?? rawAp.heading ?? rawAp.course,
+              gps_altitude: rawAp.gps_altitude ?? rawAp.altitude,
+              gps_satellites: rawAp.gps_satellites ?? rawAp.satellites ?? rawAp.sat_count,
+              gps_fixed: rawAp.gps_fixed ?? rawAp.gpsFixed ?? (rawAp.gps_satellites != null ? rawAp.gps_satellites >= 3 : undefined),
+              gpsFixed: rawAp.gpsFixed ?? rawAp.gps_fixed,
+              herdId: rawAp.herdId ?? rawAp.herd_id,
               timestamp: new Date().toLocaleTimeString(),
             }
           });

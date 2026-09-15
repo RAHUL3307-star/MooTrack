@@ -1,9 +1,10 @@
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
 import { ANIMALS } from "../types/index";
 import type { Animal, RiskLevel } from "../types/index";
+import { getAnimalHerdId } from "./herdService";
 
 // Bump this version whenever ANIMALS data changes — forces a reseed
-const DATA_VERSION = "v5-multi-herd-scc";
+const DATA_VERSION = "v6-multi-herd-gps-sync";
 
 const OLD_NAME_MAP: Record<string, string> = {
   "Ganga": "Cow 1 (Gauri)",
@@ -28,7 +29,7 @@ export function normalizeCowName(id: string, name?: string): string {
 export async function fetchAnimals(): Promise<Animal[]> {
   if (!isSupabaseConfigured || !supabase) {
     console.info("[animalService] Supabase not configured — using local seed data.");
-    return ANIMALS;
+    return ANIMALS.map((a) => ({ ...a, herdId: getAnimalHerdId(a) }));
   }
 
   try {
@@ -39,15 +40,15 @@ export async function fetchAnimals(): Promise<Animal[]> {
 
     if (error || !data || data.length === 0) {
       console.warn("[animalService] Supabase query failed or empty — falling back to local data:", error?.message);
-      return ANIMALS;
+      return ANIMALS.map((a) => ({ ...a, herdId: getAnimalHerdId(a) }));
     }
 
-    // Map Supabase rows to app Animal interface with normalized names
+    // Map Supabase rows to app Animal interface with normalized names and verified herd IDs
     return data.map((row) => ({
       id: row.id,
       name: normalizeCowName(row.id, row.name),
       species: (row.species as "Cow" | "Goat" | "Buffalo") || (row.id.startsWith("GT") ? "Goat" : row.id.startsWith("BF") ? "Buffalo" : "Cow"),
-      herdId: row.herd_id ?? undefined,
+      herdId: row.herd_id || getAnimalHerdId({ id: row.id, herdId: row.herd_id ?? undefined }),
       breed: row.breed,
       age: row.age,
       ageYears: row.age_years ?? undefined,

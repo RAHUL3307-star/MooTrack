@@ -1,4 +1,30 @@
 import type { Animal, RiskLevel } from "../types/index";
+import { ANIMALS } from "../types/index";
+
+/**
+ * Returns a guaranteed valid herdId ("HERD_A", "HERD_B", or "HERD_C") for any animal.
+ * If herdId is missing or undefined, intelligently maps it to the standard herd allocation.
+ */
+export function getAnimalHerdId(animal: Partial<Animal>): "HERD_A" | "HERD_B" | "HERD_C" {
+  if (animal.herdId === "HERD_A" || animal.herdId === "HERD_B" || animal.herdId === "HERD_C") {
+    return animal.herdId;
+  }
+  if (animal.id) {
+    const standard = ANIMALS.find((a) => a.id === animal.id);
+    if (standard?.herdId) return standard.herdId as "HERD_A" | "HERD_B" | "HERD_C";
+
+    // Species / ID based fallbacks
+    if (animal.id.startsWith("GT-003") || animal.id.startsWith("KA-052")) return "HERD_C";
+    if (animal.id.startsWith("GT") || animal.id.includes("022") || animal.id.includes("031")) return "HERD_B";
+  }
+  return "HERD_A";
+}
+
+/** Filter animals by herd ID. Pass "all" to include every animal. */
+export function filterAnimalsByHerd(animals: Animal[], herdId: string | "all"): Animal[] {
+  if (!herdId || herdId === "all") return animals;
+  return animals.filter((a) => getAnimalHerdId(a) === herdId);
+}
 
 export interface SpeciesHerdStats {
   species: "Cow" | "Goat" | "Buffalo";
@@ -41,12 +67,6 @@ export interface HerdRiskAssessment {
     buffaloes: SpeciesHerdStats;
   };
   clinicalAdvisory: string;
-}
-
-/** Filter animals by herd ID. Pass "all" to include every animal. */
-export function filterAnimalsByHerd(animals: Animal[], herdId: string | "all"): Animal[] {
-  if (herdId === "all") return animals;
-  return animals.filter((a) => a.herdId === herdId);
 }
 
 export function calculateHerdRisk(animals: Animal[]): HerdRiskAssessment {

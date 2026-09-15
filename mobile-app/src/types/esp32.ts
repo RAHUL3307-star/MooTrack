@@ -41,6 +41,19 @@ export interface ESP32Telemetry {
   riskScore?: number;     // 0-100 calculated risk score
   riskTier?: string;      // "Low" | "Watch" | "Elevated"
 
+  // GPS & Location Telemetry (Hardware GPS Module NEO-6M / NEO-8M)
+  lat?: number;           // Latitude in degrees (e.g. 22.558450)
+  lng?: number;           // Longitude in degrees (e.g. 72.952300)
+  latitude?: number;      // Alias for lat
+  longitude?: number;     // Alias for lng
+  gps_speed?: number;     // Movement speed in m/min or km/h
+  gps_heading?: number;   // Heading in degrees (0-360)
+  gps_altitude?: number;  // Altitude in meters
+  gps_satellites?: number;// Number of locked satellites (e.g. 8)
+  gps_fixed?: boolean;    // GPS satellite fix status
+  gpsFixed?: boolean;     // Alias for gps_fixed
+  herdId?: string;        // Herd assignment (e.g. "HERD_A", "HERD_B", "HERD_C")
+
   timestamp: string;
 }
 

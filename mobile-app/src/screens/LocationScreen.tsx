@@ -421,7 +421,7 @@ export function LocationScreen({
   onSelectAnimal?: (animal: Animal) => void;
 }) {
   const { animals } = useAnimals();
-  const { isLive } = useESP32();
+  const { isLive, lastTelemetry } = useESP32();
   const [cowsGPS, setCowsGPS] = useState<CowGPS[]>(() => buildInitialGPS(animals));
   const [selectedId, setSelectedId] = useState<string | null>(animals[0]?.id ?? null);
   const [filterZone, setFilterZone] = useState<"All" | "Barn" | "East Pasture" | "Water" | "Breach">("All");
@@ -430,14 +430,82 @@ export function LocationScreen({
   const [collarBuzzerActive, setCollarBuzzerActive] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Periodic GPS drift simulation
+  // Sync GPS list when animals list grows/shrinks (e.g. new RFID scan adds a cow)
   useEffect(() => {
-    if (!liveTracking) return;
+    setCowsGPS((prev) => {
+      // Add entries for any new animals not already in the GPS list
+      const existingIds = new Set(prev.map((c) => c.id));
+      const newEntries = buildInitialGPS(animals.filter((a) => !existingIds.has(a.id)));
+      if (newEntries.length === 0) return prev;
+      // Auto-select the first new animal
+      if (newEntries[0]) setSelectedId(newEntries[0].id);
+      return [...prev, ...newEntries];
+    });
+  }, [animals]);
+
+  // ── Real ESP32 GPS Integration ─────────────────────────────────────────────
+  // When the hardware is live and the telemetry packet carries valid GPS coords,
+  // update the scanned cow's position with real satellite data instead of simulation.
+  useEffect(() => {
+    if (!isLive || !lastTelemetry) return;
+
+    const lat = lastTelemetry.lat ?? lastTelemetry.latitude;
+    const lng = lastTelemetry.lng ?? lastTelemetry.longitude;
+    const gpsFixed = lastTelemetry.gps_fixed ?? lastTelemetry.gpsFixed;
+    const cowId = lastTelemetry.cowId || "COW_001";
+
+    // Only update if we have a real GPS fix with valid coords
+    if (!lat || !lng || lat === 0 || lng === 0) return;
+    if (gpsFixed === false) return; // Explicitly no fix
+
+    const dist = haversineM(FARM_CENTER.lat, FARM_CENTER.lng, lat, lng);
+    const outside = dist > FARM_RADIUS_M;
+    const dlat = lat - FARM_CENTER.lat;
+    const dlng = lng - FARM_CENTER.lng;
+    const speed = lastTelemetry.gps_speed ?? (lastTelemetry.activity != null ? (lastTelemetry.activity > 70 ? 3.4 : lastTelemetry.activity > 30 ? 1.5 : 0.4) : 1.5);
+    const heading = lastTelemetry.gps_heading ?? 0;
+    const battery = lastTelemetry.battery ?? 85;
+    const rssiVal = lastTelemetry.rssi ?? -70;
+    const sig: "Strong" | "Good" | "Weak" = rssiVal > -70 ? "Strong" : rssiVal > -85 ? "Good" : "Weak";
+    const satellites = lastTelemetry.gps_satellites ?? 0;
+
+    setCowsGPS((prev) => {
+      const idx = prev.findIndex((c) => c.id === cowId);
+      const updated: CowGPS = {
+        id: cowId,
+        lat,
+        lng,
+        speed,
+        heading,
+        zone: outside ? "⚠️ Outside Fence" : getZoneName(dist, dlat, dlng),
+        outsideGeofence: outside,
+        lastUpdate: `GPS ${satellites > 0 ? `${satellites} sats` : "Live"}`,
+        batteryPct: battery,
+        signal: sig,
+        rssi: rssiVal,
+        collarId: `GPS-${lastTelemetry.rfidTag?.slice(-6) ?? cowId}`,
+      };
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = updated;
+        return next;
+      }
+      return [...prev, updated];
+    });
+    setSelectedId(cowId);
+  }, [isLive, lastTelemetry]);
+
+  // Periodic GPS drift simulation — only runs when NOT receiving real GPS data
+  const hasRealGPS = isLive && !!lastTelemetry && !!((lastTelemetry.lat ?? lastTelemetry.latitude));
+  useEffect(() => {
+    // Skip simulation when real hardware GPS is feeding us data
+    if (!liveTracking || hasRealGPS) return;
     const interval = setInterval(() => {
       setCowsGPS((prev) => driftGPS(prev, animals));
     }, 3200);
     return () => clearInterval(interval);
-  }, [liveTracking, animals]);
+  }, [liveTracking, animals, hasRealGPS]);
+
 
   const outsideCount = cowsGPS.filter((c) => c.outsideGeofence).length;
   const inBarnCount = cowsGPS.filter((c) => c.zone === "Milking Barn").length;
@@ -458,8 +526,16 @@ export function LocationScreen({
 
   const handleWhatsAppAlert = () => {
     if (!selectedAnimal || !selectedCow) return;
-    const msg = `🚨 *MooTracker GPS Alert* 🚨\n*Animal:* ${selectedAnimal.name} (${selectedAnimal.id})\n*Zone:* ${selectedCow.zone}\n*Coordinates:* ${selectedCow.lat.toFixed(6)}°N, ${selectedCow.lng.toFixed(6)}°E\n*Geofence Status:* ${selectedCow.outsideGeofence ? "⚠️ OUTSIDE BOUNDARY" : "Safe"}\n*Speed:* ${selectedCow.speed.toFixed(1)} m/min\n*Battery:* ${selectedCow.batteryPct}%`;
-    sendWhatsAppAlert(msg);
+    const locationDetail = `GPS: ${selectedCow.lat.toFixed(6)}°N, ${selectedCow.lng.toFixed(6)}°E · Zone: ${selectedCow.zone} · Speed: ${selectedCow.speed.toFixed(1)} m/min`;
+    const status = selectedCow.outsideGeofence ? "⚠️ OUTSIDE BOUNDARY" : "Safe";
+    sendWhatsAppAlert(
+      `${selectedAnimal.name} (${selectedAnimal.id})`,
+      selectedCow.outsideGeofence ? "HIGH" : selectedAnimal.risk.toUpperCase(),
+      `Geofence Status: ${status} · ${locationDetail}`,
+      selectedCow.outsideGeofence ? "Locate and return animal to farm perimeter immediately" : "Monitor GPS position",
+      selectedCow.outsideGeofence ? "URGENT" : "Routine",
+      lang
+    );
   };
 
   // Filtered cow list for the bottom horizontal strip
