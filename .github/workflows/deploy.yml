@@ -67,6 +67,9 @@ jobs:
           cp sw.js dist-pages/app/sw.js
           cp icon.svg icon-192.png icon-512.png dist-pages/app/ 2>/dev/null || true
           
+          # Copy APK for direct download
+          cp MooTracker.apk dist-pages/MooTracker.apk 2>/dev/null || true
+          
           # Digital Asset Links and .nojekyll for Chrome TWA verification (hiding URL bar)
           mkdir -p dist-pages/.well-known dist-pages/app/.well-known
           cp .well-known/assetlinks.json dist-pages/.well-known/assetlinks.json 2>/dev/null || true
