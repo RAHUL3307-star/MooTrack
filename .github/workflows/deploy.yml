@@ -61,10 +61,17 @@ jobs:
           cp -r mobile-app/dist/assets/* dist-pages/assets/ 2>/dev/null || true
           cp -r mobile-app/dist/assets/* dist-pages/app/assets/ 2>/dev/null || true
           
-          # Copy manifest and icons for PWA
+          # Copy manifest, assetlinks and icons for PWA
+          cp manifest.json dist-pages/manifest.json
           cp manifest.json dist-pages/app/manifest.json
           cp sw.js dist-pages/app/sw.js
           cp icon.svg icon-192.png icon-512.png dist-pages/app/ 2>/dev/null || true
+          
+          # Digital Asset Links and .nojekyll for Chrome TWA verification (hiding URL bar)
+          mkdir -p dist-pages/.well-known dist-pages/app/.well-known
+          cp .well-known/assetlinks.json dist-pages/.well-known/assetlinks.json 2>/dev/null || true
+          cp .well-known/assetlinks.json dist-pages/app/.well-known/assetlinks.json 2>/dev/null || true
+          cp .nojekyll dist-pages/.nojekyll 2>/dev/null || true
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
