@@ -30,8 +30,9 @@ function sanitizeTtsText(text: string, langName: string): string {
   // Strip markdown / symbols
   s = s.replace(/[*_#~`|•·\\/→←↑↓]/g, " ");
 
-  // Normalise cow IDs: KA-001 → KA 001
-  s = s.replace(/\b([A-Z]{2})-(\d{2,4})\b/g, "$1 $2");
+  // Strip technical cow ID tags like (KA-001), KA-001, KB 1001, GT-002, BF-003
+  s = s.replace(/\([A-Z0-9- ]+\)/gi, " ");
+  s = s.replace(/\b[A-Z]{2,3}[- ]\d{2,4}\b/gi, " ");
 
   // Strip brackets
   s = s.replace(/[()[\]{}"'""'`~@$^&*+=<>]/g, " ");

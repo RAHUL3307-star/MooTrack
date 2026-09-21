@@ -37,7 +37,8 @@ export function generateLiveSituationSummary(
         (liveTelemetry.rfidTag && a.rfidTag === liveTelemetry.rfidTag) ||
         a.id === liveTelemetry.cowId
     );
-    const cowName = liveTelemetry.cowName || (targetCow ? targetCow.name : (liveTelemetry.cowId || "Cow 1"));
+    const rawName = liveTelemetry.cowName || (targetCow ? targetCow.name : (liveTelemetry.cowId || "Cow 1"));
+    const cowName = rawName.replace(/\([A-Z0-9- ]+\)/gi, "").replace(/\b[A-Z]{2,3}[- ]\d{2,4}\b/gi, "").trim() || "Cow 1";
     const riskResult = computeMilkRisk(liveTelemetry);
     const phVal = liveTelemetry.ph != null ? liveTelemetry.ph.toFixed(2) : "6.70";
     const ecVal = (liveTelemetry.conductivity ?? 5.0).toFixed(1);
@@ -130,8 +131,14 @@ export function generateLiveSituationSummary(
   const hri = total > 0 ? Math.round(((low.length * 0 + mod.length * 1 + high.length * 2) / (total * 2)) * 100) : 60;
   const hriStatus = hri >= 70 ? "High" : hri >= 40 ? "Moderate" : "Low";
 
-  const highNames = high.map((a) => `${a.name} (${a.id})`).join(", ");
-  const modNames = mod.map((a) => `${a.name} (${a.id})`).join(", ");
+  const formatCowNames = (arr: Animal[]) => {
+    return arr
+      .map((a) => (a.name || a.id).replace(/\([A-Z0-9- ]+\)/gi, "").replace(/\b[A-Z]{2,3}[- ]\d{2,4}\b/gi, "").trim())
+      .filter(Boolean)
+      .join(", ");
+  };
+  const highNames = formatCowNames(high);
+  const modNames = formatCowNames(mod);
 
   switch (lang) {
     case "Tamil":
