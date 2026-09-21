@@ -1,1 +1,12 @@
-﻿[{"relation":["delegate_permission/common.handle_all_urls"],"target":{"namespace":"android_app","package_name":"io.github.rahul3307_star.twa","sha256_cert_fingerprints":["B2:CC:09:9F:D2:6B:84:A9:A7:4E:28:FC:B0:19:93:E4:AE:BC:A6:D7:E1:CA:47:53:27:A8:62:6A:30:B5:53:D7"]}}]
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.rahul3307_star.twa",
+      "sha256_cert_fingerprints": [
+        "B2:CC:09:9F:D2:6B:84:A9:A7:4E:28:FC:B0:19:93:E4:AE:BC:A6:D7:E1:CA:47:53:27:A8:62:6A:30:B5:53:D7"
+      ]
+    }
+  }
+]
