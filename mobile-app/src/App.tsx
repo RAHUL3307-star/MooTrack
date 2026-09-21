@@ -57,6 +57,7 @@ function MainAppShell() {
 
     window.addEventListener("resize", handleResize);
     document.addEventListener("fullscreenchange", handleFullscreen);
+
     return () => {
       window.removeEventListener("resize", handleResize);
       document.removeEventListener("fullscreenchange", handleFullscreen);
@@ -307,43 +308,7 @@ function MainAppShell() {
         </div>
       )}
 
-      {/* Floating Fullscreen & Tools Pill for Mobile screens */}
-      {isMobileScreen && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: 68,
-            right: 12,
-            zIndex: 9999,
-            display: "flex",
-            flexDirection: "column",
-            gap: 6,
-          }}
-        >
-          {!isFullscreen && (
-            <button
-              onClick={toggleFullscreen}
-              style={{
-                background: "rgba(42, 92, 31, 0.92)",
-                color: "#FFFFFF",
-                border: "1px solid rgba(255,255,255,0.3)",
-                borderRadius: 24,
-                padding: "8px 12px",
-                fontSize: 11,
-                fontWeight: 700,
-                boxShadow: "0 4px 14px rgba(0,0,0,0.25)",
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-                backdropFilter: "blur(8px)",
-                cursor: "pointer",
-              }}
-            >
-              <span>⛶</span> Fullscreen
-            </button>
-          )}
-        </div>
-      )}
+
 
       {/* Main Mobile App Frame / Container */}
       <div
