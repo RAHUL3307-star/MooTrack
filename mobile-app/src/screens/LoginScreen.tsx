@@ -26,10 +26,15 @@ const LABEL_STYLE: React.CSSProperties = {
 };
 
 export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string }) {
-  const { setUser } = useUser();
+  const { savedAccounts, setUser, removeAccountFromDevice, signInWithGoogle, isGoogleLoading } = useUser();
   const [view, setView] = useState<"main" | "signin" | "register">("main");
   const [showGoogleModal, setShowGoogleModal] = useState(false);
-  const [googleMode, setGoogleMode] = useState<"choose" | "manual">("choose");
+
+  // Filter accounts on this device that have Google auth or email
+  const googleAccountsOnDevice = savedAccounts.filter((acc) => acc.authProvider === "google" || acc.email);
+
+  // Determine initial Google modal state: if accounts exist on this device, show "choose", else "manual"
+  const [googleMode, setGoogleMode] = useState<"choose" | "manual">("manual");
 
   // ── Custom Google Account fields ───────────────────────────────────────────
   const [customName, setCustomName] = useState("");
@@ -40,6 +45,9 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
   // ── Phone Sign In State ───────────────────────────────────────────────────
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState<"farmer" | "vet" | "officer">("farmer");
+  const [phoneName, setPhoneName] = useState("");
+  const [phoneFarm, setPhoneFarm] = useState("");
+  const [phoneError, setPhoneError] = useState("");
 
   // ── Create Account / Register State ───────────────────────────────────────
   const [regName, setRegName] = useState("");
@@ -56,30 +64,21 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
     { id: "officer" as const, label: t("role_officer", lang), icon: "📋" },
   ];
 
-  // ── Quick Google Sign In with Detected Account (Rahul) ──────────────────────
-  const handleQuickGoogleSignIn = (name: string, email: string) => {
-    const profile: UserProfile = {
-      name,
-      farmName: "My Dairy Farm",
-      phone: "9876543210",
-      email,
-      role: "farmer",
-      authProvider: "google",
-      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=2A5C1F&textColor=FFFFFF`,
-    };
-    setUser(profile);
+  // ── Select an Existing Account Saved on This Device ────────────────────────
+  const handleSelectDeviceAccount = (acc: UserProfile) => {
+    setUser(acc);
     setShowGoogleModal(false);
     onNext();
   };
 
-  // ── Custom Google Account Sign In ───────────────────────────────────────────
+  // ── Custom / New Google Account Sign In on This Device ─────────────────────
   const handleCustomGoogleSignIn = () => {
     if (!customName.trim()) {
-      setGoogleError("Please enter your name from your Google account");
+      setGoogleError(lang === "Tamil" ? "தயவுசெய்து உங்கள் பெயரை உள்ளிடவும்" : lang === "Hindi" ? "कृपया अपना नाम दर्ज करें" : "Please enter your name");
       return;
     }
     if (!customEmail.trim() || !customEmail.includes("@")) {
-      setGoogleError("Please enter a valid Google email address");
+      setGoogleError(lang === "Tamil" ? "சரியான மின்னஞ்சல் முகவரியை உள்ளிடவும்" : lang === "Hindi" ? "कृपया एक मान्य ईमेल पता दर्ज करें" : "Please enter a valid Google email address");
       return;
     }
     setGoogleError("");
@@ -97,30 +96,47 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
     onNext();
   };
 
-  // ── Phone Sign In ──────────────────────────────────────────────────────────
+  // ── Phone Sign In on This Device ───────────────────────────────────────────
   const handlePhoneSignIn = () => {
-    setUser({
-      name: "Farmer",
-      farmName: "My Dairy Farm",
-      phone: phone || "9876543210",
+    if (!phone.trim() || phone.trim().length < 10) {
+      setPhoneError(lang === "Tamil" ? "10 இலக்க மொபைல் எண்ணை உள்ளிடவும்" : lang === "Hindi" ? "कृपया 10 अंकों का मोबाइल नंबर दर्ज करें" : "Please enter a valid 10-digit mobile number");
+      return;
+    }
+    setPhoneError("");
+
+    // Check if an account with this phone number is saved on this device
+    const existing = savedAccounts.find((acc) => acc.phone === phone.trim());
+    if (existing) {
+      setUser(existing);
+      onNext();
+      return;
+    }
+
+    // New phone login on this device
+    const profile: UserProfile = {
+      name: phoneName.trim() || (lang === "Tamil" ? "விவசாயி" : lang === "Hindi" ? "किसान" : "Farmer"),
+      farmName: phoneFarm.trim() || "My Dairy Farm",
+      phone: phone.trim(),
       role,
       authProvider: "phone",
-    });
+      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(phoneName.trim() || "Farmer")}&backgroundColor=2A5C1F&textColor=FFFFFF`,
+    };
+    setUser(profile);
     onNext();
   };
 
-  // ── Manual Registration ────────────────────────────────────────────────────
+  // ── Manual Registration on This Device ─────────────────────────────────────
   const handleRegister = () => {
     if (!regName.trim()) {
-      setRegError("Please enter your full name");
+      setRegError(lang === "Tamil" ? "தயவுசெய்து முழு பெயரை உள்ளிடவும்" : lang === "Hindi" ? "कृपया अपना पूरा नाम दर्ज करें" : "Please enter your full name");
       return;
     }
     if (!regFarm.trim()) {
-      setRegError("Please enter your farm/dairy name");
+      setRegError(lang === "Tamil" ? "தயவுசெய்து பண்ணை பெயரை உள்ளிடவும்" : lang === "Hindi" ? "कृपया डेयरी/फार्म का नाम दर्ज करें" : "Please enter your farm/dairy name");
       return;
     }
     if (!regPhone.trim() || regPhone.length < 10) {
-      setRegError("Please enter a valid 10-digit mobile number");
+      setRegError(lang === "Tamil" ? "சரியான 10 இலக்க மொபைல் எண்ணை உள்ளிடவும்" : lang === "Hindi" ? "कृपया 10 अंकों का मोबाइल नंबर दर्ज करें" : "Please enter a valid 10-digit mobile number");
       return;
     }
     setRegError("");
@@ -129,8 +145,8 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
       farmName: regFarm.trim(),
       phone: regPhone.trim(),
       role: regRole,
-      village: regVillage.trim(),
-      state: regState.trim(),
+      village: regVillage.trim() || "Anand",
+      state: regState.trim() || "Gujarat",
       authProvider: "manual",
       avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(regName.trim())}&backgroundColor=2A5C1F&textColor=FFFFFF`,
     });
@@ -159,10 +175,12 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
   const GoogleBtn = () => (
     <button
       onClick={() => {
-        setGoogleMode("choose");
+        // If device already has accounts saved, open "choose" list; otherwise open fresh sign-in form
+        setGoogleMode(googleAccountsOnDevice.length > 0 ? "choose" : "manual");
         setGoogleError("");
         setShowGoogleModal(true);
       }}
+      disabled={isGoogleLoading}
       style={{
         width: "100%",
         background: "#FFFFFF",
@@ -172,13 +190,14 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
         fontSize: 14,
         fontWeight: 700,
         color: "#1C2714",
-        cursor: "pointer",
+        cursor: isGoogleLoading ? "wait" : "pointer",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         gap: 10,
         boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
         transition: "all 0.2s ease",
+        opacity: isGoogleLoading ? 0.7 : 1,
       }}
     >
       <svg width="20" height="20" viewBox="0 0 48 48">
@@ -188,12 +207,18 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
         <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
         <path fill="none" d="M0 0h48v48H0z" />
       </svg>
-      {lang === "Tamil" ? "Google மூலம் உள்நுழைக" : lang === "Hindi" ? "Google से साइन इन करें" : "Continue with Google"}
+      {isGoogleLoading
+        ? "Signing in..."
+        : lang === "Tamil"
+        ? "Google மூலம் உள்நுழைக"
+        : lang === "Hindi"
+        ? "Google से साइन इन करें"
+        : "Continue with Google"}
     </button>
   );
 
   // ══════════════════════════════════════════════════════════════════════════
-  // GOOGLE AUTHENTIC MODAL (Account Chooser)
+  // GOOGLE MODAL (Device-Isolated Account Chooser)
   // ══════════════════════════════════════════════════════════════════════════
   const GoogleModal = () => {
     if (!showGoogleModal) return null;
@@ -218,13 +243,15 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
           style={{
             background: "#FFFFFF",
             borderRadius: 24,
-            maxWidth: 400,
+            maxWidth: 420,
             width: "100%",
             padding: "24px 22px",
             boxShadow: "0 24px 48px rgba(0,0,0,0.25)",
             display: "flex",
             flexDirection: "column",
             gap: 16,
+            maxHeight: "90vh",
+            overflowY: "auto",
           }}
         >
           {/* Header with Google Logo */}
@@ -238,7 +265,7 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
                 <path fill="none" d="M0 0h48v48H0z" />
               </svg>
               <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 16, fontWeight: 700, color: "#1C2714" }}>
-                Sign in with Google
+                {lang === "Tamil" ? "Google மூலம் உள்நுழைக" : lang === "Hindi" ? "गूगल से साइन इन" : "Sign in with Google"}
               </div>
             </div>
             <button
@@ -257,59 +284,92 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
           </div>
 
           <div style={{ fontSize: 13, color: "#6B7A5C" }}>
-            Choose an account to continue to <strong>MooTracker</strong>
+            {googleMode === "choose" && googleAccountsOnDevice.length > 0
+              ? lang === "Tamil"
+                ? "இந்த சாதனத்தில் சேமிக்கப்பட்ட கணக்கைத் தேர்ந்தெடுக்கவும்:"
+                : lang === "Hindi"
+                ? "इस डिवाइस पर सहेजा गया खाता चुनें:"
+                : "Choose an account saved on this device to continue:"
+              : lang === "Tamil"
+              ? "தொடர உங்கள் Google கணக்கு விவரங்களை உள்ளிடவும்:"
+              : lang === "Hindi"
+              ? "जारी रखने के लिए अपने गूगल खाते का विवरण दर्ज करें:"
+              : "Enter your Google account details to sign in on this device:"}
           </div>
 
-          {googleMode === "choose" ? (
+          {googleMode === "choose" && googleAccountsOnDevice.length > 0 ? (
             <>
-              {/* Primary Google Account Card: Rahul */}
-              <div
-                onClick={() => handleQuickGoogleSignIn("Rahul", "rahulkmu007@gmail.com")}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 14,
-                  padding: "14px 16px",
-                  borderRadius: 14,
-                  border: "1.5px solid #E0DAD0",
-                  background: "#FBF9F4",
-                  cursor: "pointer",
-                  transition: "all 0.15s ease",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = "#2A5C1F";
-                  (e.currentTarget as HTMLElement).style.background = "#F2EFE8";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = "#E0DAD0";
-                  (e.currentTarget as HTMLElement).style.background = "#FBF9F4";
-                }}
-              >
-                {/* Avatar with initial R */}
-                <div
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: "50%",
-                    background: "#2A5C1F",
-                    color: "#FFFFFF",
-                    fontSize: 20,
-                    fontWeight: 700,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                  }}
-                >
-                  R
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: "#1C2714" }}>Rahul</div>
-                  <div style={{ fontSize: 12, color: "#6B7A5C", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    rahulkmu007@gmail.com
-                  </div>
-                </div>
-                <span style={{ fontSize: 16, color: "#2A5C1F", fontWeight: 700 }}>→</span>
+              {/* List of Accounts Saved ONLY on This Device */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {googleAccountsOnDevice.map((acc, i) => {
+                  const initial = (acc.name || "U")[0].toUpperCase();
+                  return (
+                    <div
+                      key={acc.email || acc.phone || i}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 12,
+                        padding: "12px 14px",
+                        borderRadius: 14,
+                        border: "1.5px solid #E0DAD0",
+                        background: "#FBF9F4",
+                        cursor: "pointer",
+                        transition: "all 0.15s ease",
+                      }}
+                      onClick={() => handleSelectDeviceAccount(acc)}
+                    >
+                      <div
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: "50%",
+                          background: "#2A5C1F",
+                          color: "#FFFFFF",
+                          fontSize: 18,
+                          fontWeight: 700,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {initial}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: "#1C2714" }}>{acc.name}</div>
+                        <div
+                          style={{
+                            fontSize: 12,
+                            color: "#6B7A5C",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {acc.email || acc.phone}
+                        </div>
+                      </div>
+                      <button
+                        title="Remove from this device"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeAccountFromDevice(acc.email || acc.phone || acc.name);
+                        }}
+                        style={{
+                          background: "transparent",
+                          border: "none",
+                          color: "#9BA88C",
+                          fontSize: 14,
+                          cursor: "pointer",
+                          padding: 4,
+                        }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Use another Google account option */}
@@ -334,43 +394,57 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
                   gap: 8,
                 }}
               >
-                <span>➕</span> Use another Google account
+                <span>➕</span> {lang === "Tamil" ? "வேறு Google கணக்கைப் பயன்படுத்தவும்" : lang === "Hindi" ? "अन्य Google खाते का उपयोग करें" : "Use another Google account"}
               </button>
-
-              <div style={{ fontSize: 11, color: "#9BA88C", lineHeight: 1.4, textAlign: "center", marginTop: 4 }}>
-                To continue, Google will securely share your name, email, and photo with MooTracker.
-              </div>
             </>
           ) : (
-            /* Manual Google Account Form */
+            /* Clean Google Account Sign In Form for New / Other Account */
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div>
-                <label style={LABEL_STYLE}>Google Account Name *</label>
+                <label style={LABEL_STYLE}>
+                  {lang === "Tamil" ? "Google கணக்கு பெயர் *" : lang === "Hindi" ? "गूगल खाता नाम *" : "Google Account Name *"}
+                </label>
                 <input
                   type="text"
                   value={customName}
                   onChange={(e) => setCustomName(e.target.value)}
-                  placeholder="e.g. Rahul J"
+                  placeholder={lang === "Tamil" ? "பெயர் (எ.கா: சுரேஷ்)" : lang === "Hindi" ? "नाम (उदा: सुरेश कुमार)" : "e.g. Ramesh Kumar"}
                   style={{ ...INPUT_STYLE, padding: "12px 14px" }}
                   autoFocus
                 />
               </div>
 
               <div>
-                <label style={LABEL_STYLE}>Google Email *</label>
+                <label style={LABEL_STYLE}>
+                  {lang === "Tamil" ? "Google மின்னஞ்சல் *" : lang === "Hindi" ? "गूगल ईमेल *" : "Google Email *"}
+                </label>
                 <input
                   type="email"
                   value={customEmail}
                   onChange={(e) => setCustomEmail(e.target.value)}
-                  placeholder="e.g. rahul@gmail.com"
+                  placeholder="e.g. farmer@gmail.com"
                   style={{ ...INPUT_STYLE, padding: "12px 14px" }}
                 />
               </div>
 
               <div>
-                <label style={LABEL_STYLE}>Mobile Number (Optional)</label>
+                <label style={LABEL_STYLE}>
+                  {lang === "Tamil" ? "மொபைல் எண் (விருப்பத்தேர்வு)" : lang === "Hindi" ? "मोबाइल नंबर (वैकल्पिक)" : "Mobile Number (Optional)"}
+                </label>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <div style={{ background: "#F4F1EA", border: "1.5px solid #E0DAD0", borderRadius: 12, padding: "12px 10px", fontSize: 13, fontWeight: 600, color: "#1C2714", display: "flex", alignItems: "center" }}>
+                  <div
+                    style={{
+                      background: "#F4F1EA",
+                      border: "1.5px solid #E0DAD0",
+                      borderRadius: 12,
+                      padding: "12px 10px",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: "#1C2714",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
                     🇮🇳 +91
                   </div>
                   <input
@@ -384,28 +458,40 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
               </div>
 
               {googleError && (
-                <div style={{ background: "#FCE8E5", border: "1px solid #F3A09A", borderRadius: 8, padding: "8px 12px", fontSize: 12, color: "#B83220", fontWeight: 600 }}>
+                <div
+                  style={{
+                    background: "#FCE8E5",
+                    border: "1px solid #F3A09A",
+                    borderRadius: 8,
+                    padding: "8px 12px",
+                    fontSize: 12,
+                    color: "#B83220",
+                    fontWeight: 600,
+                  }}
+                >
                   ⚠️ {googleError}
                 </div>
               )}
 
               <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
-                <button
-                  onClick={() => setGoogleMode("choose")}
-                  style={{
-                    flex: 1,
-                    background: "#F0EDE6",
-                    color: "#6B7A5C",
-                    border: "none",
-                    borderRadius: 12,
-                    padding: "13px 0",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    cursor: "pointer",
-                  }}
-                >
-                  ← Back
-                </button>
+                {googleAccountsOnDevice.length > 0 && (
+                  <button
+                    onClick={() => setGoogleMode("choose")}
+                    style={{
+                      flex: 1,
+                      background: "#F0EDE6",
+                      color: "#6B7A5C",
+                      border: "none",
+                      borderRadius: 12,
+                      padding: "13px 0",
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    ← Back
+                  </button>
+                )}
                 <button
                   onClick={handleCustomGoogleSignIn}
                   style={{
@@ -421,7 +507,7 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
                     boxShadow: "0 4px 12px rgba(42,92,31,0.3)",
                   }}
                 >
-                  Sign In with Google →
+                  {lang === "Tamil" ? "Google உள்நுழைக →" : lang === "Hindi" ? "गूगल से साइन इन करें →" : "Sign In with Google →"}
                 </button>
               </div>
             </div>
@@ -441,6 +527,63 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
         <Header subtitle={t("welcome_dairy", lang)} />
 
         <div style={{ flex: 1, padding: "24px 20px", overflow: "auto", display: "flex", flexDirection: "column", gap: 14 }}>
+          {/* Saved account quick badge on this device if any */}
+          {savedAccounts.length > 0 && (
+            <div
+              style={{
+                background: "#E8F5E9",
+                border: "1.5px solid #A5D6A7",
+                borderRadius: 14,
+                padding: "12px 14px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div
+                  style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: "50%",
+                    background: "#2A5C1F",
+                    color: "#FFF",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: 700,
+                    fontSize: 15,
+                  }}
+                >
+                  {(savedAccounts[0].name || "U")[0].toUpperCase()}
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#1C2714" }}>
+                    {savedAccounts[0].name}
+                  </div>
+                  <div style={{ fontSize: 11, color: "#4CAF50", fontWeight: 600 }}>
+                    {lang === "Tamil" ? "இந்த சாதனத்தில் சேமிக்கப்பட்டுள்ளது" : lang === "Hindi" ? "इस डिवाइस पर सक्रिय खाता" : "Saved on this device"}
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => handleSelectDeviceAccount(savedAccounts[0])}
+                style={{
+                  background: "#2A5C1F",
+                  color: "#FFFFFF",
+                  border: "none",
+                  borderRadius: 10,
+                  padding: "8px 12px",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                {lang === "Tamil" ? "தொடரவும் →" : lang === "Hindi" ? "जारी रखें →" : "Continue →"}
+              </button>
+            </div>
+          )}
+
           {/* Primary CTA: Google Sign-In */}
           <GoogleBtn />
 
@@ -496,10 +639,10 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
 
           <p style={{ fontSize: 11, color: "#9BA88C", textAlign: "center", margin: "8px 0 0" }}>
             {lang === "Tamil"
-              ? "உங்கள் தகவல்கள் பாதுகாப்பாக வைக்கப்படும்"
+              ? "உங்கள் கணக்கு இந்த சாதனத்தில் தனித்தனியாக பாதுகாப்பாக வைக்கப்படும்"
               : lang === "Hindi"
-              ? "आपकी जानकारी सुरक्षित रहेगी"
-              : "Your data is stored securely on your device"}
+              ? "आपका खाता इस डिवाइस पर सुरक्षित रूप से रखा जाएगा"
+              : "Your account is saved securely on this device"}
           </p>
         </div>
       </div>
@@ -536,7 +679,7 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
 
           {/* Role selector */}
           <label style={LABEL_STYLE}>{t("select_role", lang)}</label>
-          <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+          <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
             {roles.map((r) => (
               <button
                 key={r.id}
@@ -564,7 +707,7 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
 
           {/* Phone input */}
           <label style={LABEL_STYLE}>{t("mobile_num", lang)}</label>
-          <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+          <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
             <div
               style={{
                 background: "#FFFFFF",
@@ -584,13 +727,67 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
             </div>
             <input
               value={phone}
-              onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, "").slice(0, 10);
+                setPhone(val);
+                // Check if this phone number is already registered in savedAccounts on this device
+                const matched = savedAccounts.find((acc) => acc.phone === val);
+                if (matched) {
+                  setPhoneName(matched.name);
+                  setPhoneFarm(matched.farmName);
+                }
+              }}
               placeholder="98XXXXXXXX"
               type="tel"
               inputMode="numeric"
               style={{ ...INPUT_STYLE }}
             />
           </div>
+
+          {/* Optional Name & Farm fields for new mobile user */}
+          {!savedAccounts.some((acc) => acc.phone === phone) && phone.length === 10 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>
+              <div>
+                <label style={LABEL_STYLE}>
+                  {lang === "Tamil" ? "உங்கள் பெயர்" : lang === "Hindi" ? "आपका नाम" : "Your Name"}
+                </label>
+                <input
+                  value={phoneName}
+                  onChange={(e) => setPhoneName(e.target.value)}
+                  placeholder={lang === "Tamil" ? "பெயரை உள்ளிடவும்" : lang === "Hindi" ? "अपना नाम दर्ज करें" : "e.g. Ramesh Kumar"}
+                  style={{ ...INPUT_STYLE, padding: "12px 14px" }}
+                />
+              </div>
+              <div>
+                <label style={LABEL_STYLE}>
+                  {lang === "Tamil" ? "பண்ணை பெயர்" : lang === "Hindi" ? "डेयरी / फार्म नाम" : "Farm / Dairy Name"}
+                </label>
+                <input
+                  value={phoneFarm}
+                  onChange={(e) => setPhoneFarm(e.target.value)}
+                  placeholder="e.g. Balaji Dairy Farm"
+                  style={{ ...INPUT_STYLE, padding: "12px 14px" }}
+                />
+              </div>
+            </div>
+          )}
+
+          {phoneError && (
+            <div
+              style={{
+                background: "#FCE8E5",
+                border: "1px solid #F3A09A",
+                borderRadius: 10,
+                padding: "10px 14px",
+                fontSize: 13,
+                color: "#B83220",
+                marginBottom: 14,
+                fontWeight: 600,
+              }}
+            >
+              ⚠️ {phoneError}
+            </div>
+          )}
 
           <button
             onClick={handlePhoneSignIn}
@@ -655,7 +852,7 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
             gap: 4,
           }}
         >
-          ← {lang === "Tamil" ? "திரும்பு" : lang === "Hindi" ? "வாபஸ்" : "Back"}
+          ← {lang === "Tamil" ? "திரும்பு" : lang === "Hindi" ? "वापस" : "Back"}
         </button>
 
         {/* Role */}
@@ -693,7 +890,7 @@ export function LoginScreen({ onNext, lang }: { onNext: () => void; lang: string
         <input
           value={regName}
           onChange={(e) => setRegName(e.target.value)}
-          placeholder={lang === "Tamil" ? "பெயரை உள்ளிடுங்கள்" : lang === "Hindi" ? "अपना नाम दर्ज करें" : "Enter your full name"}
+          placeholder={lang === "Tamil" ? "பெயரை உள்ளிடுங்கள்" : lang === "Hindi" ? "अपना नाम दर्ज करें" : "e.g. Ramesh Kumar"}
           style={{ ...INPUT_STYLE, marginBottom: 14 }}
         />
 

@@ -6,23 +6,11 @@ import { getAnimalHerdId } from "./herdService";
 // Bump this version whenever ANIMALS data changes — forces a reseed
 const DATA_VERSION = "v6-multi-herd-gps-sync";
 
-const OLD_NAME_MAP: Record<string, string> = {
-  "Ganga": "Cow 1 (Gauri)",
-  "Kaveri": "Cow 2 (Kamdhenu)",
-  "Saraswati": "Cow 3 (Lakshmi)",
-  "Narmada": "Cow 4 (Nandini)",
-  "Yamuna": "Cow 5 (Shanti)",
-  "Godavari": "Cow 6 (Kalyani)",
-  "Chambal": "Cow 7",
-  "Betwa": "Cow 8",
-};
-
 export function normalizeCowName(id: string, name?: string): string {
-  if (name && OLD_NAME_MAP[name]) return OLD_NAME_MAP[name];
+  if (name && name.trim()) return name.trim();
   const standard = ANIMALS.find((a) => a.id === id);
   if (standard) return standard.name;
-  if (OLD_NAME_MAP[id]) return OLD_NAME_MAP[id];
-  return name || id;
+  return id;
 }
 
 // ─── Fetch Animals ────────────────────────────────────────────────────────────

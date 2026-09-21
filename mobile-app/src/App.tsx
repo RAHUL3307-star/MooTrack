@@ -174,7 +174,7 @@ function MainAppShell() {
           />
         );
       case "profile":
-        return <ProfileScreen onBack={goBack} lang={lang} onLangChange={setLang} />;
+        return <ProfileScreen onBack={goBack} onNavigate={navigate} lang={lang} onLangChange={setLang} />;
       default:
         return null;
     }

@@ -1,5 +1,5 @@
 // MooTracker PWA Service Worker
-const CACHE_NAME = 'mootracker-v5';
+const CACHE_NAME = 'mootracker-v4';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();

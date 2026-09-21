@@ -25,8 +25,8 @@ export function sendWhatsAppAlert(
       `⏱️ *அவசரம்:* ${urgency}`,
       `💡 *பரிந்துரைக்கப்பட்ட நடவடிக்கை:* ${action}`,
       ``,
-      `_ஸ்ரீ பாலாஜி பால் பண்ணை · ஆனந்த்_`,
-      `_ICAR-NRC Bovine Health மூலம் இயக்கப்படுகிறது_`,
+      `_MooTracker · Smart Cattle Health System_`,
+      `_ICAR-NRC Bovine Health_`,
     ].join("\n");
   } else if (lang === "Hindi") {
     msg = [
@@ -38,8 +38,8 @@ export function sendWhatsAppAlert(
       `⏱️ *आवश्यकता:* ${urgency}`,
       `💡 *अनुशंसित कार्रवाई:* ${action}`,
       ``,
-      `_श्री बालाजी डेयरी फार्म · आनंद_`,
-      `_ICAR-NRC Bovine Health द्वारा संचालित_`,
+      `_MooTracker · Smart Cattle Health System_`,
+      `_ICAR-NRC Bovine Health_`,
     ].join("\n");
   } else {
     msg = [
@@ -51,7 +51,7 @@ export function sendWhatsAppAlert(
       `⏱️ *Urgency:* ${urgency}`,
       `💡 *Recommended Action:* ${action}`,
       ``,
-      `_Sent via MooTracker · Shri Balaji Dairy Farm_`,
+      `_Sent via MooTracker · Smart Cattle Health System_`,
       `_Powered by ICAR-NRC Bovine Health_`,
     ].join("\n");
   }

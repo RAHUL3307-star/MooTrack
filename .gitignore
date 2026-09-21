@@ -18,6 +18,10 @@ datasets/images/cow_teat_condition_dataset/
 *.exe
 *.zip
 *.rar
+signed-out/
+mootracker-expo/
+MooTracker_base.apk
+MooTracker_unsigned*.apk
 
 # Logs
 *.log

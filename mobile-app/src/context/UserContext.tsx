@@ -15,27 +15,51 @@ export interface UserProfile {
 
 interface UserContextType {
   user: UserProfile | null;
+  savedAccounts: UserProfile[];
   setUser: (u: UserProfile) => void;
   clearUser: () => void;
+  removeAccountFromDevice: (identifier: string) => void;
   isGoogleLoading: boolean;
   signInWithGoogle: () => Promise<{ success: boolean; error?: string }>;
 }
 
+const STORAGE_ACTIVE_USER = "mootracker_user";
+const STORAGE_DEVICE_ACCOUNTS = "mootracker_device_saved_accounts";
+
+function getDeviceAccountsFromStorage(): UserProfile[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_DEVICE_ACCOUNTS);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveDeviceAccountsToStorage(accounts: UserProfile[]) {
+  try {
+    localStorage.setItem(STORAGE_DEVICE_ACCOUNTS, JSON.stringify(accounts));
+  } catch {}
+}
+
 const UserContext = createContext<UserContextType>({
   user: null,
+  savedAccounts: [],
   setUser: () => {},
   clearUser: () => {},
+  removeAccountFromDevice: () => {},
   isGoogleLoading: false,
   signInWithGoogle: async () => ({ success: false }),
 });
 
-const STORAGE_KEY = "mootracker_user";
-
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [savedAccounts, setSavedAccounts] = useState<UserProfile[]>(() => getDeviceAccountsFromStorage());
+
   const [user, setUserState] = useState<UserProfile | null>(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      const stored = localStorage.getItem(STORAGE_ACTIVE_USER);
       return stored ? (JSON.parse(stored) as UserProfile) : null;
     } catch {
       return null;
@@ -45,14 +69,44 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const setUser = (u: UserProfile) => {
     setUserState(u);
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(u));
+      localStorage.setItem(STORAGE_ACTIVE_USER, JSON.stringify(u));
     } catch {}
+
+    // Save/update this account in this device's saved accounts list
+    setSavedAccounts((prev) => {
+      const filtered = prev.filter((acc) => {
+        if (u.email && acc.email) return acc.email !== u.email;
+        if (u.phone && acc.phone) return acc.phone !== u.phone;
+        return acc.name !== u.name;
+      });
+      const updated = [u, ...filtered];
+      saveDeviceAccountsToStorage(updated);
+      return updated;
+    });
+  };
+
+  const removeAccountFromDevice = (identifier: string) => {
+    setSavedAccounts((prev) => {
+      const updated = prev.filter(
+        (acc) => acc.email !== identifier && acc.phone !== identifier && acc.name !== identifier
+      );
+      saveDeviceAccountsToStorage(updated);
+      return updated;
+    });
+
+    // If currently logged into this account, clear active session
+    if (user && (user.email === identifier || user.phone === identifier || user.name === identifier)) {
+      setUserState(null);
+      try {
+        localStorage.removeItem(STORAGE_ACTIVE_USER);
+      } catch {}
+    }
   };
 
   const clearUser = () => {
     setUserState(null);
     try {
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(STORAGE_ACTIVE_USER);
     } catch {}
     if (supabase && isSupabaseConfigured) {
       supabase.auth.signOut().catch(() => {});
@@ -77,57 +131,48 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         const avatar = meta.avatar_url || meta.picture || "";
         const phone = session.user.phone || meta.phone || "";
 
-        setUserState((prev) => {
-          const updated: UserProfile = {
-            name: fullName,
-            farmName: prev?.farmName || meta.farm_name || "Shri Balaji Dairy Farm",
-            phone: phone || prev?.phone || "",
-            role: prev?.role || "farmer",
-            village: prev?.village || meta.village || "Anand",
-            state: prev?.state || meta.state || "Gujarat",
-            email,
-            avatar,
-            authProvider: "google",
-          };
-          try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-          } catch {}
-          return updated;
-        });
+        const updated: UserProfile = {
+          name: fullName,
+          farmName: meta.farm_name || "My Dairy Farm",
+          phone: phone || "",
+          role: "farmer",
+          village: meta.village || "Anand",
+          state: meta.state || "Gujarat",
+          email,
+          avatar,
+          authProvider: "google",
+        };
+        setUser(updated);
       }
     });
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === "SIGNED_IN" && session?.user) {
-          const meta = session.user.user_metadata || {};
-          const fullName =
-            meta.full_name ||
-            meta.name ||
-            meta.user_name ||
-            session.user.email?.split("@")[0] ||
-            "Farmer";
-          const email = session.user.email || "";
-          const avatar = meta.avatar_url || meta.picture || "";
-          const phone = session.user.phone || meta.phone || "";
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session?.user) {
+        const meta = session.user.user_metadata || {};
+        const fullName =
+          meta.full_name ||
+          meta.name ||
+          meta.user_name ||
+          session.user.email?.split("@")[0] ||
+          "Farmer";
+        const email = session.user.email || "";
+        const avatar = meta.avatar_url || meta.picture || "";
+        const phone = session.user.phone || meta.phone || "";
 
-          const updated: UserProfile = {
-            name: fullName,
-            farmName: meta.farm_name || "Shri Balaji Dairy Farm",
-            phone: phone || "9876543210",
-            role: "farmer",
-            village: meta.village || "Anand",
-            state: meta.state || "Gujarat",
-            email,
-            avatar,
-            authProvider: "google",
-          };
-          setUser(updated);
-        } else if (event === "SIGNED_OUT") {
-          // Keep local if user didn't explicitly clear
-        }
+        const updated: UserProfile = {
+          name: fullName,
+          farmName: meta.farm_name || "My Dairy Farm",
+          phone: phone || "",
+          role: "farmer",
+          village: meta.village || "Anand",
+          state: meta.state || "Gujarat",
+          email,
+          avatar,
+          authProvider: "google",
+        };
+        setUser(updated);
       }
-    );
+    });
 
     return () => {
       authListener?.subscription.unsubscribe();
@@ -138,7 +183,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     setIsGoogleLoading(true);
     try {
       if (supabase && isSupabaseConfigured) {
-        // Real Supabase Google OAuth redirect
         const redirectUrl = window.location.origin + window.location.pathname;
         const { error } = await supabase.auth.signInWithOAuth({
           provider: "google",
@@ -169,8 +213,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     <UserContext.Provider
       value={{
         user,
+        savedAccounts,
         setUser,
         clearUser,
+        removeAccountFromDevice,
         isGoogleLoading,
         signInWithGoogle,
       }}
