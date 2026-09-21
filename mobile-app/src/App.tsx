@@ -350,6 +350,7 @@ function MainAppShell() {
         <ESP32TopBannerNotification
           notification={notification}
           onDismiss={dismissNotification}
+          lang={lang}
           onInspect={() => {
             navigate("sensors");
           }}

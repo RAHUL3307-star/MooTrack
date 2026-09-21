@@ -44,6 +44,7 @@ export function ESP32TopBannerNotification({
   notification,
   onDismiss,
   onInspect,
+  lang = "English",
 }: {
   notification: {
     id: number;
@@ -57,10 +58,43 @@ export function ESP32TopBannerNotification({
   } | null;
   onDismiss: () => void;
   onInspect?: () => void;
+  lang?: string;
 }) {
   if (!notification) return null;
 
   const isConnected = notification.type === "connected";
+  const ec = notification.conductivity ?? 5.0;
+  const temp = notification.temp ?? 38.5;
+
+  const isHigh = ec > 8.0 || temp > 39.2;
+  const isModerate = !isHigh && (ec > 6.0 || temp > 38.9);
+
+  const titleText = isConnected
+    ? lang === "Tamil"
+      ? "ESP32 சாதனம் இணைக்கப்பட்டது 📡"
+      : lang === "Hindi"
+      ? "ESP32 हार्डवेयर कनेक्टेड 📡"
+      : lang === "Kannada"
+      ? "ESP32 ಸಂಪರ್ಕಗೊಂಡಿದೆ 📡"
+      : lang === "Telugu"
+      ? "ESP32 కనెక్ట్ చేయబడింది 📡"
+      : "ESP32 Live Connected 📡"
+    : lang === "Tamil"
+    ? "ESP32 துண்டிக்கப்பட்டது"
+    : lang === "Hindi"
+    ? "ESP32 डिस्कनेक्ट हो गया"
+    : "ESP32 Disconnected";
+
+  const inspectBtnText =
+    lang === "Tamil"
+      ? "நேரடி சென்சார் பார்க்க →"
+      : lang === "Hindi"
+      ? "सेंसर डेटा देखें →"
+      : lang === "Kannada"
+      ? "ಸೆನ್ಸರ್ ಡೇಟಾ ನೋಡಿ →"
+      : lang === "Telugu"
+      ? "సెన్సార్ డేటా చూడండి →"
+      : "View Telemetry →";
 
   return (
     <div
@@ -100,13 +134,13 @@ export function ESP32TopBannerNotification({
           <span
             style={{
               fontFamily: "'Fraunces', serif",
-              fontSize: 15,
+              fontSize: 14,
               fontWeight: 800,
               color: "#FFFFFF",
               letterSpacing: "-0.01em",
             }}
           >
-            {isConnected ? "ESP32 Live Connected" : "ESP32 Disconnected"}
+            {titleText}
           </span>
           <span
             style={{
@@ -163,8 +197,28 @@ export function ESP32TopBannerNotification({
             <span>Cow: <strong style={{ color: "#FCD34D" }}>{notification.cowId || "KA-001"}</strong></span>
             <span>·</span>
             <span style={{ color: "#86EFAC" }}>
-              {notification.temp || 39.4}°C · {notification.conductivity || 6.85} mS/cm
+              {temp}°C · {ec.toFixed(1)} mS/cm
             </span>
+          </div>
+
+          <div
+            style={{
+              marginTop: 6,
+              display: "inline-block",
+              padding: "2px 8px",
+              borderRadius: 6,
+              fontSize: 10,
+              fontWeight: 800,
+              background: isHigh ? "#991B1B" : isModerate ? "#B45309" : "#166534",
+              color: "#FFFFFF",
+              letterSpacing: "0.03em",
+            }}
+          >
+            {isHigh
+              ? "🚨 ML PREDICTION: ALREADY AFFECTED (CLINICAL)"
+              : isModerate
+              ? "⚠️ ML PREDICTION: 70–80% CHANCE IN 7–14 DAYS"
+              : "✅ ML PREDICTION: NORMAL & HEALTHY"}
           </div>
 
           <div
@@ -198,7 +252,7 @@ export function ESP32TopBannerNotification({
                   gap: 4,
                 }}
               >
-                View Telemetry →
+                {inspectBtnText}
               </button>
             )}
           </div>
