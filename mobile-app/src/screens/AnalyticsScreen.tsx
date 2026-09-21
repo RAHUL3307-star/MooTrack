@@ -427,7 +427,7 @@ export function AnalyticsScreen({
 
           <div style={{ background: "#FFFFFF", borderRadius: 14, padding: "12px 14px", border: "1px solid #E8E3DA", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
             <div style={{ fontSize: 10.5, fontWeight: 700, color: "#8A7356", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-              {t("avg_scc", lang)}
+              {t("avg_ec", lang)}
             </div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginTop: 4 }}>
               <span style={{ fontFamily: "'Fraunces', serif", fontSize: 24, fontWeight: 800, color: avgEC > 6.5 ? "#C47A10" : "#2A5C1F" }}>
@@ -471,11 +471,11 @@ export function AnalyticsScreen({
           </div>
         </div>
 
-        {/* ── MULTI-SPECIES RISK & SCC COMPARISON CARDS ── */}
+        {/* ── MULTI-SPECIES RISK & UDDER PROFILE CARDS ── */}
         <Card style={{ marginBottom: 16 }}>
-          <SectionLabel>Species-Calibrated Risk &amp; SCC Thresholds</SectionLabel>
+          <SectionLabel>Species-Calibrated Herd Profile</SectionLabel>
           <div style={{ fontSize: 11, color: "#6B7A5C", marginBottom: 10 }}>
-            Caprine milk (Goat) naturally has higher SCC (apocrine secretion); Bovine (Cow/Buffalo) uses standard thresholds.
+            Caprine milk (Goat) monitored across 2 udder halves; Bovine (Cow/Buffalo) monitored across 4 individual quarters.
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
@@ -493,7 +493,7 @@ export function AnalyticsScreen({
             >
               <div style={{ fontSize: 20 }}>🐄</div>
               <div style={{ fontSize: 11.5, fontWeight: 800, color: "#1C2714", marginTop: 2 }}>Cows (4-Qtr)</div>
-              <div style={{ fontSize: 9.5, color: "#7A6B58" }}>Normal SCC &lt;200k</div>
+              <div style={{ fontSize: 9.5, color: "#7A6B58" }}>Normal EC 4.0–6.5</div>
               <div style={{ fontSize: 12, fontWeight: 800, color: herdAssessment.speciesBreakdown.cows.high > 0 ? "#B91C1C" : "#2E7D32", marginTop: 4 }}>
                 {herdAssessment.speciesBreakdown.cows.high} High / {herdAssessment.speciesBreakdown.cows.count} Total
               </div>
@@ -513,7 +513,7 @@ export function AnalyticsScreen({
             >
               <div style={{ fontSize: 20 }}>🐐</div>
               <div style={{ fontSize: 11.5, fontWeight: 800, color: "#1C2714", marginTop: 2 }}>Goats (2-Half)</div>
-              <div style={{ fontSize: 9.5, color: "#7A6B58" }}>Normal SCC &lt;750k</div>
+              <div style={{ fontSize: 9.5, color: "#7A6B58" }}>Normal EC 4.5–7.0</div>
               <div style={{ fontSize: 12, fontWeight: 800, color: herdAssessment.speciesBreakdown.goats.high > 0 ? "#B91C1C" : "#2E7D32", marginTop: 4 }}>
                 {herdAssessment.speciesBreakdown.goats.high} High / {herdAssessment.speciesBreakdown.goats.count} Total
               </div>
@@ -533,7 +533,7 @@ export function AnalyticsScreen({
             >
               <div style={{ fontSize: 20 }}>🐃</div>
               <div style={{ fontSize: 11.5, fontWeight: 800, color: "#1C2714", marginTop: 2 }}>Buffalo (4-Qtr)</div>
-              <div style={{ fontSize: 9.5, color: "#7A6B58" }}>Normal SCC &lt;200k</div>
+              <div style={{ fontSize: 9.5, color: "#7A6B58" }}>Normal EC 4.0–6.5</div>
               <div style={{ fontSize: 12, fontWeight: 800, color: herdAssessment.speciesBreakdown.buffaloes.high > 0 ? "#B91C1C" : "#2E7D32", marginTop: 4 }}>
                 {herdAssessment.speciesBreakdown.buffaloes.high} High / {herdAssessment.speciesBreakdown.buffaloes.count} Total
               </div>
@@ -544,7 +544,7 @@ export function AnalyticsScreen({
         {/* EC & Yield Correlation Trends */}
         <Card style={{ marginBottom: 16 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-            <SectionLabel>{t("scc_trend", lang)} vs {t("milk_yield", lang)}</SectionLabel>
+            <SectionLabel>{t("ec_trend", lang)} vs {t("milk_yield", lang)}</SectionLabel>
             <div style={{ display: "flex", gap: 4, background: "#F0EBE1", padding: 2, borderRadius: 8 }}>
               {(["7d", "30d", "90d"] as const).map((r) => (
                 <button

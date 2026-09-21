@@ -26,8 +26,6 @@ export interface Database {
 
           ph?: number | null;
           conductivity?: number | null;
-          scc?: number | null;
-          scs?: number | null;
           weight?: number | null;
           temperature: number;
           activity: "low" | "normal" | "high";
@@ -57,8 +55,6 @@ export interface Database {
 
           ph?: number | null;
           conductivity?: number | null;
-          scc?: number | null;
-          scs?: number | null;
           weight?: number | null;
           temperature: number;
           activity: "low" | "normal" | "high";
@@ -88,8 +84,6 @@ export interface Database {
 
           ph?: number | null;
           conductivity?: number | null;
-          scc?: number | null;
-          scs?: number | null;
           weight?: number | null;
           temperature?: number;
           activity?: "low" | "normal" | "high";
@@ -113,8 +107,6 @@ export interface Database {
           temperature: number;
           conductivity: number;
           ph?: number | null;
-          scc?: number | null;
-          scs?: number | null;
           ec_fl?: number | null;
           ec_fr?: number | null;
           ec_rl?: number | null;
@@ -138,8 +130,6 @@ export interface Database {
           temperature: number;
           conductivity: number;
           ph?: number | null;
-          scc?: number | null;
-          scs?: number | null;
           ec_fl?: number | null;
           ec_fr?: number | null;
           ec_rl?: number | null;
@@ -163,8 +153,6 @@ export interface Database {
           temperature?: number;
           conductivity?: number;
           ph?: number | null;
-          scc?: number | null;
-          scs?: number | null;
           ec_fl?: number | null;
           ec_fr?: number | null;
           ec_rl?: number | null;

@@ -67,14 +67,6 @@ export function SensorsScreen({
   const species = targetAnimal?.species || (targetAnimal?.id.startsWith("GT") ? "Goat" : targetAnimal?.id.startsWith("BF") ? "Buffalo" : "Cow");
   const speciesIcon = species === "Goat" ? "🐐" : species === "Buffalo" ? "🐃" : "🐄";
 
-  const effectiveSCC = isLive && lastTelemetry?.scc != null
-    ? lastTelemetry.scc
-    : (isLive && lastTelemetry
-      ? (computeMilkRisk(lastTelemetry).risk === "high" ? 1850000 : computeMilkRisk(lastTelemetry).risk === "moderate" ? 420000 : (species === "Goat" ? 450000 : 85000))
-      : (targetAnimal?.scc || (species === "Goat" ? 450000 : 185000)));
-
-  const sccCriticalLimit = species === "Goat" ? 1500000 : 500000;
-  const sccElevatedLimit = species === "Goat" ? 750000 : 200000;
   const ambientT = targetAnimal?.ambientTemp || 28.5;
   const shedHum = isLive && lastTelemetry?.humidity != null ? lastTelemetry.humidity : (targetAnimal?.humidity || 68);
   // Temperature-Humidity Index (THI): THI = (1.8 × T + 32) - (0.55 - 0.0055 × RH) × (1.8 × T - 26)
@@ -84,14 +76,15 @@ export function SensorsScreen({
 
   const ruminationMins = targetAnimal?.rumination || (targetAnimal?.risk === "high" ? 210 : targetAnimal?.risk === "moderate" ? 285 : 420);
   const feedingMins = targetAnimal?.feeding || (targetAnimal?.risk === "high" ? 130 : targetAnimal?.risk === "moderate" ? 185 : 240);
+  const effectiveQuarterRatio = isLive && lastTelemetry?.quarterRatio != null ? lastTelemetry.quarterRatio : (targetAnimal?.risk === "high" ? 1.32 : targetAnimal?.risk === "moderate" ? 1.21 : 1.04);
 
   const readings = [
     {
-      label: lang === "Tamil" ? "சோமாடிக் செல் எண்ணிக்கை (SCC)" : lang === "Hindi" ? "सोमैटिक सेल काउंट (SCC)" : "Somatic Cell Count (SCC)",
-      value: `${(effectiveSCC / 1000).toFixed(0)}k cells/mL`,
-      status: effectiveSCC > sccCriticalLimit ? "Critical 🚨" : effectiveSCC > sccElevatedLimit ? "Elevated ⚠️" : "Normal ✅",
-      icon: "🔬",
-      color: effectiveSCC > sccCriticalLimit ? "#B83220" : effectiveSCC > sccElevatedLimit ? "#C47A10" : "#2A5C1F",
+      label: lang === "Tamil" ? "மடி பகுதி கடத்துதிறன் விகிதம்" : lang === "Hindi" ? "क्वार्टर अंतर अनुपात (Quarter Diff)" : "Quarter EC Differential Ratio",
+      value: `${effectiveQuarterRatio.toFixed(2)}x`,
+      status: effectiveQuarterRatio > 1.25 ? "Asymmetric 🚨" : effectiveQuarterRatio > 1.15 ? "Elevated ⚠️" : "Balanced ✅",
+      icon: "⚖️",
+      color: effectiveQuarterRatio > 1.25 ? "#B83220" : effectiveQuarterRatio > 1.15 ? "#C47A10" : "#2A5C1F",
     },
     {
       label: lang === "Tamil" ? "பால் pH" : "Milk pH (GPIO 34)",

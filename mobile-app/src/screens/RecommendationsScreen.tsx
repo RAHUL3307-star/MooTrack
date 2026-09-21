@@ -119,8 +119,8 @@ export function RecommendationsScreen({
       items: [
         {
           p: 1,
-          title: "Caprine (Goat) Apocrine Milking Care",
-          text: "Goat milk naturally sheds non-cellular particles (apocrine secretion). High SCC (>750k) indicates subclinical mastitis in goats vs >200k in cattle. Ensure half-udder teat cups fit snugly.",
+          title: "Caprine (Goat) Udder Milking Care",
+          text: "Goat milk is produced in a 2-half udder. Elevated electrical conductivity (>7.0 mS/cm) or half-udder asymmetry indicates subclinical mastitis. Ensure half-udder teat cups fit snugly.",
           tag: "Goats 🐐",
           animal: undefined,
         },

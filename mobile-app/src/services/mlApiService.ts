@@ -148,21 +148,6 @@ function apiResponseToSummary(
       deviation: ec > 6.0 ? `+${(((ec - 5.2) / 5.2) * 100).toFixed(0)}%` : "Normal",
     },
     {
-      name: "SCC Estimate",
-      current: `${(api.somatic_cell_count_estimate / 1000).toFixed(0)}k cells/mL`,
-      datasetNormal: "< 200k cells/mL",
-      status:
-        api.somatic_cell_count_estimate > 800000
-          ? "critical"
-          : api.somatic_cell_count_estimate > 200000
-          ? "elevated"
-          : "normal",
-      deviation:
-        api.somatic_cell_count_estimate > 200000
-          ? `${(api.somatic_cell_count_estimate / 200000).toFixed(1)}x above normal`
-          : "Normal",
-    },
-    {
       name: "Milk Temperature",
       current: `${(telemetry.temp ?? 38.5).toFixed(1)}°C`,
       datasetNormal: "38.0 – 38.8°C",

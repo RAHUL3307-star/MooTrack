@@ -42,11 +42,6 @@ export function AnimalProfileScreen({
       ? herd.speciesBreakdown.buffaloes
       : herd.speciesBreakdown.cows;
 
-  // Species-calibrated SCC thresholds
-  const normalSccThreshold = species === "Goat" ? 750000 : 200000;
-  const criticalSccThreshold = species === "Goat" ? 1500000 : 500000;
-  const animalScc = a.scc || (species === "Goat" ? 450000 : 185000);
-
   // Extended parameters with realistic defaults
   const rumination = a.rumination ?? (a.activity === "low" ? 210 : 360);
   const feeding = a.feeding ?? (a.risk === "high" ? 130 : 205);
@@ -86,7 +81,7 @@ export function AnimalProfileScreen({
       labels: ["D-6", "D-5", "D-4", "D-3", "D-2", "Yst", "Today"],
       timeline: [
         { time: "Today 06:30 AM", event: `Daily milking yield ${a.milk}L — EC ${a.conductivity} mS/cm (${a.risk.toUpperCase()} risk tier)`, status: "Status", color: RISK_COLOR[a.risk].dot },
-        { time: "Yesterday 05:45 PM", event: `Evening yield ${(a.milk * 0.95).toFixed(1)}L · Somatic Cell Count estimated at ${((animalScc) / 1000).toFixed(0)}k`, status: "Sensor", color: "#C47A10" },
+        { time: "Yesterday 05:45 PM", event: `Evening yield ${(a.milk * 0.95).toFixed(1)}L · Stable in-line conductivity & pH profile`, status: "Sensor", color: "#C47A10" },
         { time: "3 Days Ago", event: `Conductivity increased above 6.0 mS/cm — 7-14 day early warning triggered`, status: "AI Warning", color: "#B83220" },
         { time: "5 Days Ago", event: `Routine herd biosecurity check completed at ${herdName}`, status: "Audit", color: "#2A5C1F" },
       ],
@@ -113,7 +108,7 @@ export function AnimalProfileScreen({
       labels: ["Month-1", "Wk-3", "Wk-2", "Wk-1", "D-3", "Today"],
       timeline: [
         { time: "30-Day Epidemiology Summary", event: `Lactation cycle month: Overall stability until mid-cycle subclinical mastitis event. Early detection prevented clinical progression in 3 quarters.`, status: "Report", color: "#2A5C1F" },
-        { time: "22 Days Ago", event: `Monthly veterinary ultrasound & somatic cell benchmark completed`, status: "Vet Exam", color: "#3B82F6" },
+        { time: "22 Days Ago", event: `Monthly veterinary ultrasound & udder health benchmark completed`, status: "Vet Exam", color: "#3B82F6" },
       ],
     },
   };
@@ -364,33 +359,33 @@ export function AnimalProfileScreen({
               </div>
             </Card>
 
-            {/* Somatic Cell Count Card */}
+            {/* Udder Quarter Balance Card */}
             <Card>
-              <SectionLabel>{lang === "Tamil" ? "சோமாடிக் செல் எண்ணிக்கை (SCC)" : lang === "Hindi" ? "सोमैटिक सेल काउंट (SCC)" : "Somatic Cell Count (SCC)"}</SectionLabel>
+              <SectionLabel>{lang === "Tamil" ? "மடிப் பகுதி கடத்துதிறன் விகிதம்" : lang === "Hindi" ? "अयन संतुलन अनुपात (Quarter Balance)" : "Udder Quarter Balance (EC Ratio)"}</SectionLabel>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
-                  <div style={{ fontFamily: "'Fraunces', serif", fontSize: 24, fontWeight: 700, color: animalScc > criticalSccThreshold ? "#B83220" : animalScc > normalSccThreshold ? "#C47A10" : "#2A5C1F" }}>
-                    {(animalScc / 1000).toFixed(0)}k <span style={{ fontSize: 13, fontWeight: 500, fontFamily: "sans-serif" }}>cells/mL</span>
+                  <div style={{ fontFamily: "'Fraunces', serif", fontSize: 24, fontWeight: 700, color: (a.risk === "high") ? "#B83220" : (a.risk === "moderate") ? "#C47A10" : "#2A5C1F" }}>
+                    {a.risk === "high" ? "1.32x" : a.risk === "moderate" ? "1.21x" : "1.04x"} <span style={{ fontSize: 13, fontWeight: 500, fontFamily: "sans-serif" }}>ratio</span>
                   </div>
                   <div style={{ fontSize: 11, color: "#6B7A5C", marginTop: 2 }}>
-                    SCS Score: <strong>{(a.scs || (animalScc > criticalSccThreshold ? 7.2 : 3.2)).toFixed(1)}</strong> · <span style={{ color: animalScc > criticalSccThreshold ? "#B83220" : animalScc > normalSccThreshold ? "#C47A10" : "#2A5C1F", fontWeight: 700 }}>
-                      {animalScc > criticalSccThreshold
-                        ? `🚨 Acute Mastitis (>${(criticalSccThreshold / 1000).toFixed(0)}k)`
-                        : animalScc > normalSccThreshold
-                        ? `⚠️ Subclinical (${(normalSccThreshold / 1000).toFixed(0)}k–${(criticalSccThreshold / 1000).toFixed(0)}k)`
-                        : `✅ Healthy Baseline (<${(normalSccThreshold / 1000).toFixed(0)}k)`}
+                    Quarter: <strong>{a.quarter}</strong> · <span style={{ color: (a.risk === "high") ? "#B83220" : (a.risk === "moderate") ? "#C47A10" : "#2A5C1F", fontWeight: 700 }}>
+                      {a.risk === "high"
+                        ? "🚨 Asymmetric Differential (>1.25x)"
+                        : a.risk === "moderate"
+                        ? "⚠️ Elevated Drift (1.15x–1.25x)"
+                        : "✅ Balanced Symmetry (<1.15x)"}
                     </span>
                   </div>
                   <div style={{ fontSize: 10, color: "#94A3B8", marginTop: 2 }}>
-                    {species === "Goat" ? "ℹ️ Caprine apocrine baseline: up to 750k cells/mL is normal physiological secretion." : "ℹ️ Bovine healthy threshold: <200k cells/mL."}
+                    {species === "Goat" ? "ℹ️ Caprine udder: 2-half electrical conductivity balance." : "ℹ️ Bovine udder: 4-quarter inter-mammary EC differential."}
                   </div>
                 </div>
-                <div style={{ fontSize: 28 }}>🔬</div>
+                <div style={{ fontSize: 28 }}>⚖️</div>
               </div>
             </Card>
 
             <Card>
-              <SectionLabel>{t("scc_trend", lang)} (EC Telemetry)</SectionLabel>
+              <SectionLabel>{t("ec_trend", lang)}</SectionLabel>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div>
                   <div style={{ fontFamily: "'Fraunces', serif", fontSize: 24, fontWeight: 700, color: (a.conductivity || 5.0) > 6.5 ? "#B83220" : "#2A5C1F" }}>
@@ -548,7 +543,7 @@ export function AnimalProfileScreen({
               { label: "Conductivity (EC Probe GPIO 35)", value: `${a.conductivity} mS/cm`, status: a.conductivity > 8 ? "Elevated" : "Normal", color: a.conductivity > 8 ? "#B83220" : "#2A5C1F", icon: "⚡" },
               { label: "Milk pH (Electrode GPIO 34)", value: `${a.ph || 6.6}`, status: (a.ph || 6.6) > 7.0 || (a.ph || 6.6) < 6.4 ? "Borderline" : "Normal", color: (a.ph || 6.6) > 7.0 || (a.ph || 6.6) < 6.4 ? "#C47A10" : "#2A5C1F", icon: "🧪" },
               { label: "Milk Temperature (DS18B20 GPIO 4)", value: `${a.temp}°C`, status: a.temp > 39.2 ? "Fever" : "Normal", color: a.temp > 39.2 ? "#B83220" : "#2A5C1F", icon: "🌡" },
-              { label: "Somatic Cell Count (SCC)", value: `${((animalScc) / 1000).toFixed(0)}k/mL`, status: animalScc > criticalSccThreshold ? "Critical" : animalScc > normalSccThreshold ? "Watch" : "Normal", color: animalScc > criticalSccThreshold ? "#B83220" : "#2A5C1F", icon: "🔬" },
+              { label: "Quarter EC Ratio (Differential)", value: a.risk === "high" ? "1.32x" : a.risk === "moderate" ? "1.21x" : "1.04x", status: a.risk === "high" ? "Asymmetric" : a.risk === "moderate" ? "Drift" : "Balanced", color: a.risk === "high" ? "#B83220" : a.risk === "moderate" ? "#C47A10" : "#2A5C1F", icon: "⚖️" },
               { label: "Rumination Duration (IMU Collar)", value: `${rumination} min/day`, status: rumination < 250 ? "Reduced" : "Optimal", color: rumination < 250 ? "#B83220" : "#2A5C1F", icon: "🔄" },
               { label: "Feeding Duration (IMU Collar)", value: `${feeding} min/day`, status: feeding < 150 ? "Reduced" : "Normal", color: feeding < 150 ? "#C47A10" : "#2A5C1F", icon: "🌾" },
               { label: "Ambient Barn Temp (DHT22 GPIO 27)", value: `${ambientTemp}°C`, status: ambientTemp > 32 ? "High Heat" : "Optimal", color: ambientTemp > 32 ? "#C47A10" : "#2A5C1F", icon: "🌤" },

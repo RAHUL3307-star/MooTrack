@@ -36,7 +36,7 @@ export interface SpeciesHerdStats {
   hri: number;
   status: "LOW" | "MODERATE" | "HIGH";
   avgEC: number;
-  avgSCC: number;
+  avgPH: number;
   totalMilk: number;
 }
 
@@ -74,7 +74,7 @@ export function calculateHerdRisk(animals: Animal[]): HerdRiskAssessment {
 
   const emptyStats = (sp: "Cow" | "Goat" | "Buffalo"): SpeciesHerdStats => ({
     species: sp, count: 0, high: 0, moderate: 0, low: 0, none: 0,
-    hri: 0, status: "LOW", avgEC: 0, avgSCC: 0, totalMilk: 0,
+    hri: 0, status: "LOW", avgEC: 0, avgPH: 6.6, totalMilk: 0,
   });
 
   if (total === 0) {
@@ -145,14 +145,14 @@ export function calculateHerdRisk(animals: Animal[]): HerdRiskAssessment {
     const sNone = subset.filter((a) => a.risk === "none").length;
     const sHri  = Math.round(((sLow * 0 + sMod * 1 + sHigh * 2) / (subTotal * 2)) * 100);
     const sAvgEc  = Number((subset.reduce((acc, a) => acc + (a.conductivity || 5.0), 0) / subTotal).toFixed(1));
-    const sAvgScc = Math.round(subset.reduce((acc, a) => acc + (a.scc || (sp === "Goat" ? 450000 : 150000)), 0) / subTotal);
+    const sAvgPh  = Number((subset.reduce((acc, a) => acc + (a.ph || 6.65), 0) / subTotal).toFixed(2));
     const sTotalMilk = Number(subset.reduce((acc, a) => acc + (a.milk || 0), 0).toFixed(1));
     let sStatus: "LOW" | "MODERATE" | "HIGH" = "LOW";
     if (sHri >= 70) sStatus = "HIGH";
     else if (sHri >= 40) sStatus = "MODERATE";
     return {
       species: sp, count: subTotal, high: sHigh, moderate: sMod, low: sLow, none: sNone,
-      hri: sHri, status: sStatus, avgEC: sAvgEc, avgSCC: sAvgScc, totalMilk: sTotalMilk,
+      hri: sHri, status: sStatus, avgEC: sAvgEc, avgPH: sAvgPh, totalMilk: sTotalMilk,
     };
   };
 

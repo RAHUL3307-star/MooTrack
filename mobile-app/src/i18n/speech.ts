@@ -42,38 +42,34 @@ export function generateLiveSituationSummary(
     const phVal = liveTelemetry.ph != null ? liveTelemetry.ph.toFixed(2) : "6.70";
     const ecVal = (liveTelemetry.conductivity ?? 5.0).toFixed(1);
     const tempVal = (liveTelemetry.temp ?? 38.5).toFixed(1);
-    const sccNum = liveTelemetry.scc ?? (targetCow?.scc || (riskResult.risk === "high" ? 1850000 : riskResult.risk === "moderate" ? 420000 : 75000));
-    const sccRegional = `${(sccNum / 1000).toFixed(0)} ஆயிரம்`;
-    const sccHindi = `${(sccNum / 1000).toFixed(0)} हजार`;
-    const sccFormatted = sccNum >= 1000000 ? `${(sccNum / 1000000).toFixed(1)} million` : `${(sccNum / 1000).toFixed(0)} thousand`;
 
     if (riskResult.risk === "high") {
       // Already Affected (Clinical Mastitis)
       switch (lang) {
         case "Tamil":
-          return `${cowName} மாட்டின் நேரடி பால் பரிசோதனை முடிவுகள்: தீவிர மடிநோய் எச்சரிக்கை! பாலின் சோமாடிக் செல் எண்ணிக்கை ${sccRegional} செல்கள் என உச்சத்தில் உள்ளது. பாலின் காரத்தன்மை பி எச் ${phVal}, மின்கடத்துதிறன் ${ecVal} மற்றும் வெப்பநிலை ${tempVal} டிகிரி செல்சியஸ். நமது எந்திர கற்றல் மாடல் கணிப்பின்படி இம்மாடு ஏற்கனவே தீவிர மடிநோயால் பாதிக்கப்பட்டுள்ளது. விவசாயி செய்ய வேண்டிய உடனடி நடவடிக்கை: இந்த மாட்டை உடனே மற்ற மாடுகளிலிருந்து பிரித்து தனி கொட்டகையில் தனிமைப்படுத்துங்கள். இதன் பாலை மற்ற பாலுடன் கலக்காமல் கீழே கொட்டி விடுங்கள். எளிய மருந்துகள்: உடனடியாக கால்நடை மருத்துவரை வரவழைத்து, மடிக்குள் செலுத்தும் பெண்டிஸ்ட்ரின்-எஸ் எச் அல்லது செஃப்ட்ரியாக்சோன் ஆன்டிபயாடிக் மருந்து குழாயை செலுத்தவும். மடி வீக்கம் குறைய மேஸ்டிலெப் மூலிகை களிம்பை தடவி, பாலின் அமிலத்தன்மையை சீராக்க முப்பது கிராம் ட்ரைசோடியம் சிட்ரேட் பொடியை வெல்லத்தில் கலந்து தினமும் ஐந்து நாட்களுக்கு கொடுக்கவும்.`;
+          return `${cowName} மாட்டின் நேரடி பால் பரிசோதனை முடிவுகள்: தீவிர மடிநோய் எச்சரிக்கை! பாலின் காரத்தன்மை பி எச் ${phVal}, மின்கடத்துதிறன் ${ecVal} மற்றும் வெப்பநிலை ${tempVal} டிகிரி செல்சியஸ் என அபாயகரமாக உயர்ந்துள்ளது. நமது எந்திர கற்றல் மாடல் கணிப்பின்படி இம்மாடு ஏற்கனவே தீவிர மடிநோயால் பாதிக்கப்பட்டுள்ளது. விவசாயி செய்ய வேண்டிய உடனடி நடவடிக்கை: இந்த மாட்டை உடனே மற்ற மாடுகளிலிருந்து பிரித்து தனி கொட்டகையில் தனிமைப்படுத்துங்கள். இதன் பாலை மற்ற பாலுடன் கலக்காமல் கீழே கொட்டி விடுங்கள். எளிய மருந்துகள்: உடனடியாக கால்நடை மருத்துவரை வரவழைத்து, மடிக்குள் செலுத்தும் பெண்டிஸ்ட்ரின்-எஸ் எச் அல்லது செஃப்ட்ரியாக்சோன் ஆன்டிபயாடிக் மருந்து குழாயை செலுத்தவும். மடி வீக்கம் குறைய மேஸ்டிலெப் மூலிகை களிம்பை தடவி, பாலின் அமிலத்தன்மையை சீராக்க முப்பது கிராம் ட்ரைசோடியம் சிட்ரேட் பொடியை வெல்லத்தில் கலந்து தினமும் ஐந்து நாட்களுக்கு கொடுக்கவும்.`;
         case "Hindi":
-          return `${cowName} के दूध सेंसर जांच का लाइव विश्लेषण: गंभीर थनैला रोग की चेतावनी! सोमैटिक सेल काउंट ${sccHindi} सेल्स के गंभीर स्तर पर है, दूध का पी एच ${phVal}, चालकता ${ecVal} और तापमान ${tempVal} डिग्री है। हमारे एआई मॉडल के अनुसार यह गाय पहले से ही थनैला रोग से गंभीर रूप से प्रभावित है। किसान भाई तुरंत यह कदम उठाएं: गाय को तुरंत अन्य पशुओं से अलग बाड़े में क्वारंटाइन करें और इसका दूध बिल्कुल नष्ट कर दें। किसान उपयोगी दवाइयां: पशु चिकित्सक को तुरंत बुलाकर थन के अंदर पेंडिस्ट्रिन-एस एच या सेफ्ट्रियाक्सोन ट्यूब लगवाएं। थन की सूजन कम करने के लिए मैस्टिलेप मलहम लगाएं और दूध की अम्लता ठीक करने हेतु तीस ग्राम ट्राइसोडियम साइट्रेट पाउडर गुड़ के साथ पांच दिन तक रोजाना खिलाएं।`;
+          return `${cowName} के दूध सेंसर जांच का लाइव विश्लेषण: गंभीर थनैला रोग की चेतावनी! दूध का पी एच ${phVal}, चालकता ${ecVal} और तापमान ${tempVal} डिग्री के अत्यधिक गंभीर स्तर पर पहुंच चुका है। हमारे एआई मॉडल के अनुसार यह गाय पहले से ही थनैला रोग से गंभीर रूप से प्रभावित है। किसान भाई तुरंत यह कदम उठाएं: गाय को तुरंत अन्य पशुओं से अलग बाड़े में क्वारंटाइन करें और इसका दूध बिल्कुल नष्ट कर दें। किसान उपयोगी दवाइयां: पशु चिकित्सक को तुरंत बुलाकर थन के अंदर पेंडिस्ट्रिन-एस एच या सेफ्ट्रियाक्सोन ट्यूब लगवाएं। थन की सूजन कम करने के लिए मैस्टिलेप मलहम लगाएं और दूध की अम्लता ठीक करने हेतु तीस ग्राम ट्राइसोडियम साइट्रेट पाउडर गुड़ के साथ पांच दिन तक रोजाना खिलाएं।`;
         case "Kannada":
-          return `${cowName} ಹಸುವಿನ ನೇರ ಹಾಲು ಪರೀಕ್ಷಾ ವರದಿ: ತೀವ್ರ ಕೆಚ್ಚಲುಬಾವು ಎಚ್ಚರಿಕೆ! ಸೋಮ್ಯಾಟಿಕ್ ಕೋಶಗಳ ಸಂಖ್ಯೆ ${sccHindi} ಆಗಿದೆ, ಹಾಲಿನ ಪಿ ಎಚ್ ${phVal}, ವಾಹಕತೆ ${ecVal} ಮತ್ತು ತಾಪಮಾನ ${tempVal} ಡಿಗ್ರಿ ಆಗಿದೆ. ನಮ್ಮ ಎಂ ಎಲ್ ಮಾದರಿಯ ಪ್ರಕಾರ ಈ ಹಸು ಈಗಾಗಲೇ ಕೆಚ್ಚಲುಬಾವಿನಿಂದ ತೀವ್ರವಾಗಿ ಬಾಧಿತವಾಗಿದೆ. ರೈತರು ತಕ್ಷಣ ಮಾಡಬೇಕಾದ ಕ್ರಮ: ಹಸುವನ್ನು ತಕ್ಷಣ ಪ್ರತ್ಯೇಕಿಸಿ ಮತ್ತು ಹಾಲನ್ನು ನಾಶಪಡಿಸಿ. ಔಷಧಗಳು: ಪಶುವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ ಪೆಂಡಿಸ್ಟ್ರಿನ್-ಎಸ್ ಎಚ್ ಆಂಟಿಬಯೋಟಿಕ್ ಟ್ಯೂಬ್ ಹಾಕಿಸಿ, ಊತ ಕಡಿಮೆಯಾಗಲು ಮ್ಯಾಸ್ಟಿಲೆಪ್ ಮುಲಾಮು ಹಚ್ಚಿ, ಮೂವತ್ತು ಗ್ರಾಂ ಟ್ರೈಸೋಡಿಯಂ ಸಿಟ್ರೇಟ್ ಪುಡಿಯನ್ನು ಬೆಲ್ಲದೊಂದಿಗೆ ಐದು ದಿನ ನೀಡಿ.`;
+          return `${cowName} ಹಸುವಿನ ನೇರ ಹಾಲು ಪರೀಕ್ಷಾ ವರದಿ: ತೀವ್ರ ಕೆಚ್ಚಲುಬಾವು ಎಚ್ಚರಿಕೆ! ಹಾಲಿನ ಪಿ ಎಚ್ ${phVal}, ವಾಹಕತೆ ${ecVal} ಮತ್ತು ತಾಪಮಾನ ${tempVal} ಡಿಗ್ರಿ ತೀವ್ರ ಮಟ್ಟಕ್ಕೆ ಏರಿದೆ. ನಮ್ಮ ಎಂ ಎಲ್ ಮಾದರಿಯ ಪ್ರಕಾರ ಈ ಹಸು ಈಗಾಗಲೇ ಕೆಚ್ಚಲುಬಾವಿನಿಂದ ತೀವ್ರವಾಗಿ ಬಾಧಿತವಾಗಿದೆ. ರೈತರು ತಕ್ಷಣ ಮಾಡಬೇಕಾದ ಕ್ರಮ: ಹಸುವನ್ನು ತಕ್ಷಣ ಪ್ರತ್ಯೇಕಿಸಿ ಮತ್ತು ಹಾಲನ್ನು ನಾಶಪಡಿಸಿ. ಔಷಧಗಳು: ಪಶುವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ ಪೆಂಡಿಸ್ಟ್ರಿನ್-ಎಸ್ ಎಚ್ ಆಂಟಿಬಯೋಟಿಕ್ ಟ್ಯೂಬ್ ಹಾಕಿಸಿ, ಊತ ಕಡಿಮೆಯಾಗಲು ಮ್ಯಾಸ್ಟಿಲೆಪ್ ಮುಲಾಮು ಹಚ್ಚಿ, ಮೂವತ್ತು ಗ್ರಾಂ ಟ್ರೈಸೋಡಿಯಂ ಸಿಟ್ರೇಟ್ ಪುಡಿಯನ್ನು ಬೆಲ್ಲದೊಂದಿಗೆ ಐದು ದಿನ ನೀಡಿ.`;
         case "Telugu":
-          return `${cowName} ఆవు ప్రత్యక్ష పాల సెన్సార్ విశ్లేషణ: తీవ్ర పొదుగువాపు హెచ్చరిక! సోమాటిక్ సెల్స్ ${sccHindi} గా ఉన్నాయి, పాల పి హెచ్ ${phVal}, వాహకత ${ecVal} మరియు ఉష్ణోగ్రత ${tempVal} డిగ్రీలు. మన ఎం ఎల్ మోడల్ ప్రకారం ఈ ఆవు ఇప్పటికే తీవ్ర వ్యాధితో బాధపడుతోంది. రైతు వెంటనే చేయవలసిన పని: ఆవును వెంటనే వేరు చేసి క్వారంటైన్ చేయండి, పాలను పారబోయండి. సాధారణ మందులు: పశువైద్యుడితో పొదుగులోకి పెండిస్ట్రిన్-ఎస్ హెచ్ ట్యూబ్ ఎక్కించండి, మ్యాస్టిలెప్ లేపనం రాయండి మరియు ముప్పై గ్రాముల ట్రైసోడియం సిట్రేట్ పొడిని బెల్లంతో ఐదు రోజులు ఇవ్వండి.`;
+          return `${cowName} ఆవు ప్రత్యక్ష పాల సెన్సార్ విశ్లేషణ: తీవ్ర పొదుగువాపు హెచ్చరిక! పాల పి హెచ్ ${phVal}, వాహకత ${ecVal} మరియు ఉష్ಣోగ్రత ${tempVal} డిగ్రీలు తీవ్ర స్థాయికి చేరాయి. మన ఎం ఎల్ మోడల్ ప్రకారం ఈ ఆవు ఇప్పటికే తీవ్ర వ్యాధితో బాధపడుతోంది. రైతు వెంటనే చేయవలసిన పని: ఆవును వెంటనే వేరు చేసి క్వారంటైన్ చేయండి, పాలను పారబోయండి. సాధారణ మందులు: పశువైద్యుడితో పొదుగులోకి పెండిస్ట్రిన్-ఎస్ హెచ్ ట్యూబ్ ఎక్కించండి, మ్యాస్టిలెప్ లేపనం రాయండి మరియు ముప్పై గ్రాముల ట్రైసోడియం సిట్రేట్ పొడిని బెల్లంతో ఐదు రోజులు ఇవ్వండి.`;
         case "Marathi":
-          return `${cowName} चे थेट दूध सेन्सर विश्लेषण: तीव्र स्तनदाह धोका! सोमॅटिक सेल्स ${sccHindi} आहेत, दुधाचा पी एच ${phVal} आणि तापमान ${tempVal} अंश आहे. गाईला आधीच गंभीर स्तनदाह झालेला आहे. तात्काळ गाईला वेगळे करा व दूध नष्ट करा. पशुवैद्यकांकडून पेंडिस्ट्रिन-एस एच ट्यूब द्या, मॅस्टिलेप मलम लावा आणि तीस ग्रॅम ट्रायसोडियम सायट्रेट पावडर पाच दिवस खाऊ घाला.`;
+          return `${cowName} चे थेट दूध सेन्सर विश्लेषण: तीव्र स्तनदाह धोका! दुधाचा पी एच ${phVal}, चालकता ${ecVal} आणि तापमान ${tempVal} अंश तीव्र पातळीवर पोहोचले आहे. गाईला आधीच गंभीर स्तनदाह झालेला आहे. तात्काळ गाईला वेगळे करा व दूध नष्ट करा. पशुवैद्यकांकडून पेंडिस्ट्रिन-एस एच ट्यूब द्या, मॅस्टिलेप मलम लावा आणि तीस ग्रॅम ट्रायसोडियम सायट्रेट पावडर पाच दिवस खाऊ घाला.`;
         case "Gujarati":
-          return `${cowName} નું લાઈવ દૂધ સેન્સર વિશ્લેષણ: ગંભીર મસ્ટાઇટિસ ચેતવણી! સોમેટિક સેલ કાઉન્ટ ${sccHindi} છે, દૂધનું પી એચ ${phVal} અને તાપમાન ${tempVal} ડિગ્રી છે. ગાય પહેલેથી જ રોગથી ગંભીર રીતે પ્રભાવિત છે. તાત્કાલિક ગાયને અલગ કરો. પશુચિકિત્સક પાસે પેન્ડિસ્ટ્રિન-એસ એચ ટ્યુબ ચઢાવો, મેસ્ટિલેપ મલમ લગાવો અને ત્રીસ ગ્રામ ટ્રાઈસોડિયમ સાઈટ્રેટ ગોળ સાથે પાંચ દિવસ આપો.`;
+          return `${cowName} નું લાઈવ દૂધ સેન્સર વિશ્લેષણ: ગંભીર મસ્ટાઇટિસ ચેતવણી! દૂધનું પી એચ ${phVal}, વાહકતા ${ecVal} અને તાપમાન ${tempVal} ડિગ્રી ગંભીર સ્તરે પહોંચી ગયું છે. ગાય પહેલેથી જ રોગથી ગંભીર રીતે પ્રભાવિત છે. તાત્કાલિક ગાયને અલગ કરો. પશુચિકિત્સક પાસે પેન્ડિસ્ટ્રિન-એસ એચ ટ્યુબ ચઢાવો, મેસ્ટિલેપ મલમ લગાવો અને ત્રીસ ગ્રામ ટ્રાઈસોડિયમ સાઈટ્રેટ ગોળ સાથે પાંચ દિવસ આપો.`;
         case "Punjabi":
-          return `${cowName} ਦਾ ਲਾਈਵ ਦੁੱਧ ਸੈਂਸਰ ਵਿਸ਼ਲੇਸ਼ਣ: ਗੰਭੀਰ ਥਣੇਲਾ ਰੋਗ ਚੇਤਾਵਨੀ! ਸੋਮੈਟਿਕ ਸੈੱਲ ਕਾਊਂਟ ${sccHindi} ਹੈ, ਦੁੱਧ ਦਾ ਪੀ ਐਚ ${phVal} ਅਤੇ ਤਾਪਮਾਨ ${tempVal} ਡਿਗਰੀ ਹੈ। ਗਾਂ ਪਹਿਲਾਂ ਹੀ ਗੰਭੀਰ ਰੂਪ ਵਿੱਚ ਪ੍ਰਭਾਵਿਤ ਹੈ। ਗਾਂ ਨੂੰ ਤੁਰੰਤ ਵੱਖ ਕਰੋ। ਡਾਕਟਰ ਤੋਂ ਪੈਂਡਿਸਟ੍ਰਿਨ-ਐਸ ਐਚ ਟਿਊਬ ਲਗਵਾਓ, ਮੈਸਟੀਲੈਪ ਮੱਲ੍ਹਮ ਲਗਾਓ ਅਤੇ ਤੀਹ ਗ੍ਰਾਮ ਟ੍ਰਾਈਸੋਡੀਅਮ ਸਾਈਟ੍ਰੇਟ ਪੰਜ ਦਿਨ ਦਿਓ।`;
+          return `${cowName} ਦਾ ਲਾਈਵ ਦੁੱਧ ਸੈਂਸਰ ਵਿਸ਼ਲੇਸ਼ਣ: ਗੰਭੀਰ ਥਣੇਲਾ ਰੋਗ ਚੇਤਾਵਨੀ! ਦੁੱਧ ਦਾ ਪੀ ਐਚ ${phVal}, ਚਾਲਕਤਾ ${ecVal} ਅਤੇ ਤਾਪਮਾਨ ${tempVal} ਡਿਗਰੀ ਗੰਭੀਰ ਪੱਧਰ ਤੇ ਪਹੁੰਚ ਗਿਆ ਹੈ। ਗਾਂ ਪਹਿਲਾਂ ਹੀ ਗੰਭੀਰ ਰੂਪ ਵਿੱਚ ਪ੍ਰਭਾਵਿਤ ਹੈ। ਗਾਂ ਨੂੰ ਤੁਰੰਤ ਵੱਖ ਕਰੋ। ਡਾਕਟਰ ਤੋਂ ਪੈਂਡਿਸਟ੍ਰਿਨ-ਐਸ ਐਚ ਟਿਊਬ ਲਗਵਾਓ, ਮੈਸਟੀਲੈਪ ਮੱਲ੍ਹਮ ਲਗਾਓ ਅਤੇ ਤੀਹ ਗ੍ਰਾਮ ਟ੍ਰਾਈਸੋਡੀਅਮ ਸਾਈਟ੍ਰੇਟ ਪੰਜ ਦਿਨ ਦਿਓ।`;
         default:
-          return `Live milk sensor analysis for ${cowName}: High Mastitis Alert! Somatic Cell Count is critically high at ${sccFormatted} cells/mL, Milk pH is ${phVal}, Electrical Conductivity is ${ecVal}, and temperature is ${tempVal} degrees Celsius. Based on our trained machine learning model, this cow is ALREADY AFFECTED by acute clinical mastitis. What the farmer must do immediately: isolate ${cowName} in a separate quarantine pen right away, and discard all infected milk completely. Farmer-friendly medicines: call veterinarian Dr. Sharma immediately to infuse an intramammary antibiotic tube such as Pendistrin-SH or Ceftriaxone into the teat. Apply herbal anti-inflammatory Mastilep ointment on the udder swelling, and feed thirty grams of Trisodium Citrate powder mixed with jaggery daily for five days to restore milk pH and repair udder tissue.`;
+          return `Live milk sensor analysis for ${cowName}: High Mastitis Alert! Electrical Conductivity is critically high at ${ecVal} mS/cm, Milk pH is ${phVal}, and temperature is ${tempVal} degrees Celsius. Based on our trained machine learning model, this cow is ALREADY AFFECTED by acute clinical mastitis. What the farmer must do immediately: isolate ${cowName} in a separate quarantine pen right away, and discard all infected milk completely. Farmer-friendly medicines: call veterinarian Dr. Sharma immediately to infuse an intramammary antibiotic tube such as Pendistrin-SH or Ceftriaxone into the teat. Apply herbal anti-inflammatory Mastilep ointment on the udder swelling, and feed thirty grams of Trisodium Citrate powder mixed with jaggery daily for five days to restore milk pH and repair udder tissue.`;
       }
     } else if (riskResult.risk === "moderate") {
       // Chance of Getting Affected (Intermediate Warning Stage: 7 to 14 days)
       switch (lang) {
         case "Tamil":
-          return `${cowName} மாட்டின் நேரடி பால் பரிசோதனை முடிவுகள்: எழுபது முதல் எண்பது சதவீத இடைநிலை எச்சரிக்கை நிலை. சோமாடிக் செல் எண்ணிக்கை ${sccRegional} ஆக அதிகரித்துள்ளது. நமது எந்திர கற்றல் தரவுத்தள கணிப்பின்படி, ${cowName} மாட்டிற்கு அடுத்த ஏழு முதல் பதினான்கு நாட்களில் தீவிர மடிநோய் தாக்கும் மிக அதிக வாய்ப்புள்ளது! விவசாயி செய்ய வேண்டிய தடுப்பு நடவடிக்கை: பால் கறந்த உடன் மாடு உடனே தரையில் படுக்க விடாமல் குறைந்தது முப்பது நிமிடங்கள் நிற்க வையுங்கள், ஏனெனில் காம்பு துவாரம் திறந்திருக்கும். கொட்டகை தரையில் காய்ந்த சுண்ணாம்பு பொடி தூவி கிருமிநீக்கம் செய்யுங்கள். எளிய தடுப்பு மருந்துகள்: பால் கறந்த உடனே நான்கு காம்புகளையும் பூஜ்யம் புள்ளி ஐந்து சதவீத பொவிடோன் அயோடின் கிருமிநாசினி கரைசலில் நனைத்து பாதுகாப்பு பூச்சு இடுங்கள். மடி திசுக்களை பலப்படுத்த மேஸ்டிலெப் மூலிகை ஸ்ப்ரே அடிக்கவும். மடியின் நோய் எதிர்ப்பு சக்தியை கூட்ட இருபத்தைந்து கிராம் ட்ரைசோடியம் சிட்ரேட் பொடியையும், வைட்டமின் ஈ மற்றும் செலினியம் தாது கலவையையும் தீவனத்தில் நான்கு நாட்கள் கலந்து கொடுத்து நோய் வராமல் தடுத்திடுங்கள்.`;
+          return `${cowName} மாட்டின் நேரடி பால் பரிசோதனை முடிவுகள்: எழுபது முதல் எண்பது சதவீத இடைநிலை எச்சரிக்கை நிலை. மின்கடத்துதிறன் ${ecVal} மற்றும் pH ${phVal} ஆக முன்கூட்டியே அதிகரித்துள்ளது. நமது எந்திர கற்றல் தரவுத்தள கணிப்பின்படி, ${cowName} மாட்டிற்கு அடுத்த ஏழு முதல் பதினான்கு நாட்களில் தீவிர மடிநோய் தாக்கும் மிக அதிக வாய்ப்புள்ளது! விவசாயி செய்ய வேண்டிய தடுப்பு நடவடிக்கை: பால் கறந்த உடன் மாடு உடனே தரையில் படுக்க விடாமல் குறைந்தது முப்பது நிமிடங்கள் நிற்க வையுங்கள், ஏனெனில் காம்பு துவாரம் திறந்திருக்கும். கொட்டகை தரையில் காய்ந்த சுண்ணாம்பு பொடி தூவி கிருமிநீக்கம் செய்யுங்கள். எளிய தடுப்பு மருந்துகள்: பால் கறந்த உடனே நான்கு காம்புகளையும் பூஜ்யம் புள்ளி ஐந்து சதவீத பொவிடோன் அயோடின் கிருமிநாசினி கரைசலில் நனைத்து பாதுகாப்பு பூச்சு இடுங்கள். மடி திசுக்களை பலப்படுத்த மேஸ்டிலெப் மூலிகை ஸ்ப்ரே அடிக்கவும். மடியின் நோய் எதிர்ப்பு சக்தியை கூட்ட இருபத்தைந்து கிராம் ட்ரைசோடியம் சிட்ரேட் பொடியையும், வைட்டமின் ஈ மற்றும் செலினியம் தாது கலவையையும் தீவனத்தில் நான்கு நாட்கள் கலந்து கொடுத்து நோய் வராமல் தடுத்திடுங்கள்.`;
         case "Hindi":
-          return `${cowName} के दूध सेंसर जांच का लाइव विश्लेषण: सत्तर से अस्सी प्रतिशत मध्यवर्ती चेतावनी चरण! सोमैटिक सेल काउंट ${sccHindi} तक बढ़ गया है। हमारे मशीन लर्निंग मॉडल के अनुसार ${cowName} में अगले सात से चौदह दिनों में थनैला रोग होने की पूरी आशंका है! किसान भाई तुरंत यह बचाव करें: दूध दुहने के बाद गाय को तुरंत जमीन पर बैठने न दें, कम से कम तीस मिनट तक खड़ा रखें ताकि थन का छिद्र बंद हो सके। बाड़े के फर्श पर सूखा चूना पाउडर छिड़कें। उपयोगी रोकथाम दवाइयां: दूध निकालने के तुरंत बाद चारों थनों को शून्य दशमलव पांच प्रतिशत पोविडोन-आयोडीन घोल में डुबोकर लेप लगाएं। थनों पर मैस्टिलेप हर्बल स्प्रे लगाएं और प्रतिरोधक क्षमता बढ़ाने हेतु पच्चीस ग्राम ट्राइसोडियम साइट्रेट पाउडर तथा विटामिन ई व सेलेनियम खनिज मिश्रण चार दिन तक खिलाकर बीमारी को पहले ही रोकें।`;
+          return `${cowName} के दूध सेंसर जांच का लाइव विश्लेषण: सत्तर से अस्सी प्रतिशत मध्यवर्ती चेतावनी चरण! दूध की चालकता ${ecVal} और pH ${phVal} तक बढ़ गया है। हमारे मशीन लर्निंग मॉडल के अनुसार ${cowName} में अगले सात से चौदह दिनों में थनैला रोग होने की पूरी आशंका है! किसान भाई तुरंत यह बचाव करें: दूध दुहने के बाद गाय को तुरंत जमीन पर बैठने न दें, कम से कम तीस मिनट तक खड़ा रखें ताकि थन का छिद्र बंद हो सके। बाड़े के फर्श पर सूखा चूना पाउडर छिड़कें। उपयोगी रोकथाम दवाइयां: दूध निकालने के तुरंत बाद चारों थनों को शून्य दशमलव पांच प्रतिशत पोविडोन-आयोडीन घोल में डुबोकर लेप लगाएं। थनों पर मैस्टिलेप हर्बल स्प्रे लगाएं और प्रतिरोधक क्षमता बढ़ाने हेतु पच्चीस ग्राम ट्राइसोडियम साइट्रेट पाउडर तथा विटामिन ई व सेलेनियम खनिज मिश्रण चार दिन तक खिलाकर बीमारी को पहले ही रोकें।`;
         case "Kannada":
           return `${cowName} ಹಸುವಿನ ನೇರ ಹಾಲು ಪರೀಕ್ಷಾ ವರದಿ: ಎಪ್ಪತ್ತರಿಂದ ಎಂಬತ್ತು ಪ್ರತಿಶತ ಮಧ್ಯಂತರ ಎಚ್ಚರಿಕೆ ಹಂತ! ಮುಂದಿನ ಏಳರಿಂದ ಹದಿನಾಲ್ಕು ದಿನಗಳಲ್ಲಿ ರೋಗ ಬರುವ ಹೆಚ್ಚಿನ ಸಾಧ್ಯತೆಯಿದೆ ಎಂದು ನಮ್ಮ ಎಂ ಎಲ್ ಮಾದರಿ ಎಚ್ಚರಿಸಿದೆ. ರೈತರು ಮಾಡಬೇಕಾದ ಕ್ರಮ: ಹಾಲು ಕರೆದ ನಂತರ ಹಸುವನ್ನು ಮೂವತ್ತು ನಿಮಿಷ ಮಲಗಲು ಬಿಡಬೇಡಿ, ನೆಲಕ್ಕೆ ಸುಣ್ಣದ ಪುಡಿ ಹಾಕಿ. ಮುನ್ನೆಚ್ಚರಿಕೆ ಔಷಧಗಳು: ಹಾಲು ಕರೆದ ತಕ್ಷಣ ಅಯೋಡಿನ್ ದ್ರಾವಣದಲ್ಲಿ ಕೆಚ್ಚಲನ್ನು ಅದ್ದಿ ರಕ್ಷಣಾ ಕವಚ ನೀಡಿ, ಮ್ಯಾಸ್ಟಿಲೆಪ್ ಸ್ಪ್ರೇ ಬಳಸಿ ಮತ್ತು ಇಪ್ಪತ್ತೈದು ಗ್ರಾಂ ಟ್ರೈಸೋಡಿಯಂ ಸಿಟ್ರೇಟ್ ಜೊತೆಗೆ ವಿಟಮಿನ್ ಇ ಖನಿಜ ಮಿಶ್ರಣ ನೀಡಿ ರೋಗ ಬರದಂತೆ ತಡೆಯಿರಿ.`;
         case "Telugu":
@@ -85,15 +81,15 @@ export function generateLiveSituationSummary(
         case "Punjabi":
           return `${cowName} ਦਾ ਲਾਈਵ ਦੁੱਧ ਵਿਸ਼ਲੇਸ਼ਣ: ਸੱਤਰ ਤੋਂ ਅੱਸੀ ਪ੍ਰਤੀਸ਼ਤ ਦਰਮਿਆਨੇ ਖ਼ਤਰੇ ਦੀ ਚੇਤਾਵਨੀ! ਅਗਲੇ ਸੱਤ ਤੋਂ ਚੌਦਾਂ ਦਿਨਾਂ ਵਿੱਚ ਬਿਮਾਰੀ ਹੋਣ ਦੀ ਪੂਰੀ ਸੰਭਾਵਨਾ ਹੈ। ਦੁੱਧ ਚੋਣ ਤੋਂ ਬਾਅਦ ਗਾਂ ਨੂੰ ਤੀਹ ਮਿੰਟ ਬੈਠਣ ਨਾ ਦਿਓ, ਫਰਸ਼ ਤੇ ਚੂਨਾ ਪਾਓ। ਬਚਾਅ ਦਵਾਈਆਂ: ਦੁੱਧ ਕੱਢਣ ਤੋਂ ਤੁਰੰਤ ਬਾਅਦ ਆਇਓਡੀਨ ਘੋਲ ਵਿੱਚ ਥਣ ਡੁਬੋਵੋ, ਮੈਸਟੀਲੈਪ ਸਪਰੇਅ ਲਗਾਓ ਅਤੇ ਪੱਚੀ ਗ੍ਰਾਮ ਟ੍ਰਾਈਸੋਡੀਅਮ ਸਾਈਟ੍ਰੇਟ ਨਾਲ ਵਿਟਾਮਿਨ ਈ ਖਣਿਜ ਮਿਸ਼ਰਣ ਦਿਓ।`;
         default:
-          return `Live milk sensor analysis for ${cowName}: Subclinical Warning Stage (70% to 80% intermediate risk). Somatic Cell Count has risen to ${sccFormatted} cells/mL, Milk pH is ${phVal}, and conductivity is ${ecVal}. Based on our machine learning dataset model, this cow has a SEVENTY TO EIGHTY PERCENT CHANCE OF GETTING CLINICAL MASTITIS WITHIN THE NEXT SEVEN TO FOURTEEN DAYS if preventive action is not taken now! What the farmer must do: keep the cow standing for at least thirty minutes after milking so the open teat canal can seal naturally. Keep the barn floor dry by spreading clean lime powder, and milk this cow last. Farmer-friendly preventive medicines: immediately dip all four teats in zero point five percent Povidone-Iodine solution right after every milking to create an antiseptic barrier. Apply Mastilep herbal spray on the udder, and feed twenty-five grams of Trisodium Citrate powder daily for four days along with Vitamin E and Selenium mineral supplement to boost immunity and stop disease onset!`;
+          return `Live milk sensor analysis for ${cowName}: Subclinical Warning Stage (70% to 80% intermediate risk). Electrical Conductivity has risen to ${ecVal} mS/cm, and Milk pH is ${phVal}. Based on our machine learning dataset model, this cow has a SEVENTY TO EIGHTY PERCENT CHANCE OF GETTING CLINICAL MASTITIS WITHIN THE NEXT SEVEN TO FOURTEEN DAYS if preventive action is not taken now! What the farmer must do: keep the cow standing for at least thirty minutes after milking so the open teat canal can seal naturally. Keep the barn floor dry by spreading clean lime powder, and milk this cow last. Farmer-friendly preventive medicines: immediately dip all four teats in zero point five percent Povidone-Iodine solution right after every milking to create an antiseptic barrier. Apply Mastilep herbal spray on the udder, and feed twenty-five grams of Trisodium Citrate powder daily for four days along with Vitamin E and Selenium mineral supplement to boost immunity and stop disease onset!`;
       }
     } else {
       // Normal & Healthy Milk
       switch (lang) {
         case "Tamil":
-          return `${cowName} மாட்டின் நேரடி பால் பரிசோதனை முடிவுகள்: பால் முற்றிலும் ஆரோக்கியமாகவும் தூய்மையாகவும் உள்ளது! சோமாடிக் செல் எண்ணிக்கை இயல்பான பாதுகாப்பான வரம்பில் உள்ளது. பாலின் காரத்தன்மை பி எச் ${phVal}, மின்கடத்துதிறன் ${ecVal} மற்றும் வெப்பநிலை ${tempVal} டிகிரி செல்சியஸ். மடிநோய் அறிகுறிகள் எதுவும் இல்லை. பால் கறந்த உடன் வழக்கமான அயோடின் காம்பு நனைக்கும் முறையையும் சுத்தத்தையும் தொடருங்கள்.`;
+          return `${cowName} மாட்டின் நேரடி பால் பரிசோதனை முடிவுகள்: பால் முற்றிலும் ஆரோக்கியமாகவும் தூய்மையாகவும் உள்ளது! பாலின் காரத்தன்மை பி எச் ${phVal}, மின்கடத்துதிறன் ${ecVal} மற்றும் வெப்பநிலை ${tempVal} டிகிரி செல்சியஸ் என அனைத்தும் இயல்பான பாதுகாப்பான வரம்பில் உள்ளது. மடிநோய் அறிகுறிகள் எதுவும் இல்லை. பால் கறந்த உடன் வழக்கமான அயோடின் காம்பு நனைக்கும் முறையையும் சுத்தத்தையும் தொடருங்கள்.`;
         case "Hindi":
-          return `${cowName} के दूध सेंसर जांच का लाइव विश्लेषण: दूध पूरी तरह स्वस्थ, सामान्य और शुद्ध है! सोमैटिक सेल काउंट सुरक्षित सीमा में है, दूध का पी एच ${phVal}, चालकता ${ecVal} और तापमान ${tempVal} डिग्री है। थनैला रोग का कोई लक्षण नहीं है। नियमित स्वच्छता और दूध दुहने के बाद थन डुबोने का नियम बनाए रखें।`;
+          return `${cowName} के दूध सेंसर जांच का लाइव विश्लेषण: दूध पूरी तरह स्वस्थ, सामान्य और शुद्ध है! दूध का पी एच ${phVal}, चालकता ${ecVal} और तापमान ${tempVal} डिग्री सुरक्षित सामान्य सीमा में है। थनैला रोग का कोई लक्षण नहीं है। नियमित स्वच्छता और दूध दुहने के बाद थन डुबोने का नियम बनाए रखें।`;
         case "Kannada":
           return `${cowName} ಹಸುವಿನ ನೇರ ಹಾಲು ಪರೀಕ್ಷಾ ವರದಿ: ಹಾಲು ಸಂಪೂರ್ಣ ಆರೋಗ್ಯಕರ ಮತ್ತು ಶುದ್ಧವಾಗಿದೆ! ಯಾವುದೇ ರೋಗದ ಲಕ್ಷಣಗಳಿಲ್ಲ. ಸ್ವಚ್ಛತೆಯನ್ನು ಮುಂದುವರಿಸಿ.`;
         case "Telugu":
@@ -105,7 +101,7 @@ export function generateLiveSituationSummary(
         case "Punjabi":
           return `${cowName} ਦਾ ਲਾਈਵ ਦੁੱਧ ਵਿਸ਼ਲੇਸ਼ਣ: ਦੁੱਧ ਬਿਲਕੁਲ ਤੰਦਰੁਸਤ ਅਤੇ ਸ਼ੁੱਧ ਹੈ! ਕੋਈ ਖ਼ਤਰਾ ਨਹੀਂ ਹੈ। ਸਫਾਈ ਬਣਾਈ ਰੱਖੋ।`;
         default:
-          return `Live milk sensor analysis for ${cowName}: Milk is completely healthy, clean, and normal. Somatic Cell Count is low at ${sccFormatted} cells/mL, Milk pH is ${phVal}, and conductivity is ${ecVal}. No signs of mastitis. Continue standard post-milking teat dips and barn hygiene.`;
+          return `Live milk sensor analysis for ${cowName}: Milk is completely healthy, clean, and normal. Electrical Conductivity is normal at ${ecVal} mS/cm, Milk pH is ${phVal}, and temperature is ${tempVal} degrees Celsius. No signs of mastitis. Continue standard post-milking teat dips and barn hygiene.`;
       }
     }
   }
@@ -160,7 +156,7 @@ export function generateLiveSituationSummary(
       return `ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ ਕਿਸਾਨ ਵੀਰੋ! ਇਹ ਤੁਹਾਡੇ ਡੇਅਰੀ ਫਾਰਮ ਦਾ ਲਾਈਵ ਡੈਸ਼ਬੋਰਡ ਸਾਰ ਹੈ। ਤੁਹਾਡੇ ਫਾਰਮ ਦਾ ਹਰਡ ਰਿਸਕ ਇੰਡੈਕਸ ${hri} ਪ੍ਰਤੀਸ਼ਤ ਹੈ। ${total} ਵਿੱਚੋਂ ${high.length > 0 ? `${highNames} ਪਹਿਲਾਂ ਹੀ ਗੰਭੀਰ ਥਣੇਲਾ ਰੋਗ ਨਾਲ ਪ੍ਰਭਾਵਿਤ ਹਨ।` : "ਕੋਈ ਬਿਮਾਰੀ ਨਹੀਂ ਹੈ।"} ਸਭ ਤੋਂ ਜ਼ਰੂਰੀ ਗੱਲ ਇਹ ਹੈ ਕਿ ਸੱਤਰ ਤੋਂ ਅੱਸੀ ਪ੍ਰਤੀਸ਼ਤ ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਾਲੀਆਂ ${mod.length > 0 ? modNames : "ਗਾਵਾਂ"} ਵਿੱਚ ਅਗਲੇ ਸੱਤ ਤੋਂ ਚੌਦਾਂ ਦਿਨਾਂ ਵਿੱਚ ਰੋਗ ਲੱਗਣ ਦੀ ਪੂਰੀ ਸੰਭਾਵਨਾ ਹੈ! ਅੱਜ ਦਾ ਦੁੱਧ ${totalMilk} ਲੀਟਰ ਹੈ। ਤੁਰੰਤ ਬਿਮਾਰ ਗਾਵਾਂ ਨੂੰ ਵੱਖ ਕਰਕੇ ਪੈਂਡਿਸਟ੍ਰਿਨ-ਐਸ ਐਚ ਟਿਊਬ, ਮੈਸਟੀਲੈਪ ਮੱਲ੍ਹਮ ਦਿਓ ਅਤੇ ਦਰਮਿਆਨੀਆਂ ਗਾਵਾਂ ਨੂੰ ਆਇਓਡੀਨ ਘੋਲ ਅਤੇ ਵਿਟਾਮਿਨ ਈ ਦੇ ਕੇ ਬਿਮਾਰੀ ਰੋਕੋ!`;
 
     default:
-      return `Hello farmer! Here is your live dairy situation and herd summary. The overall Herd Risk Index, HRI, is currently ${hri} percent with ${hriStatus} risk status. Out of ${total} animals in your herd, ${high.length > 0 ? `${highNames} are ALREADY AFFECTED with acute clinical mastitis and elevated Somatic Cell Counts.` : "no cows have acute clinical disease."} Crucially, animals in the intermediate stage with 70 to 80 percent risk, including ${mod.length > 0 ? modNames : "those under active monitoring"}, have a high chance of getting the disease within the next 7 to 14 days based on our machine learning dataset model! Today's total milk yield is ${totalMilk} litres. Immediate actions for the farmer: for already affected cows, isolate them in quarantine right away, discard milk, call your vet for intramammary antibiotic tubes like Pendistrin-SH, apply herbal Mastilep ointment on udder swelling, and feed 30 grams of Trisodium Citrate powder with jaggery daily for 5 days. For intermediate-risk cows, apply post-milking Povidone-Iodine teat dips, keep them standing for 30 minutes, spray Mastilep, and supplement feed with Trisodium Citrate and Vitamin E with Selenium to stop disease onset before it happens!`;
+      return `Hello farmer! Here is your live dairy situation and herd summary. The overall Herd Risk Index, HRI, is currently ${hri} percent with ${hriStatus} risk status. Out of ${total} animals in your herd, ${high.length > 0 ? `${highNames} are ALREADY AFFECTED with acute clinical mastitis and elevated electrical conductivity.` : "no cows have acute clinical disease."} Crucially, animals in the intermediate stage with 70 to 80 percent risk, including ${mod.length > 0 ? modNames : "those under active monitoring"}, have a high chance of getting the disease within the next 7 to 14 days based on our machine learning dataset model! Today's total milk yield is ${totalMilk} litres. Immediate actions for the farmer: for already affected cows, isolate them in quarantine right away, discard milk, call your vet for intramammary antibiotic tubes like Pendistrin-SH, apply herbal Mastilep ointment on udder swelling, and feed 30 grams of Trisodium Citrate powder with jaggery daily for 5 days. For intermediate-risk cows, apply post-milking Povidone-Iodine teat dips, keep them standing for 30 minutes, spray Mastilep, and supplement feed with Trisodium Citrate and Vitamin E with Selenium to stop disease onset before it happens!`;
   }
 }
 
@@ -203,19 +199,19 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Punjabi":
         return "ਪਸ਼ੂ ਸੂਚੀ ਸਾਰ। Cow 1 ਅਤੇ Cow 8 ਗੰਭੀਰ ਖ਼ਤਰੇ ਵਿੱਚ ਹਨ। Cow 2 ਅਤੇ Cow 3 70 ਤੋਂ 80 ਪ੍ਰਤੀਸ਼ਤ ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਿੱਚ ਹਨ ਅਤੇ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਬਿਮਾਰੀ ਹੋਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ।";
       default:
-        return "Cattle list summary. Cow 1 and Cow 8 have critical mastitis risk above 90% with elevated somatic cell counts. Cow 2 and Cow 3 are in the intermediate stage with 70 to 80 percent risk, and our AI models predict a high chance of clinical disease appearing in 7 to 14 days without preventive care. Cow 5 and Cow 7 are completely healthy. Tap any animal's card to view its detailed health records.";
+        return "Cattle list summary. Cow 1 and Cow 8 have critical mastitis risk above 90% with elevated electrical conductivity and abnormal milk pH. Cow 2 and Cow 3 are in the intermediate stage with 70 to 80 percent risk, and our AI models predict a high chance of clinical disease appearing in 7 to 14 days without preventive care. Cow 5 and Cow 7 are completely healthy. Tap any animal's card to view its detailed health records.";
     }
   },
   "animal-profile": (lang: string) => {
     switch (lang) {
       case "Tamil":
-        return "மாட்டின் உடல்நிலை சுருக்கம். Cow 1 மாட்டின் மின்கடத்துதிறன் 12.4 mS/cm மற்றும் சோமாடிக் செல் எண்ணிக்கை 1.8 மில்லியன் என அதிகமாக உள்ளது. அதேபோல் 70 முதல் 80 சதவீத இடைநிலை ஆபத்தில் உள்ள மாடுகளுக்கு அடுத்த 7 முதல் 14 நாட்களில் நோய் தாக்கும் வாய்ப்புள்ளது. உடனே மடி காம்புகளை அயோடின் திரவத்தால் சுத்தம் செய்யவும், மருத்துவரை வரவழைக்க வாட்ஸ்அப் பட்டனைத் தொடுங்கள்.";
+        return "மாட்டின் உடல்நிலை சுருக்கம். Cow 1 மாட்டின் மின்கடத்துதிறன் 12.4 mS/cm மற்றும் பால் pH 6.1 என மாறுபட்டுள்ளது. அதேபோல் 70 முதல் 80 சதவீத இடைநிலை ஆபத்தில் உள்ள மாடுகளுக்கு அடுத்த 7 முதல் 14 நாட்களில் நோய் தாக்கும் வாய்ப்புள்ளது. உடனே மடி காம்புகளை அயோடின் திரவத்தால் சுத்தம் செய்யவும், மருத்துவரை வரவழைக்க வாட்ஸ்அப் பட்டனைத் தொடுங்கள்.";
       case "Hindi":
-        return "पशु स्वास्थ्य रिपोर्ट का सारांश। Cow 1 में दूध चालकता 12.4 mS/cm और सोमैटिक सेल काउंट 18 लाख सेल्स प्रति मिलीलीटर है। वहीं 70 से 80 प्रतिशत मध्यवर्ती जोखिम वाले पशुओं में अगले 7 से 14 दिनों में बीमारी उभरने की पूरी आशंका है। तुरंत थनों की जांच कर दवा का लेप लगाएं और डॉक्टर को बुलाने के लिए व्हाट्सएप बटन दबाएं।";
+        return "पशु स्वास्थ्य रिपोर्ट का सारांश। Cow 1 में दूध चालकता 12.4 mS/cm और असामान्य pH 6.1 है। वहीं 70 से 80 प्रतिशत मध्यवर्ती जोखिम वाले पशुओं में अगले 7 से 14 दिनों में बीमारी उभरने की पूरी आशंका है। तुरंत थनों की जांच कर दवा का लेप लगाएं और डॉक्टर को बुलाने के लिए व्हाट्सएप बटन दबाएं।";
       case "Kannada":
         return "ಹಸುವಿನ ಆರೋಗ್ಯ ಸಾರಾಂಶ. Cow 1 ಹಸುವಿನ ಹಾಲಿನ ವಾಹಕತೆ 12.4 mS/cm ಮತ್ತು ತಾಪಮಾನ 39.4 ಡಿಗ್ರಿ ಆಗಿದೆ. 70 ರಿಂದ 80 ಪ್ರತಿಶತ ಮಧ್ಯಂತರ ಹಂತದಲ್ಲಿರುವ ಹಸುಗಳಿಗೆ ಮುಂದಿನ 7 ರಿಂದ 14 ದಿನಗಳಲ್ಲಿ ರೋಗ ಬರುವ ಸಾಧ್ಯತೆಯಿದೆ. ತಕ್ಷಣ ಪಶುವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.";
       case "Telugu":
-        return "ఆవు ఆరోగ్య సారాంశం. Cow 1 పాల వాహకత 12.4 mS/cm మరియు ఉష్ణోగ్రత 39.4 డిగ్రీలు. 70 నుండి 80 శాతం మధ్యస్థ దశలోని ఆవులకు రాబోయే 7 నుండి 14 రోజులలో వ్యాధి సోకే అవకాశం ఉంది. వెంటనే పశువైద్యుడిని సంప్రదించండి.";
+        return "ఆవు ఆరోగ్య సారాంశం. Cow 1 పాల వాహకత 12.4 mS/cm మరియు ఉష్ణోగ్రత 39.4 డిగ్రీలు. 70 నుండి 80 శాతం మధ్యస్థ దశలోని ఆవులకు రాబోయే 7 నుండి 14 రోజులలో వ్యాధి సోకే అవకాశం ఉంది. వెంటనే నివారణ చర్యలు చేపట్టి వైద్యుడిని సంప్రదించండి.";
       case "Marathi":
         return "आरोग्य अहवाल सारांश. Cow 1 गायीला तीव्र धोका आहे. तसेच 70 ते 80% मध्यम टप्प्यातील गाईंना 7 ते 14 दिवसांत आजार होण्याची शक्यता आहे. तातडीने सडांची स्वच्छता करा.";
       case "Gujarati":
@@ -223,7 +219,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Punjabi":
         return "ਸਿਹਤ ਰਿਪੋਰਟ ਸਾਰ। Cow 1 ਨੂੰ ਗੰਭੀਰ ਖ਼ਤਰਾ ਹੈ। ਇਸ ਤੋਂ ਇਲਾਵਾ 70 ਤੋਂ 80% ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਾਲੀਆਂ ਗਾਵਾਂ ਵਿੱਚ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਬਿਮਾਰੀ ਹੋਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ।";
       default:
-        return "Health summary for Cow 1. Cow 1 has high risk with an estimated Somatic Cell Count of 1.85 million cells/mL, elevated 39.4°C temperature, and 12.4 mS/cm milk electrical conductivity. Crucially, intermediate stage cows at 70% to 80% risk, like Cow 2 and Cow 3, show early warning signs and have a high chance of clinical infection in 7 to 14 days without preventive intervention. Inspect and disinfect udder teats immediately.";
+        return "Health summary for Cow 1. Cow 1 has high risk with an elevated electrical conductivity of 12.4 mS/cm, abnormal pH of 6.1, and 39.4°C milk temperature. Crucially, intermediate stage cows at 70% to 80% risk, like Cow 2 and Cow 3, show early warning signs and have a high chance of clinical infection in 7 to 14 days without preventive intervention. Inspect and disinfect udder teats immediately.";
     }
   },
   "ai-risk": (lang: string) => {
@@ -243,7 +239,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Punjabi":
         return "AI ਜੋਖਮ ਵਿਸ਼ਲੇਸ਼ਣ ਸਾਰ। 70 ਤੋਂ 80 ਪ੍ਰਤੀਸ਼ਤ ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਾਲੀਆਂ ਗਾਵਾਂ ਵਿੱਚ ਅਗਲੇ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਰੋਗ ਲੱਗਣ ਦੀ ਪੂਰੀ ਸੰਭਾਵਨਾ ਹੈ। ਸਮੇਂ ਸਿਰ ਇਲਾਜ ਸ਼ੁਰੂ ਕਰੋ।";
       default:
-        return "AI Risk Assessment summary. Our smart AI has detected critical mastitis and high somatic cell counts for Cow 1. Crucially, cows entering the 70% to 80% intermediate stage, such as Cow 2 and Cow 3, face high chances of contracting clinical mastitis in 7 to 14 days. Early intervention during this 7 to 14 day window prevents acute inflammation.";
+        return "AI Risk Assessment summary. Our smart AI has detected critical mastitis and elevated electrical conductivity for Cow 1. Crucially, cows entering the 70% to 80% intermediate stage, such as Cow 2 and Cow 3, face high chances of contracting clinical mastitis in 7 to 14 days. Early intervention during this 7 to 14 day window prevents acute inflammation.";
     }
   },
   alerts: (lang: string) => {
@@ -263,7 +259,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Punjabi":
         return "ਐਮਰਜੈਂਸੀ ਚੇਤਾਵਨੀ ਸਾਰ। 70 ਤੋਂ 80% ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਾਲੀਆਂ ਗਾਵਾਂ ਵਿੱਚ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਬਿਮਾਰੀ ਹੋਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ। ਡਾਕਟਰ ਨੂੰ ਸੂਚਿਤ ਕਰੋ।";
       default:
-        return "Emergency alerts summary. Cow 1 and Cow 8 are at critical risk with elevated somatic cell counts and must be isolated immediately. Furthermore, cows in the 70% to 80% intermediate stage like Cow 2 and Cow 3 have high chance of getting clinical mastitis in 7 to 14 days, and need pre-milking iodine teat sanitization right now. Tap the WhatsApp button to alert your veterinarian.";
+        return "Emergency alerts summary. Cow 1 and Cow 8 are at critical risk with elevated electrical conductivity and must be isolated immediately. Furthermore, cows in the 70% to 80% intermediate stage like Cow 2 and Cow 3 have high chance of getting clinical mastitis in 7 to 14 days, and need pre-milking iodine teat sanitization right now. Tap the WhatsApp button to alert your veterinarian.";
     }
   },
   recommendations: (lang: string) => {
@@ -303,15 +299,15 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
   sensors: (lang: string) => {
     switch (lang) {
       case "Tamil":
-        return "சென்சார் கருவிகள் சுருக்கம். உங்கள் 48 சென்சார்களில் 42 கருவிகள் முழுமையாக இயங்குகின்றன. சோமாடிக் செல் எண்ணிக்கை மற்றும் பால் கடத்துதிறன் அளவீடுகள் துல்லியமாக கண்காணிக்கப்படுகின்றன.";
+        return "சென்சார் கருவிகள் சுருக்கம். உங்கள் 48 சென்சார்களில் 42 கருவிகள் முழுமையாக இயங்குகின்றன. பால் மின்கடத்துதிறன், வெப்பநிலை மற்றும் pH அளவீடுகள் துல்லியமாக கண்காணிக்கப்படுகின்றன.";
       case "Hindi":
-        return "सेंसर स्थिति सारांश। आपके 48 में से 42 स्मार्ट सेंसर लाइव काम कर रहे हैं। सोमैटिक सेल काउंट, तापमान और दूध चालकता की सटीक लाइव ट्रैकिंग चालू है।";
+        return "सेंसर स्थिति सारांश। आपके 48 में से 42 स्मार्ट सेंसर लाइव काम कर रहे हैं। दूध चालकता, तापमान और pH की सटीक लाइव ट्रैकिंग चालू है।";
       case "Kannada":
         return "ಸೆನ್ಸರ್ ಸಾಧನಗಳ ಸಾರಾಂಶ. 48 ಸೆನ್ಸರ್‌ಗಳಲ್ಲಿ 42 ಸರಿಯಾಗಿ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತಿವೆ. 6 ಸಾಧನಗಳಲ್ಲಿ ಬ್ಯಾಟರಿ ಕಡಿಮೆಯಿದೆ. ಶೆಡ್‌ನಲ್ಲಿ ಗಾಳಿಯಾಡುವಂತೆ ಮಾಡಿ.";
       case "Telugu":
         return "సెన్సార్ల స్థితి సారాంశం. 48 సెన్సార్లలో 42 సమర్థవంతంగా పనిచేస్తున్నాయి. 6 పరికరాలలో బ్యాటరీ తక్కువగా ఉంది. షెడ్‌లో గాలి వెలుతురు పెంచండి.";
       default:
-        return "IoT Sensors summary. 42 out of 48 smart devices are active. Somatic cell count, milk conductivity, and temperature are actively tracked in real-time.";
+        return "IoT Sensors summary. 42 out of 48 smart devices are active. Milk electrical conductivity, temperature, and pH are actively tracked in real-time.";
     }
   },
   gis: (lang: string) => {
@@ -339,7 +335,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Telugu":
         return "చికిత్స నివేదిక సారాంశం. Cow 1 కు సిఎంటి పరీక్ష చేసి ల్యాబ్‌కు పంపారు. Cow 8 ను వేరు చేశారు. Cow 3 ఆవు 52 శాతం మెరుగుదలతో కోలుకుంది.";
       default:
-        return "Interventions summary. Cow 1 has completed CMT testing with lab results pending. Cow 8 is safely isolated. Great news: Cow 3 has achieved full recovery with normalized somatic cell count and conductivity.";
+        return "Interventions summary. Cow 1 has completed CMT testing with lab results pending. Cow 8 is safely isolated. Great news: Cow 3 has achieved full recovery with normalized electrical conductivity and milk pH.";
     }
   },
   profile: (lang: string) => {
@@ -369,9 +365,9 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
   "ml-lab": (lang: string) => {
     switch (lang) {
       case "Tamil":
-        return "செயற்கை நுண்ணறிவு கணிப்பு மற்றும் சிகிச்சை ஆய்வகம். Cow 1 மாட்டிற்கு மடிநோய் ஆபத்து 96 சதவீதம் என கணிக்கப்பட்டுள்ளது. சோமாடிக் செல் எண்ணிக்கை 1.85 மில்லியன், பாலின் மின்கடத்துதிறன் 12.4 mS/cm மற்றும் pH 6.1 என ஆபத்தான அளவில் பதிவாகியுள்ளது. நீங்கள் செய்ய வேண்டியது: இடைநிலை மாடுகளுக்கு அயோடின் தடுப்பு பூச்சு போடுங்கள், Cow 1 மாட்டை தனிமைப்படுத்தி டாக்டர் சர்மாவை உடனே அழையுங்கள்.";
+        return "செயற்கை நுண்ணறிவு கணிப்பு மற்றும் சிகிச்சை ஆய்வகம். Cow 1 மாட்டிற்கு மடிநோய் ஆபத்து 96 சதவீதம் என கணிக்கப்பட்டுள்ளது. பாலின் மின்கடத்துதிறன் 12.4 mS/cm மற்றும் pH 6.1 என ஆபத்தான அளவில் பதிவாகியுள்ளது. நீங்கள் செய்ய வேண்டியது: இடைநிலை மாடுகளுக்கு அயோடின் தடுப்பு பூச்சு போடுங்கள், Cow 1 மாட்டை தனிமைப்படுத்தி டாக்டர் சர்மாவை உடனே அழையுங்கள்.";
       case "Hindi":
-        return "एआई भविष्यवाणी और उपचार लैब। Cow 1 में थनैला का जोखिम 96% है। सोमैटिक सेल काउंट 18.5 लाख सेल्स/मि.ली, दूध की चालकता 12.4 mS/cm और pH 6.1 दर्ज हुई है। तुरंत मध्यवर्ती गायों के थनों में आयोडीन घोल लगाएं, Cow 1 को अलग बाड़े में रखें और व्हाट्सएप से डॉक्टर शर्मा को तुरंत बुलाएं।";
+        return "एआई भविष्यवाणी और उपचार लैब। Cow 1 में थनैला का जोखिम 96% है। दूध की चालकता 12.4 mS/cm और pH 6.1 दर्ज हुई है। तुरंत मध्यवर्ती गायों के थनों में आयोडीन घोल लगाएं, Cow 1 को अलग बाड़े में रखें और व्हाट्सएप से डॉक्टर शर्मा को तुरंत बुलाएं।";
       case "Kannada":
         return "AI ಕೆಚ್ಚಲುಬಾವು ಮುನ್ಸೂಚನೆ ಮತ್ತು ಚಿಕಿತ್ಸೆ ಲ್ಯಾಬ್. Cow 1 ಹಸುವಿಗೆ 96% ಗಂಭೀರ ಅಪಾಯವಿದೆ. ಹಾಲಿನ ವಾಹಕತೆ 12.4 mS/cm ಮತ್ತು pH 6.1 ಆಗಿದೆ. ಮುಖ್ಯವಾಗಿ 70 ರಿಂದ 80 ಪ್ರತಿಶತ ಮಧ್ಯಂತರ ಹಂತದಲ್ಲಿರುವ ಹಸುಗಳಿಗೆ ಮುಂದಿನ 7 ರಿಂದ 14 ದಿನಗಳಲ್ಲಿ ರೋಗ ಬರುವ ಸಾಧ್ಯತೆಯಿದೆ. ತಕ್ಷಣ ಹಸುವನ್ನು ಪ್ರತ್ಯೇಕಿಸಿ, ಅಯೋಡಿನ್ ದ್ರಾವಣದಿಂದ ತೊಳೆದು ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.";
       case "Telugu":
@@ -383,7 +379,7 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
       case "Punjabi":
         return "AI ਭਵਿੱਖਬਾਣੀ ਅਤੇ ਇਲਾਜ ਲੈਬ। 70 ਤੋਂ 80 ਪ੍ਰਤੀਸ਼ਤ ਦਰਮਿਆਨੇ ਪੜਾਅ ਵਾਲੀਆਂ ਗਾਵਾਂ ਵਿੱਚ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਬਿਮਾਰੀ ਹੋਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ। ਤੁਰੰਤ ਬਚਾਅ ਇਲਾਜ ਸ਼ੁਰੂ ਕਰੋ।";
       default:
-        return "AI Predictive Modeling and Treatment Lab. High mastitis risk of 96% is forecasted for Cow 1 with Somatic Cell Count of 1.85 million cells/mL, elevated milk conductivity of 12.4 mS/cm, abnormal pH of 6.1, and 40.4°C temperature. Immediately apply iodine teat barrier, isolate critical cows, and alert your veterinarian Dr. Sharma.";
+        return "AI Predictive Modeling and Treatment Lab. High mastitis risk of 96% is forecasted for Cow 1 with elevated milk conductivity of 12.4 mS/cm, abnormal pH of 6.1, and 40.4°C milk temperature. Immediately apply iodine teat barrier, isolate critical cows, and alert your veterinarian Dr. Sharma.";
     }
   },
   "visual-ai": (lang: string) => {

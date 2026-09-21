@@ -936,9 +936,9 @@ export function AnimalsScreen({
                     <span style={{ color: "#6B7A5C" }}>
                       🥛 <strong style={{ color: "#1C2714" }}>{isMonitoredCow && lastTelemetry.weight != null ? `${Number(lastTelemetry.weight).toFixed(1)}kg` : `${a.milk}L`}</strong>
                     </span>
-                    {a.scc != null && (
+                    {a.ph != null && (
                       <span style={{ color: "#6B7A5C" }}>
-                        SCC <strong style={{ color: a.scc > (sp === "Goat" ? 1200000 : 500000) ? "#B83220" : "#1C2714" }}>{((a.scc) / 1000).toFixed(0)}k</strong>
+                        pH <strong style={{ color: (a.ph < 6.3 || a.ph > 7.0) ? "#B83220" : "#1C2714" }}>{Number(a.ph).toFixed(1)}</strong>
                       </span>
                     )}
                     {a.rumination != null && (

@@ -222,9 +222,9 @@ export function AIRiskScreen({
                 detail: `${animal.conductivity} mS/cm (${animal.quarter} asymmetric shift)`,
               },
               {
-                label: "Somatic Cell Count (SCC)",
-                weight: (animal.scc || 185000) > (species === "Goat" ? 1200000 : 500000) ? 0.88 : (animal.scc || 185000) > (species === "Goat" ? 750000 : 200000) ? 0.62 : 0.15,
-                detail: `${(((animal.scc || (species === "Goat" ? 450000 : 185000))) / 1000).toFixed(0)}k cells/mL (SCS ${(animal.scs || 3.2).toFixed(1)})`,
+                label: "Inter-Quarter EC Differential Ratio",
+                weight: animal.risk === "high" ? 0.88 : animal.risk === "moderate" ? 0.62 : 0.15,
+                detail: `${animal.risk === "high" ? "1.32x (Critical Asymmetry >1.25x)" : animal.risk === "moderate" ? "1.21x (Early Warning Drift 1.15x–1.25x)" : "1.04x (Balanced Symmetry <1.15x)"}`,
               },
               {
                 label: "Milk pH Shift",

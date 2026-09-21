@@ -13,8 +13,6 @@ export async function logTelemetry(
     temperature: telemetry.temp,
     ph: telemetry.ph ?? null,
     conductivity: telemetry.conductivity ?? 0,
-    scc: telemetry.scc ?? null,
-    scs: telemetry.scs ?? null,
     ec_fl: telemetry.ec_fl ?? null,
     ec_fr: telemetry.ec_fr ?? null,
     ec_rl: telemetry.ec_rl ?? null,
