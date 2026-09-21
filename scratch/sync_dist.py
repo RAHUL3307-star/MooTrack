@@ -26,6 +26,7 @@ target_dirs = [
     os.path.join(root, 'dist-pages', 'assets'),
     os.path.join(root, 'dist-pages', 'app', 'assets'),
     os.path.join(root, 'assets'),
+    os.path.join(root, 'app', 'assets'),
 ]
 
 for d in target_dirs:
@@ -35,11 +36,12 @@ for d in target_dirs:
         shutil.copy2(built_css, os.path.join(d, css_name))
     print(f'Copied to {d}')
 
-# Copy index.html to dist-pages destinations
+# Copy index.html to dist-pages & app destinations
 dist_index = os.path.join(root, 'mobile-app', 'dist', 'index.html')
 shutil.copy2(dist_index, os.path.join(root, 'dist-pages', 'app', 'index.html'))
 shutil.copy2(dist_index, os.path.join(root, 'dist-pages', 'mobile.html'))
-print('Updated dist-pages/app/index.html and dist-pages/mobile.html')
+shutil.copy2(dist_index, os.path.join(root, 'app', 'index.html'))
+print('Updated dist-pages/app/index.html, dist-pages/mobile.html, and app/index.html')
 
 # Update root mobile.html references to new bundle
 mobile_path = os.path.join(root, 'mobile.html')

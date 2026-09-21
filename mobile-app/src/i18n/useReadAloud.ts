@@ -161,35 +161,59 @@ function splitIntoChunks(text: string): string[] {
   return chunks.length > 0 ? chunks : [text.trim()];
 }
 
-// ─── Fetch audio blob with no-referrer ─────────────────────────────────────────
-// Fetching as a blob + using an object URL is the ONLY reliable way to play
-// Google TTS audio from a non-Google domain. Direct new Audio(url) sends
-// a Referer header that Google TTS blocks, producing a beep or error.
-async function fetchTtsBlob(text: string, langCode: string): Promise<string | null> {
-  const url =
-    `https://translate.google.com/translate_tts` +
-    `?client=gtx&ie=UTF-8&tl=${langCode}&q=${encodeURIComponent(text)}`;
+// ─── Fetch audio blob with multi-tier fallback ────────────────────────────────
+function getTtsUrls(text: string, langCode: string): string[] {
+  const enc = encodeURIComponent(text);
+  const urls: string[] = [];
 
-  try {
-    const res = await fetch(url, {
-      method: "GET",
-      referrerPolicy: "no-referrer",
-      headers: {
-        // Mimic a browser request so Google TTS returns audio
-        Accept: "audio/mpeg, audio/*, */*",
-        "Accept-Language": "en-US,en;q=0.9",
-      },
-    });
-
-    if (!res.ok) return null;
-
-    const blob = await res.blob();
-    if (!blob || blob.size < 100) return null; // sanity: a valid MP3 is at least ~100 bytes
-
-    return URL.createObjectURL(blob);
-  } catch {
-    return null;
+  if (typeof window !== "undefined") {
+    const loc = window.location;
+    // 1. If on Vite dev server (port 8443 / 5173), query backend on port 3000
+    if (loc.port === "8443" || loc.port === "5173") {
+      urls.push(`http://${loc.hostname || "localhost"}:3000/api/tts?tl=${langCode}&text=${enc}`);
+    } else {
+      // 2. Local relative endpoint on same host
+      urls.push(`/api/tts?tl=${langCode}&text=${enc}`);
+      // Also absolute localhost:3000 if on localhost
+      if (loc.hostname === "localhost" || loc.hostname === "127.0.0.1") {
+        urls.push(`http://localhost:3000/api/tts?tl=${langCode}&text=${enc}`);
+      }
+    }
   }
+
+  // 3. Direct Google TTS endpoints
+  urls.push(`https://translate.google.com/translate_tts?client=tw-ob&ie=UTF-8&tl=${langCode}&q=${enc}`);
+  urls.push(`https://translate.google.com/translate_tts?client=gtx&ie=UTF-8&tl=${langCode}&q=${enc}`);
+
+  return urls;
+}
+
+async function fetchTtsBlob(text: string, langCode: string): Promise<string | null> {
+  const candidateUrls = getTtsUrls(text, langCode);
+
+  for (const url of candidateUrls) {
+    try {
+      const res = await fetch(url, {
+        method: "GET",
+        referrerPolicy: "no-referrer",
+        headers: {
+          Accept: "audio/mpeg, audio/*, */*",
+        },
+      });
+
+      if (!res.ok) continue;
+
+      const blob = await res.blob();
+      if (!blob || blob.size < 80) continue;
+
+      return URL.createObjectURL(blob);
+    } catch {
+      // Try next endpoint
+      continue;
+    }
+  }
+
+  return null;
 }
 
 // ─── Hook ───────────────────────────────────────────────────────────────────────
@@ -201,7 +225,6 @@ export function useReadAloud(text: string, langName: string) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const isSpeakingRef = useRef<boolean>(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // Track blob URLs so we can revoke them to free memory
   const blobUrlsRef = useRef<string[]>([]);
 
   const clearTimer = () => {
@@ -267,7 +290,7 @@ export function useReadAloud(text: string, langName: string) {
     setSpeaking(true);
     isSpeakingRef.current = true;
 
-    // ── Web Speech fallback (offline / when Google TTS fails) ─────────────
+    // ── Web Speech fallback (only if native voice exists or English) ──────
     const playViaWebSpeech = (idx: number) => {
       if (!isSpeakingRef.current) return;
       if (idx >= chunks.length) { stop(); return; }
@@ -287,7 +310,6 @@ export function useReadAloud(text: string, langName: string) {
         utt.rate = ["ta", "te", "kn"].includes(tl) ? 0.88 : 0.92;
         utt.pitch = 1.0;
 
-        // Pick a matching voice if available
         const allVoices = window.speechSynthesis.getVoices();
         if (allVoices.length > 0) {
           const v =
@@ -321,29 +343,33 @@ export function useReadAloud(text: string, langName: string) {
       }
     };
 
-    // ── Google TTS via blob fetch (primary, avoids Referer blocking) ──────
-    const playViaGoogleTts = async (idx: number) => {
+    // ── Primary Audio Player (Direct Audio / Blob) ────────────────────────
+    const playChunk = async (idx: number) => {
       if (!isSpeakingRef.current) return;
       if (idx >= chunks.length) { stop(); return; }
 
       setActiveChunk(idx + 1);
 
+      // Attempt 1: Fetch binary audio blob from backend TTS proxy
       const blobUrl = await fetchTtsBlob(chunks[idx], tl);
 
-      // If fetch failed or speaking was stopped while fetching
       if (!isSpeakingRef.current) return;
 
-      if (!blobUrl) {
-        // Google TTS unavailable → use Web Speech
-        console.warn(`[MooTracker TTS] Google TTS fetch failed for chunk ${idx + 1}, using Web Speech`);
-        playViaWebSpeech(idx);
-        return;
+      let audioSource = blobUrl;
+
+      // Attempt 2: Direct Google TTS URL via tw-ob
+      if (!audioSource) {
+        audioSource = `https://translate.google.com/translate_tts?client=tw-ob&ie=UTF-8&tl=${tl}&q=${encodeURIComponent(chunks[idx])}`;
       }
 
-      blobUrlsRef.current.push(blobUrl);
+      if (blobUrl) {
+        blobUrlsRef.current.push(blobUrl);
+      }
 
       try {
-        const audio = new Audio(blobUrl);
+        const audio = new Audio();
+        audio.referrerPolicy = "no-referrer";
+        audio.src = audioSource;
         audio.volume = 1.0;
         audioRef.current = audio;
 
@@ -357,8 +383,8 @@ export function useReadAloud(text: string, langName: string) {
           if (idx + 1 < chunks.length) {
             clearTimer();
             timerRef.current = setTimeout(() => {
-              if (isSpeakingRef.current) playViaGoogleTts(idx + 1);
-            }, 80);
+              if (isSpeakingRef.current) playChunk(idx + 1);
+            }, 60);
           } else {
             stop();
           }
@@ -367,7 +393,7 @@ export function useReadAloud(text: string, langName: string) {
         audio.onerror = () => {
           audioRef.current = null;
           if (!isSpeakingRef.current) return;
-          console.warn(`[MooTracker TTS] Blob audio error on chunk ${idx + 1}, trying Web Speech`);
+          console.warn(`[MooTracker TTS] Audio playback fallback for chunk ${idx + 1}`);
           playViaWebSpeech(idx);
         };
 
@@ -383,8 +409,8 @@ export function useReadAloud(text: string, langName: string) {
       }
     };
 
-    // Start from chunk 0
-    playViaGoogleTts(0);
+    // Start playback
+    playChunk(0);
   }, [text, langName, speaking, stop]);
 
   useEffect(() => {
