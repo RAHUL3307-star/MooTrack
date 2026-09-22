@@ -6,6 +6,7 @@ import { t } from "../i18n/index";
 import { useAnimals } from "../context/AnimalsContext";
 import { useHerd } from "../context/HerdContext";
 import { useESP32 } from "../context/ESP32Context";
+import { generateAnimalsListSpeech } from "../i18n/speech";
 
 // ─── RFID Registration Modal ──────────────────────────────────────────────────
 // ─── RFID Registration Modal ──────────────────────────────────────────────────
@@ -365,9 +366,11 @@ export function AnimalsScreen({
     setTimeout(() => setJustAdded(null), 3000);
   };
 
+  const speechText = generateAnimalsListSpeech(animals, lang);
+
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "#F7F4EE", position: "relative" }}>
-      <ReadAloudFAB screen="animals" lang={lang} />
+      <ReadAloudFAB screen="animals" lang={lang} customText={speechText} />
 
       {showRFIDModal && (
         <RFIDRegisterModal

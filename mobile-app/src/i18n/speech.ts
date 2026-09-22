@@ -414,3 +414,263 @@ export const SCREEN_SPEECH: Record<string, (lang: string) => string> = {
     }
   },
 };
+
+// ─── Helper: extract clean spoken name from Animal ────────────────────────────
+function animalSpokenName(a: Animal): string {
+  return (a.name || a.id)
+    .replace(/\([A-Z0-9- ]+\)/gi, "")
+    .replace(/\b[A-Z]{2,3}[- ]\d{2,4}\b/gi, "")
+    .trim() || "Cow 1";
+}
+
+// ─── Dynamic: Animal Profile Voice Summary ────────────────────────────────────
+export function generateAnimalProfileSpeech(a: Animal, lang: string): string {
+  const name = animalSpokenName(a);
+  const risk = a.risk || "low";
+  const ec = (a.conductivity ?? 5.0).toFixed(1);
+  const ph = (a.ph ?? 6.70).toFixed(2);
+  const temp = (a.temp ?? 38.5).toFixed(1);
+  const milk = (a.milk ?? 10.0).toFixed(1);
+
+  if (risk === "high") {
+    switch (lang) {
+      case "Tamil":
+        return `${name} மாட்டின் ஆரோக்கிய சுருக்கம். மின்கடத்துதிறன் ${ec}, pH ${ph}, வெப்பநிலை ${temp} டிகிரி ஆபத்தான நிலையில் உள்ளது. பால் ${milk} லிட்டர். உடனே தனிமைப்படுத்தி கால்நடை மருத்துவரை அழைக்கவும்.`;
+      case "Hindi":
+        return `${name} का स्वास्थ्य सारांश। चालकता ${ec}, pH ${ph} और तापमान ${temp} डिग्री खतरनाक स्तर पर है। दूध ${milk} लीटर। इसे तुरंत अलग करें और डॉक्टर को बुलाएं।`;
+      case "Kannada":
+        return `${name} ಹಸುವಿನ ಆರೋಗ್ಯ ಸಾರಾಂಶ. ವಾಹಕತೆ ${ec}, ಪಿ ಎಚ್ ${ph}, ತಾಪಮಾನ ${temp} ಅಪಾಯಕಾರಿ ಮಟ್ಟದಲ್ಲಿದೆ. ಹಾಲು ${milk} ಲೀಟರ್. ತಕ್ಷಣ ಪ್ರತ್ಯೇಕಿಸಿ ಪಶುವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
+      case "Telugu":
+        return `${name} ఆవు ఆరోగ్య సారాంశం. వాహకత ${ec}, పి హెచ్ ${ph}, ఉష్ణోగ్రత ${temp} ప్రమాద స్థాయికి చేరింది. పాలు ${milk} లీటర్లు. వెంటనే వేరు చేసి పశువైద్యుడిని సంప్రదించండి.`;
+      case "Marathi":
+        return `${name} गायीचा आरोग्य सारांश. चालकता ${ec}, pH ${ph}, तापमान ${temp} अंश धोकादायक पातळीवर आहे. दूध ${milk} लिटर. ताबडतोब वेगळे करा आणि डॉक्टरांना बोलवा.`;
+      case "Gujarati":
+        return `${name} ગાયનો આરોગ્ય સારાંશ. વાહકતા ${ec}, pH ${ph}, તાપમાન ${temp} ડિગ્રી ખતરનાક સ્તરે છે. દૂધ ${milk} લિટર. તાત્કાલિક અલગ કરો અને ડૉક્ટરને બોલાવો.`;
+      case "Punjabi":
+        return `${name} ਗਾਂ ਦੀ ਸਿਹਤ ਸਾਰ। ਚਾਲਕਤਾ ${ec}, pH ${ph}, ਤਾਪਮਾਨ ${temp} ਡਿਗਰੀ ਖ਼ਤਰਨਾਕ ਪੱਧਰ ਤੇ ਹੈ। ਦੁੱਧ ${milk} ਲੀਟਰ। ਤੁਰੰਤ ਵੱਖ ਕਰੋ ਅਤੇ ਡਾਕਟਰ ਨੂੰ ਬੁਲਾਓ।`;
+      default:
+        return `Health summary for ${name}. Critical readings: electrical conductivity ${ec} mS/cm, milk pH ${ph}, temperature ${temp} degrees Celsius, daily milk yield ${milk} litres. ALREADY AFFECTED — isolate immediately and call your veterinarian.`;
+    }
+  } else if (risk === "moderate") {
+    switch (lang) {
+      case "Tamil":
+        return `${name} மாட்டின் ஆரோக்கிய சுருக்கம். மின்கடத்துதிறன் ${ec}, pH ${ph}, வெப்பநிலை ${temp} இடைநிலை ஆபத்தில் உள்ளது. பால் ${milk} லிட்டர். அடுத்த 7 முதல் 14 நாட்களில் மடிநோய் தாக்கும் வாய்ப்புள்ளது. காம்புகளை அயோடின் கொண்டு சுத்தம் செய்யுங்கள்.`;
+      case "Hindi":
+        return `${name} का स्वास्थ्य सारांश। चालकता ${ec}, pH ${ph}, तापमान ${temp} डिग्री मध्यम खतरे पर है। दूध ${milk} लीटर। अगले 7 से 14 दिनों में थनैला होने की आशंका है। अभी से बचाव करें।`;
+      case "Kannada":
+        return `${name} ಹಸುವಿನ ಆರೋಗ್ಯ ಸಾರಾಂಶ. ವಾಹಕತೆ ${ec}, ಪಿ ಎಚ್ ${ph}, ತಾಪಮಾನ ${temp} ಮಧ್ಯಂತರ ಅಪಾಯದಲ್ಲಿದೆ. ಹಾಲು ${milk} ಲೀಟರ್. 7 ರಿಂದ 14 ದಿನಗಳಲ್ಲಿ ರೋಗ ಬರಬಹುದು. ಮುನ್ನೆಚ್ಚರಿಕೆ ಕ್ರಮ ತೆಗೆದುಕೊಳ್ಳಿ.`;
+      case "Telugu":
+        return `${name} ఆవు ఆరోగ్య సారాంశం. వాహకత ${ec}, పి హెచ్ ${ph}, ఉష్ణోగ్రత ${temp} మధ్యస్థ ప్రమాదంలో ఉంది. పాలు ${milk} లీటర్లు. 7 నుండి 14 రోజులలో వ్యాధి సోకే అవకాశం ఉంది. ముందస్తు జాగ్రత్తలు తీసుకోండి.`;
+      default:
+        return `Health summary for ${name}. Intermediate risk — electrical conductivity ${ec} mS/cm, milk pH ${ph}, temperature ${temp} degrees Celsius, milk yield ${milk} litres. Disease likely in next 7 to 14 days. Apply post-milking iodine teat dip and Vitamin E supplement now.`;
+    }
+  } else {
+    switch (lang) {
+      case "Tamil":
+        return `${name} மாட்டின் ஆரோக்கிய சுருக்கம். மின்கடத்துதிறன் ${ec}, pH ${ph}, வெப்பநிலை ${temp} அனைத்தும் இயல்பாக உள்ளது. பால் ${milk} லிட்டர். மாடு ஆரோக்கியமாக உள்ளது.`;
+      case "Hindi":
+        return `${name} का स्वास्थ्य सारांश। चालकता ${ec}, pH ${ph} और तापमान ${temp} डिग्री सब सामान्य है। दूध ${milk} लीटर। पशु पूरी तरह स्वस्थ है।`;
+      case "Kannada":
+        return `${name} ಹಸುವಿನ ಆರೋಗ್ಯ ಸಾರಾಂಶ. ಎಲ್ಲವೂ ಸಾಮಾನ್ಯ. ಹಾಲು ${milk} ಲೀಟರ್. ಆರೋಗ್ಯವಾಗಿದೆ.`;
+      case "Telugu":
+        return `${name} ఆవు ఆరోగ్య సారాంశం. అన్నీ సాధారణంగా ఉన్నాయి. పాలు ${milk} లీటర్లు. ఆవు ఆరోగ్యంగా ఉంది.`;
+      default:
+        return `Health summary for ${name}. All readings are normal — electrical conductivity ${ec} mS/cm, milk pH ${ph}, temperature ${temp} degrees Celsius, daily milk yield ${milk} litres. This animal is healthy.`;
+    }
+  }
+}
+
+// ─── Dynamic: AI Risk Voice Summary ──────────────────────────────────────────
+export function generateAiRiskSpeech(a: Animal, lang: string): string {
+  const name = animalSpokenName(a);
+  const risk = a.risk || "low";
+  const riskScore = risk === "high" ? 88 : risk === "moderate" ? 64 : risk === "low" ? 22 : 8;
+
+  switch (lang) {
+    case "Tamil":
+      return risk === "high"
+        ? `${name} மாட்டிற்கு செயற்கை நுண்ணறிவு ஆபத்து மதிப்பெண் ${riskScore} சதவீதம். இந்த மாடு ஏற்கனவே தீவிர மடிநோயால் பாதிக்கப்பட்டுள்ளது. உடனடி மருத்துவ கவனிப்பு அவசியம்.`
+        : risk === "moderate"
+        ? `${name} மாட்டிற்கு ஆபத்து மதிப்பெண் ${riskScore} சதவீதம். அடுத்த 7 முதல் 14 நாட்களில் மடிநோய் தாக்கும் வாய்ப்பு அதிகம். இப்போதே தடுப்பு சிகிச்சை அளிக்கவும்.`
+        : `${name} மாடு ஆரோக்கியமாக உள்ளது. ஆபத்து மதிப்பெண் ${riskScore} சதவீதம் மட்டுமே. வழக்கமான பராமரிப்பு தொடர்க.`;
+    case "Hindi":
+      return risk === "high"
+        ? `${name} का AI जोखिम स्कोर ${riskScore} प्रतिशत है। यह गाय पहले से ही तीव्र थनैला से प्रभावित है। तुरंत पशु चिकित्सक से संपर्क करें।`
+        : risk === "moderate"
+        ? `${name} का जोखिम स्कोर ${riskScore} प्रतिशत है। अगले 7 से 14 दिनों में थनैला होने की पूरी आशंका है। अभी बचाव उपाय शुरू करें।`
+        : `${name} पूरी तरह स्वस्थ है। AI जोखिम स्कोर केवल ${riskScore} प्रतिशत है। नियमित देखभाल जारी रखें।`;
+    case "Kannada":
+      return risk === "high"
+        ? `${name} ಹಸುವಿನ AI ಅಪಾಯ ಅಂಕ ${riskScore} ಪ್ರತಿಶತ. ಈ ಹಸು ಈಗಾಗಲೇ ತೀವ್ರ ಕೆಚ್ಚಲುಬಾವಿನಿಂದ ಬಾಧಿತವಾಗಿದೆ. ತಕ್ಷಣ ಪಶುವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.`
+        : risk === "moderate"
+        ? `${name} ಹಸುವಿನ ಅಪಾಯ ಅಂಕ ${riskScore} ಪ್ರತಿಶತ. 7 ರಿಂದ 14 ದಿನಗಳಲ್ಲಿ ರೋಗ ಬರಬಹುದು. ಮುನ್ನೆಚ್ಚರಿಕೆ ತೆಗೆದುಕೊಳ್ಳಿ.`
+        : `${name} ಆರೋಗ್ಯವಾಗಿದೆ. AI ಅಪಾಯ ಅಂಕ ಕೇವಲ ${riskScore} ಪ್ರತಿಶತ. ನಿಯಮಿತ ಆರೈಕೆ ಮುಂದುವರಿಸಿ.`;
+    case "Telugu":
+      return risk === "high"
+        ? `${name} ఆవుకు AI రిస్క్ స్కోర్ ${riskScore} శాతం. ఈ ఆవు ఇప్పటికే తీవ్ర వ్యాధితో బాధపడుతోంది. వెంటనే పశువైద్యుడిని సంప్రదించండి.`
+        : risk === "moderate"
+        ? `${name} ఆవుకు రిస్క్ స్కోర్ ${riskScore} శాతం. 7 నుండి 14 రోజులలో వ్యాధి సోకే అవకాశం ఎక్కువ. ముందస్తు చికిత్స మొదలుపెట్టండి.`
+        : `${name} ఆవు ఆరోగ్యంగా ఉంది. AI రిస్క్ స్కోర్ ${riskScore} శాతం మాత్రమే. సాధారణ సంరక్షణ కొనసాగించండి.`;
+    case "Marathi":
+      return risk === "high"
+        ? `${name} गायीचा AI जोखीम स्कोर ${riskScore} टक्के आहे. ही गाय आधीच तीव्र स्तनदाहाने बाधित आहे. ताबडतोब डॉक्टरांना बोलवा.`
+        : risk === "moderate"
+        ? `${name} गायीचा जोखीम स्कोर ${riskScore} टक्के आहे. 7 ते 14 दिवसांत रोग होण्याची दाट शक्यता आहे. आत्ताच प्रतिबंधक उपाय करा.`
+        : `${name} पूर्णपणे निरोगी आहे. AI जोखीम स्कोर फक्त ${riskScore} टक्के आहे. नियमित काळजी सुरू ठेवा.`;
+    case "Gujarati":
+      return risk === "high"
+        ? `${name} ગાયનો AI જોખમ સ્કોર ${riskScore} ટકા છે. આ ગાય પહેલેથી જ ગંભીર રોગથી ગ્રસ્ત છે. તાત્કાલિક ડૉક્ટરને બોલાવો.`
+        : risk === "moderate"
+        ? `${name} ગાયનો જોખમ સ્કોર ${riskScore} ટકા છે. 7 થી 14 દિવસમાં રોગ થવાની પૂરી શક્યતા છે. અત્યારે જ નિવારક ઉપાય કરો.`
+        : `${name} સ્વસ્થ છે. AI જોખમ સ્કોર ફક્ત ${riskScore} ટકા છે. નિયમિત સંભાળ ચાલુ રાખો.`;
+    case "Punjabi":
+      return risk === "high"
+        ? `${name} ਗਾਂ ਦਾ AI ਜੋਖਮ ਸਕੋਰ ${riskScore} ਪ੍ਰਤੀਸ਼ਤ ਹੈ। ਇਹ ਗਾਂ ਪਹਿਲਾਂ ਹੀ ਗੰਭੀਰ ਬਿਮਾਰੀ ਨਾਲ ਪ੍ਰਭਾਵਿਤ ਹੈ। ਤੁਰੰਤ ਡਾਕਟਰ ਨੂੰ ਬੁਲਾਓ।`
+        : risk === "moderate"
+        ? `${name} ਗਾਂ ਦਾ ਜੋਖਮ ਸਕੋਰ ${riskScore} ਪ੍ਰਤੀਸ਼ਤ ਹੈ। 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਬਿਮਾਰੀ ਹੋਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ। ਹੁਣੇ ਬਚਾਅ ਕਦਮ ਚੁੱਕੋ।`
+        : `${name} ਪੂਰੀ ਤਰ੍ਹਾਂ ਤੰਦਰੁਸਤ ਹੈ। AI ਜੋਖਮ ਸਕੋਰ ਸਿਰਫ਼ ${riskScore} ਪ੍ਰਤੀਸ਼ਤ ਹੈ। ਨਿਯਮਤ ਦੇਖਭਾਲ ਜਾਰੀ ਰੱਖੋ।`;
+    default:
+      return risk === "high"
+        ? `AI Risk Assessment for ${name}: Risk score is ${riskScore} percent. This animal is ALREADY AFFECTED by acute clinical mastitis. Immediate veterinary attention required — isolate, discard milk, and administer intramammary treatment.`
+        : risk === "moderate"
+        ? `AI Risk Assessment for ${name}: Risk score is ${riskScore} percent. This animal has a HIGH CHANCE of contracting clinical mastitis within the next 7 to 14 days. Begin preventive iodine teat dipping, Mastilep spray, and Vitamin E supplement immediately.`
+        : `AI Risk Assessment for ${name}: Risk score is ${riskScore} percent — LOW RISK. This animal is healthy. Continue regular post-milking hygiene and biosecurity practices.`;
+  }
+}
+
+// ─── Dynamic: Animals List Voice Summary ─────────────────────────────────────
+export function generateAnimalsListSpeech(animals: Animal[], lang: string): string {
+  const total = animals.length;
+  if (total === 0) {
+    switch (lang) {
+      case "Tamil": return "பண்ணையில் மாடுகள் எதுவும் பதிவு செய்யப்படவில்லை. ஆர் எப் ஐ டி அட்டையை ஸ்கேன் செய்யுங்கள்.";
+      case "Hindi": return "फार्म में कोई पशु दर्ज नहीं है। आर एफ आई डी कार्ड स्कैन करें।";
+      default: return "No animals registered yet. Scan an RFID card to add your first animal.";
+    }
+  }
+
+  const high = animals.filter(a => a.risk === "high");
+  const mod = animals.filter(a => a.risk === "moderate");
+  const healthy = animals.filter(a => a.risk === "low" || a.risk === "none");
+  const highNames = high.map(a => animalSpokenName(a)).join(", ");
+  const modNames = mod.map(a => animalSpokenName(a)).join(", ");
+  const healthyNames = healthy.map(a => animalSpokenName(a)).join(", ");
+
+  switch (lang) {
+    case "Tamil":
+      return [
+        `உங்கள் பண்ணையில் மொத்தம் ${total} மாடுகள் உள்ளன.`,
+        high.length > 0 ? `${highNames} தீவிர மடிநோய் ஆபத்தில் உள்ளன. உடனே தனிமைப்படுத்தவும்.` : "",
+        mod.length > 0 ? `${modNames} இடைநிலை ஆபத்தில் உள்ளன. 7 முதல் 14 நாட்களில் மடிநோய் தாக்கும் வாய்ப்புள்ளது.` : "",
+        healthy.length > 0 ? `${healthyNames} ஆரோக்கியமாக உள்ளன.` : "",
+      ].filter(Boolean).join(" ");
+    case "Hindi":
+      return [
+        `आपके फार्म में कुल ${total} पशु हैं।`,
+        high.length > 0 ? `${highNames} गंभीर थनैला से प्रभावित हैं। तुरंत अलग करें।` : "",
+        mod.length > 0 ? `${modNames} मध्यवर्ती जोखिम में हैं। 7 से 14 दिनों में रोग होने की आशंका है।` : "",
+        healthy.length > 0 ? `${healthyNames} पूरी तरह स्वस्थ हैं।` : "",
+      ].filter(Boolean).join(" ");
+    case "Kannada":
+      return [
+        `ನಿಮ್ಮ ಫಾರ್ಮ್‌ನಲ್ಲಿ ಒಟ್ಟು ${total} ಹಸುಗಳಿವೆ.`,
+        high.length > 0 ? `${highNames} ತೀವ್ರ ಕೆಚ್ಚಲುಬಾವಿನ ಅಪಾಯದಲ್ಲಿದೆ. ತಕ್ಷಣ ಪ್ರತ್ಯೇಕಿಸಿ.` : "",
+        mod.length > 0 ? `${modNames} ಮಧ್ಯಂತರ ಅಪಾಯದಲ್ಲಿದ್ದು 7 ರಿಂದ 14 ದಿನಗಳಲ್ಲಿ ರೋಗ ಬರಬಹುದು.` : "",
+        healthy.length > 0 ? `${healthyNames} ಆರೋಗ್ಯವಾಗಿದೆ.` : "",
+      ].filter(Boolean).join(" ");
+    case "Telugu":
+      return [
+        `మీ ఫారమ్‌లో మొత్తం ${total} ఆవులు ఉన్నాయి.`,
+        high.length > 0 ? `${highNames} తీవ్ర వ్యాధి ప్రమాదంలో ఉన్నాయి. వెంటనే వేరు చేయండి.` : "",
+        mod.length > 0 ? `${modNames} మధ్యస్థ ప్రమాదంలో ఉన్నాయి, 7 నుండి 14 రోజులలో వ్యాధి సోకవచ్చు.` : "",
+        healthy.length > 0 ? `${healthyNames} ఆరోగ్యంగా ఉన్నాయి.` : "",
+      ].filter(Boolean).join(" ");
+    case "Marathi":
+      return [
+        `तुमच्या फार्मवर एकूण ${total} गाई आहेत.`,
+        high.length > 0 ? `${highNames} गंभीर स्तनदाहाच्या धोक्यात आहेत. ताबडतोब वेगळे करा.` : "",
+        mod.length > 0 ? `${modNames} मध्यम जोखमीत आहेत, 7 ते 14 दिवसांत रोग होऊ शकतो.` : "",
+        healthy.length > 0 ? `${healthyNames} पूर्णपणे निरोगी आहेत.` : "",
+      ].filter(Boolean).join(" ");
+    case "Gujarati":
+      return [
+        `તમારા ફાર્મમાં કુલ ${total} ગાયો છે.`,
+        high.length > 0 ? `${highNames} ગંભીર જોખમમાં છે. તાત્કાલિક અલગ કરો.` : "",
+        mod.length > 0 ? `${modNames} મધ્યવર્તી જોખમમાં છે, 7 થી 14 દિવસમાં રોગ થઈ શકે.` : "",
+        healthy.length > 0 ? `${healthyNames} સ્વસ્થ છે.` : "",
+      ].filter(Boolean).join(" ");
+    case "Punjabi":
+      return [
+        `ਤੁਹਾਡੇ ਫਾਰਮ ਵਿੱਚ ਕੁੱਲ ${total} ਪਸ਼ੂ ਹਨ।`,
+        high.length > 0 ? `${highNames} ਗੰਭੀਰ ਖ਼ਤਰੇ ਵਿੱਚ ਹਨ। ਤੁਰੰਤ ਵੱਖ ਕਰੋ।` : "",
+        mod.length > 0 ? `${modNames} ਦਰਮਿਆਨੇ ਖ਼ਤਰੇ ਵਿੱਚ ਹਨ, 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਬਿਮਾਰੀ ਹੋ ਸਕਦੀ ਹੈ।` : "",
+        healthy.length > 0 ? `${healthyNames} ਪੂਰੀ ਤਰ੍ਹਾਂ ਤੰਦਰੁਸਤ ਹਨ।` : "",
+      ].filter(Boolean).join(" ");
+    default:
+      return [
+        `Your herd has ${total} animals total.`,
+        high.length > 0 ? `${highNames} ${high.length === 1 ? "is" : "are"} at critical risk and ALREADY AFFECTED — isolate immediately.` : "No animals have acute disease.",
+        mod.length > 0 ? `${modNames} ${mod.length === 1 ? "is" : "are"} in intermediate risk and likely to contract mastitis within 7 to 14 days — begin preventive treatment now.` : "",
+        healthy.length > 0 ? `${healthyNames} ${healthy.length === 1 ? "is" : "are"} healthy.` : "",
+      ].filter(Boolean).join(" ");
+  }
+}
+
+// ─── Dynamic: Alerts Voice Summary ───────────────────────────────────────────
+export function generateAlertsSpeech(animals: Animal[], lang: string): string {
+  const high = animals.filter(a => a.risk === "high");
+  const mod = animals.filter(a => a.risk === "moderate");
+  const highNames = high.map(a => animalSpokenName(a)).join(", ");
+  const modNames = mod.map(a => animalSpokenName(a)).join(", ");
+
+  switch (lang) {
+    case "Tamil":
+      return [
+        "அவசர எச்சரிக்கைகள் சுருக்கம்.",
+        high.length > 0 ? `${highNames} தீவிர ஆபத்தில் உள்ளன. உடனே தனிமைப்படுத்தி கால்நடை மருத்துவரை அழைக்கவும்.` : "தீவிர ஆபத்தான மாடுகள் எதுவும் இல்லை.",
+        mod.length > 0 ? `${modNames} இடைநிலை ஆபத்தில் உள்ளன. அடுத்த 7 முதல் 14 நாட்களில் மடிநோய் தாக்கும் வாய்ப்புள்ளது. உடனே கிருமிநாசினி காம்பு நனைப்பு செய்யவும்.` : "",
+      ].filter(Boolean).join(" ");
+    case "Hindi":
+      return [
+        "आपातकालीन अलर्ट सारांश।",
+        high.length > 0 ? `${highNames} गंभीर थनैला से प्रभावित हैं। तुरंत अलग करें और डॉक्टर को बुलाएं।` : "कोई गाय गंभीर रूप से बीमार नहीं है।",
+        mod.length > 0 ? `${modNames} मध्यवर्ती जोखिम में हैं और 7 से 14 दिनों में रोग होने की आशंका है। तुरंत बचाव उपाय करें।` : "",
+      ].filter(Boolean).join(" ");
+    case "Kannada":
+      return [
+        "ತುರ್ತು ಎಚ್ಚರಿಕೆಗಳ ಸಾರಾಂಶ.",
+        high.length > 0 ? `${highNames} ತೀವ್ರ ಅಪಾಯದಲ್ಲಿದ್ದು ತಕ್ಷಣ ಪ್ರತ್ಯೇಕಿಸಿ ಪಶುವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.` : "ಯಾವ ಹಸುವೂ ತೀವ್ರ ಅಪಾಯದಲ್ಲಿಲ್ಲ.",
+        mod.length > 0 ? `${modNames} ಮಧ್ಯಂತರ ಅಪಾಯದಲ್ಲಿದ್ದು 7 ರಿಂದ 14 ದಿನಗಳಲ್ಲಿ ರೋಗ ಬರಬಹುದು. ತಕ್ಷಣ ಮುನ್ನೆಚ್ಚರಿಕೆ ತೆಗೆದುಕೊಳ್ಳಿ.` : "",
+      ].filter(Boolean).join(" ");
+    case "Telugu":
+      return [
+        "అత్యవసర హెచ్చరికల సారాంశం.",
+        high.length > 0 ? `${highNames} తీవ్ర ప్రమాదంలో ఉన్నాయి. వెంటనే వేరు చేసి పశువైద్యుడిని పిలవండి.` : "తీవ్ర ప్రమాదంలో ఆవులు లేవు.",
+        mod.length > 0 ? `${modNames} మధ్యస్థ ప్రమాదంలో ఉండి 7 నుండి 14 రోజులలో వ్యాధి సోకవచ్చు. ముందస్తు జాగ్రత్తలు తీసుకోండి.` : "",
+      ].filter(Boolean).join(" ");
+    case "Marathi":
+      return [
+        "आणीबाणी अलर्ट सारांश.",
+        high.length > 0 ? `${highNames} गंभीर धोक्यात आहेत. ताबडतोब वेगळे करा आणि डॉक्टरांना बोलवा.` : "कोणतीही गाय गंभीर धोक्यात नाही.",
+        mod.length > 0 ? `${modNames} मध्यम जोखमीत आहेत, 7 ते 14 दिवसांत रोग होऊ शकतो. तातडीने प्रतिबंधात्मक उपाय करा.` : "",
+      ].filter(Boolean).join(" ");
+    case "Gujarati":
+      return [
+        "કટોકટી ચેતવણી સારાંશ.",
+        high.length > 0 ? `${highNames} ગંભીર જોખમમાં છે. તાત્કાલિક અલગ કરો અને ડૉક્ટરને બોલાવો.` : "કોઈ ગાય ગંભીર જોખમમાં નથી.",
+        mod.length > 0 ? `${modNames} મધ્યવર્તી જોખમમાં છે, 7 થી 14 દિવસમાં રોગ થઈ શકે. અત્યારે જ નિવારક ઉપાય કરો.` : "",
+      ].filter(Boolean).join(" ");
+    case "Punjabi":
+      return [
+        "ਐਮਰਜੈਂਸੀ ਚੇਤਾਵਨੀ ਸਾਰ।",
+        high.length > 0 ? `${highNames} ਗੰਭੀਰ ਖ਼ਤਰੇ ਵਿੱਚ ਹਨ। ਤੁਰੰਤ ਵੱਖ ਕਰੋ ਅਤੇ ਡਾਕਟਰ ਨੂੰ ਬੁਲਾਓ।` : "ਕੋਈ ਪਸ਼ੂ ਗੰਭੀਰ ਖ਼ਤਰੇ ਵਿੱਚ ਨਹੀਂ ਹੈ।",
+        mod.length > 0 ? `${modNames} ਦਰਮਿਆਨੇ ਖ਼ਤਰੇ ਵਿੱਚ ਹਨ ਅਤੇ 7 ਤੋਂ 14 ਦਿਨਾਂ ਵਿੱਚ ਬਿਮਾਰੀ ਹੋ ਸਕਦੀ ਹੈ। ਹੁਣੇ ਬਚਾਅ ਕਦਮ ਚੁੱਕੋ।` : "",
+      ].filter(Boolean).join(" ");
+    default:
+      return [
+        "Emergency alerts summary.",
+        high.length > 0 ? `${highNames} ${high.length === 1 ? "is" : "are"} at critical risk with acute mastitis — isolate immediately and call your veterinarian.` : "No animals have acute disease.",
+        mod.length > 0 ? `${modNames} ${mod.length === 1 ? "is" : "are"} in the intermediate danger zone and likely to develop mastitis in 7 to 14 days — apply iodine teat dips and preventive supplements right now.` : "",
+      ].filter(Boolean).join(" ");
+  }
+}

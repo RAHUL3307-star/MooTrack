@@ -13,6 +13,7 @@ import type { Screen } from "../types/index";
 import { t } from "../i18n/index";
 import { useAnimals } from "../context/AnimalsContext";
 import { calculateHerdRisk } from "../services/herdService";
+import { generateAnimalProfileSpeech } from "../i18n/speech";
 
 export function AnimalProfileScreen({
   onBack,
@@ -129,9 +130,11 @@ export function AnimalProfileScreen({
   const isRearAffected = a.quarter.toLowerCase().includes("rear");
   const isFrontAffected = a.quarter.toLowerCase().includes("front");
 
+  const speechText = generateAnimalProfileSpeech(a, lang);
+
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "#F7F4EE", position: "relative" }}>
-      <ReadAloudFAB screen="animal-profile" lang={lang} />
+      <ReadAloudFAB screen="animal-profile" lang={lang} customText={speechText} />
       <div style={{ background: "#FFFFFF" }}>
         <BackHeader
           title={t("animal_profile", lang)}

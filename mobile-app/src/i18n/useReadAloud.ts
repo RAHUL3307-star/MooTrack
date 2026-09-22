@@ -308,7 +308,7 @@ export function useReadAloud(text: string, langName: string) {
         const utt = new SpeechSynthesisUtterance(chunks[idx]);
         utt.lang = fullLocale;
         utt.volume = 1.0;
-        utt.rate = ["ta", "te", "kn"].includes(tl) ? 0.88 : 0.92;
+        utt.rate = ["ta", "te", "kn"].includes(tl) ? 1.0 : 1.05;
         utt.pitch = 1.0;
 
         const allVoices = window.speechSynthesis.getVoices();

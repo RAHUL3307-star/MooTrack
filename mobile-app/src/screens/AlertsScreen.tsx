@@ -8,6 +8,8 @@ import {
 import { RISK_COLOR } from "../types/index";
 import type { Screen, RiskLevel } from "../types/index";
 import { t, sendWhatsAppAlert } from "../i18n/index";
+import { useAnimals } from "../context/AnimalsContext";
+import { generateAlertsSpeech } from "../i18n/speech";
 
 export function AlertsScreen({
   onNavigate,
@@ -133,6 +135,7 @@ export function AlertsScreen({
     },
   ];
 
+  const { animals } = useAnimals();
   const [acknowledged, setAcknowledged] = useState<string[]>([]);
 
   const filteredAlerts = alerts.filter((a) => {
@@ -141,9 +144,11 @@ export function AlertsScreen({
     return true;
   });
 
+  const speechText = generateAlertsSpeech(animals, lang);
+
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "#F7F4EE", position: "relative" }}>
-      <ReadAloudFAB screen="alerts" lang={lang} />
+      <ReadAloudFAB screen="alerts" lang={lang} customText={speechText} />
       <div style={{ background: "#FFFFFF", borderBottom: "1px solid #E0DAD0" }}>
         <div style={{ padding: "12px 16px 10px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>

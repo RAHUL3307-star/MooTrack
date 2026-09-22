@@ -60,10 +60,10 @@ let simulationConfig = {
 };
 
 const SIM_COWS = [
-  { cowId: "KA-001", rfidTag: "E200001938090124", name: "Ganga (Cow 1)", baseTemp: 38.6, basePh: 6.68, baseEc: 5.1, baseWeight: 14.2, baseAct: 58, riskScore: 18, riskTier: "Low" },
-  { cowId: "KA-007", rfidTag: "E200001938090128", name: "Nandini (Cow 2)", baseTemp: 38.85, basePh: 6.78, baseEc: 5.4, baseWeight: 12.6, baseAct: 42, riskScore: 48, riskTier: "Watch" },
-  { cowId: "KA-014", rfidTag: "E200001938090135", name: "Kaveri (Cow 3)", baseTemp: 38.45, basePh: 6.62, baseEc: 4.95, baseWeight: 15.0, baseAct: 62, riskScore: 12, riskTier: "Low" },
-  { cowId: "KA-022", rfidTag: "E200001938090142", name: "Kamadhenu (Cow 4)", baseTemp: 39.45, basePh: 7.15, baseEc: 7.85, baseWeight: 8.4, baseAct: 28, riskScore: 86, riskTier: "Elevated" }
+  { cowId: "KA-001", rfidTag: "E200001938090124", name: "Cow 1", baseTemp: 38.6, basePh: 6.68, baseEc: 5.1, baseWeight: 14.2, baseAct: 58, riskScore: 18, riskTier: "Low" },
+  { cowId: "KA-007", rfidTag: "E200001938090128", name: "Cow 2", baseTemp: 38.85, basePh: 6.78, baseEc: 5.4, baseWeight: 12.6, baseAct: 42, riskScore: 48, riskTier: "Watch" },
+  { cowId: "KA-014", rfidTag: "E200001938090135", name: "Cow 3", baseTemp: 38.45, basePh: 6.62, baseEc: 4.95, baseWeight: 15.0, baseAct: 62, riskScore: 12, riskTier: "Low" },
+  { cowId: "KA-022", rfidTag: "E200001938090142", name: "Cow 4", baseTemp: 39.45, basePh: 7.15, baseEc: 7.85, baseWeight: 8.4, baseAct: 28, riskScore: 86, riskTier: "Elevated" }
 ];
 
 function stepSimulation() {

@@ -11,6 +11,7 @@ import type { Screen, RiskLevel } from "../types/index";
 import { t } from "../i18n/index";
 import { useAnimals } from "../context/AnimalsContext";
 import { calculateHerdRisk } from "../services/herdService";
+import { generateAiRiskSpeech } from "../i18n/speech";
 
 export function AIRiskScreen({
   onBack,
@@ -50,9 +51,11 @@ export function AIRiskScreen({
     if (found) setSelectedAnimal(found);
   };
 
+  const speechText = generateAiRiskSpeech(animal, lang);
+
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "#F7F4EE", position: "relative" }}>
-      <ReadAloudFAB screen="ai-risk" lang={lang} />
+      <ReadAloudFAB screen="ai-risk" lang={lang} customText={speechText} />
       <div style={{ background: "#FFFFFF", borderBottom: "1px solid #E0DAD0" }}>
         <BackHeader title={t("ai_risk_title", lang)} onBack={onBack} />
         {/* Animal Selector Dropdown Bar */}
